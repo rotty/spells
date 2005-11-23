@@ -47,4 +47,9 @@
 ;;@ The identity function, returning @1.
 (define (identity x) x)
 
+
+;;@ Compose two procedures, yielding a procedure of the same arity
+;;  as @2.
+(define (compose f g) (lambda args (f (apply g args))))
+
 ;;; misc.scm ends here
