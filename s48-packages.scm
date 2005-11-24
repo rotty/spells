@@ -62,6 +62,7 @@
         i/o
         closures templates bitwise byte-vectors architecture
         posix-process-data
+        (subset posix-processes (exit))
         threads
         sort)
   (files ((pure all) misc) ((pure scheme48) misc)))
@@ -120,17 +121,20 @@
         spells.pregexp spells.misc spells.file)
   (files file-list))
 
-(define-structure spells.process (export fork
-                                         process-id?
-                                         process-id=?
-                                         process-id->integer
-                                         integer->process-id
-                                         process-id-exit-status
-                                         wait-for-child-process
-                                         exec
-                                         exec-file
-                                         exit)
-  (open posix-processes))
+(define-structure spells.process (export process?
+                                         process-input
+                                         process-output
+                                         process-errors
+                                         spawn-process
+                                         exec-process
+                                         wait-for-process)
+  (open scheme srfi-6 srfi-8 srfi-11 srfi-13
+        posix-processes
+        posix-i/o
+        spells.define-record-type
+        spells.byte-vectors
+        spells.block-io)
+  (files ((pure scheme48) process)))
 
 (define-structure spells.ascii (export char->ascii ascii->char
                                        ascii-limit ascii-whitespaces

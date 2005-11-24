@@ -22,17 +22,11 @@
 
 ;;; Code:
 
-(all-dialects-except mzscheme gauche)
+(define (lines . strings)
+  (values 0 #f (string-join strings (string #\newline) 'suffix)))
 
 (testeez
- "process unit tests"
- (test/eqv "fork"
-           (let ((pid (fork)))
-             (cond (pid
-                    (wait-for-child-process pid)
-                    (process-id-exit-status pid))
-                   (else
-                    (exit 33))))
-           33))
+ "exec-process"
+ (test/equal "echo" (exec-process "echo" "foo") (lines "foo")))
 
 ;;; process.scm ends here
