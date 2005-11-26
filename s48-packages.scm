@@ -47,16 +47,17 @@
         (modify posix-time (prefix posix:)))
   (files ((pure scheme48) srfi-19)))
 
-(define-structure spells.misc (export
-                               identity
-                               eof-object
-                               unspecific
-                               sleep-seconds
-                               thunk?
-                               lookup-environment-variable
-                               sort-list
-                               and-map
-                               or-map)
+(define-structure spells.misc (export identity
+                                      compose
+                                      eof-object
+                                      unspecific
+                                      sleep-seconds
+                                      thunk?
+                                      lookup-environment-variable
+                                      sort-list
+                                      and-map
+                                      or-map
+                                      exit)
   (open scheme srfi-23
         (subset primitives (unspecific eof-object))
         i/o
