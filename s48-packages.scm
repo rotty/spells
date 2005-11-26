@@ -52,6 +52,7 @@
                                eof-object
                                unspecific
                                sleep-seconds
+                               exit
                                thunk?
                                lookup-environment-variable
                                sort-list
@@ -126,7 +127,8 @@
                                          process-output
                                          process-errors
                                          spawn-process
-                                         exec-process
+                                         run-process
+                                         run-process/string
                                          wait-for-process)
   (open scheme srfi-6 srfi-8 srfi-11 srfi-13
         posix-processes

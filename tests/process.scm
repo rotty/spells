@@ -27,6 +27,6 @@
 
 (testeez
  "exec-process"
- (test/equal "echo" (exec-process "echo" "foo") (lines "foo")))
+ (test/equal "echo" (run-process/string "echo" "foo") (lines "foo")))
 
 ;;; process.scm ends here
