@@ -64,11 +64,11 @@
   (lambda x (normalize-path (string-join x *psep*))))
 
 ;; aux function
-(define (make-match-or-empty-proc rx pos)
+(define (make-match-proc rx pos def)
   (let ((rx (pregexp rx)))
     (lambda (f)
       (let ((m (pregexp-match rx f)))
-        (or (and m (list-ref m pos)) "")))))
+        (or (and m (list-ref m pos)) (if def f ""))))))
 
 ;;@ Get the given filename's extension, without the leading dot.
 ;; For instance
@@ -76,7 +76,24 @@
 ;;   (file-extension "foo.bar") => "bar"
 ;; @end example
 (define file-extension
-  (make-match-or-empty-proc ".+(\\.)([^./]*)$" 2))
+  (make-match-proc ".+(\\.)([^./]*)$" 2 #f))
+
+;;@ Return the given filename without extension.
+;; E.g.
+;; @example
+;;   (file-name-sans-extension "/foo/bar/baz.c") => "/foo/bar/baz"
+;; @end example
+(define file-name-sans-extension
+  (make-match-proc "(.+)(\\.[^./]+)$" 1 #t))
+
+;;@ Convenience procedure to substitute a file name's extension.
+(define (replace-extension filename new-extension)
+  (append-extension (file-name-sans-extension filename) new-extension))
+
+;;@ Append extension to file if it has not already got it.
+(define (append-extension f ext)
+  (if (string=? ext (file-extension f)) f (string-append f "." ext)))
+
 
 ;;@ Convenience functions for timestamp comparisons
 (define (file-modification-time< f1 f2) (fmt f1 f2 <))
@@ -84,10 +101,6 @@
 
 (define (fmt f1 f2 pred) (pred (file-modification-time f1)
                                (file-modification-time f2)))
-
-;;@ Append extension to file if it has not already got it.
-(define (append-extension f ext)
-  (if (string=? ext (file-extension f)) f (string-append f "." ext)))
 
 ;;@ Test whether the given pathname is absolute.
 (define (absolute-path? f) (string-prefix? *psep* f))

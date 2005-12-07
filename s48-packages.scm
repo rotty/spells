@@ -75,7 +75,9 @@
                                       file-extension
                                       file-basename
                                       file-dirname
+                                      file-name-sans-extension
                                       append-extension
+                                      replace-extension
                                       file?
                                       directory?
                                       file-is-readable?

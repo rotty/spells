@@ -80,11 +80,32 @@
  (test/equal "file-dirname" (file-dirname "/.foo/./a/.") "/.foo/./a")
  (test/equal "file-dirname" (file-dirname "/") "/")
 
+ (test/equal "file-name-sans-extension"
+   (file-name-sans-extension "foo/.././bar/e.foo") "foo/.././bar/e")
+ (test/equal "file-name-sans-extension"
+   (file-name-sans-extension "foo/.././bar/e.foo/") "foo/.././bar/e.foo/")
+ (test/equal "file-name-sans-extension" (file-name-sans-extension "foo") "foo")
+ (test/equal "file-name-sans-extension" (file-name-sans-extension "foo.bar") "foo")
+ (test/equal "file-name-sans-extension" (file-name-sans-extension "/foo.") "/foo.")
+ (test/equal "file-name-sans-extension"
+   (file-name-sans-extension "a//...foo") "a//..")
+ (test/equal "file-name-sans-extension"
+   (file-name-sans-extension "/.foo/./a/.") "/.foo/./a/.")
+ (test/equal "file-name-sans-extension" (file-name-sans-extension "/") "/")
+
  (test/equal "append-extension" (append-extension "foo" "bar") "foo.bar")
  (test/equal "append-extension" (append-extension "foo.bar" "bar") "foo.bar")
- (test/equal "append-extension" (append-extension "a/b/foo" "bar") "a/b/foo.bar")
+ (test/equal "append-extension"
+   (append-extension "a/b/foo" "bar") "a/b/foo.bar")
  (test/equal "append-extension"
              (append-extension "/foo/foo.bar" "bar") "/foo/foo.bar")
+
+ (test/equal "replace-extension" (replace-extension "foo" "bar") "foo.bar")
+ (test/equal "replace-extension" (replace-extension "foo.bar" "baz") "foo.baz")
+ (test/equal "replace-extension"
+   (replace-extension "a/b/foo.o" "bar") "a/b/foo.bar")
+ (test/equal "replace-extension"
+   (replace-extension "/foo/foo.bar" "qux") "/foo/foo.qux")
 
  (test-define "Current dir" cur (current-directory))
  (test/equal "current-directory"
