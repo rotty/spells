@@ -64,11 +64,11 @@
   (lambda x (normalize-path (string-join x *psep*))))
 
 ;; aux function
-(define (make-match-proc rx pos def)
+(define (make-match-proc rx pos nm-k)
   (let ((rx (pregexp rx)))
     (lambda (f)
       (let ((m (pregexp-match rx f)))
-        (or (and m (list-ref m pos)) (if def f ""))))))
+        (or (and m (list-ref m pos)) (nm-k f))))))
 
 ;;@ Get the given filename's extension, without the leading dot.
 ;; For instance
@@ -76,7 +76,7 @@
 ;;   (file-extension "foo.bar") => "bar"
 ;; @end example
 (define file-extension
-  (make-match-proc ".+(\\.)([^./]*)$" 2 #f))
+  (make-match-proc ".+(\\.)([^./]*)$" 2 (lambda (f) "")))
 
 ;;@ Return the given filename without extension.
 ;; E.g.
@@ -84,7 +84,7 @@
 ;;   (file-name-sans-extension "/foo/bar/baz.c") => "/foo/bar/baz"
 ;; @end example
 (define file-name-sans-extension
-  (make-match-proc "(.+)(\\.[^./]+)$" 1 #t))
+  (make-match-proc "(.+)(\\.[^./]+)$" 1 (lambda (f) f)))
 
 ;;@ Convenience procedure to substitute a file name's extension.
 (define (replace-extension filename new-extension)
