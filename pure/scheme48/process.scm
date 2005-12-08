@@ -79,4 +79,46 @@
      (receive (status signal) (wait-for-process process)
        (values status signal result))))
 
+(define (open-process-input prog . args)
+  (receive (in-in in-out) (open-pipe)
+    (let ((id (fork)))
+      (cond (id
+             (close-input-port in-in)
+             in-out)
+            (else
+             (close-output-port in-out)
+             (remap-file-descriptors! in-in #f #f)
+             (apply exec prog args))))))
+
+(define (open-process-output prog . args)
+  (receive (out-in out-out) (open-pipe)
+    (let ((id (fork)))
+      (cond (id
+             (close-output-port out-out)
+             out-in)
+            (else
+             (close-input-port out-in)
+             (remap-file-descriptors! #f out-out #f)
+             (apply exec prog args))))))
+
+(define (call-with-process-output prog+args receiver)
+  (let ((port (apply open-process-output prog+args)))
+    (receive results (receiver port)
+      (close-input-port port)
+      (apply values results))))
+
+(define (port->lines port)
+  (unfold eof-object? values (lambda (seed) (read-line port)) (read-line port)))
+
+(define (port->sexps port)
+  (unfold eof-object? values (lambda (seed) (read port)) (read port)))
+
+(define (run-process/lines prog . args)
+  (call-with-process-output (cons prog args)
+    port->lines))
+
+(define (run-process/sexps prog . args)
+  (call-with-process-output (cons prog args)
+    port->sexps))
+
 ;;; process.scm ends here

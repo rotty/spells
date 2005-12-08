@@ -132,13 +132,15 @@
                                          spawn-process
                                          run-process
                                          run-process/string
+                                         run-process/lines
+                                         run-process/sexps
                                          wait-for-process)
-  (open scheme srfi-6 srfi-8 srfi-11 srfi-13
+  (open scheme srfi-1 srfi-6 srfi-8 srfi-11 srfi-13
         posix-processes
         posix-i/o
         spells.define-record-type
         spells.byte-vectors
-        spells.block-io)
+        spells.delimited-readers)
   (files ((pure scheme48) process)))
 
 (define-structure spells.ascii (export char->ascii ascii->char
