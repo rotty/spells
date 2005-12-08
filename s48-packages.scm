@@ -330,12 +330,11 @@
   (open scheme ports (subset primitives (eof-object))
         srfi-8
         srfi-13
-	(subset srfi-14 (char-set x->char-set char-set-contains?))
+        srfi-14
 	spells.byte-vectors
         spells.error
 	spells.ascii
-        spells.opt-args
-        spells.pregexp)
+        spells.opt-args)
   (files ((pure scheme48) delimited-readers)))
 
 (define-structure spells.define-record-type spells.define-record-type-interface

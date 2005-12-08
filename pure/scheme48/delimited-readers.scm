@@ -94,7 +94,8 @@
 ;;; (read-paragraph [port handle-delim])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define blank-line-regexp (pregexp "^[[:white:]]*\\n$"))
+(define (blank-line? line)
+  (string-every char-set:whitespace line))
 
 (define (read-paragraph . args)
   (let-optionals* args ((port         (current-input-port))
@@ -105,14 +106,14 @@
 	(cond ((eof-object? line)
 	       (if (eq? handle-delim 'split) (values line line) line))
 
-	      ((pregexp-match-positions blank-line-regexp line) (lp))
+	      ((blank-line? line) (lp))
               
 	      ;; Then, read in non-blank lines.
 	      (else
 	       (let lp ((lines (list line)))
 		 (let ((line (read-line port 'concat)))
 		   (if (and (string? line)
-			    (not (pregexp-match-positions blank-line-regexp line)))
+			    (not (blank-line? line)))
 
 		       (lp (cons line lines))
 
