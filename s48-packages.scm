@@ -10,7 +10,8 @@
 (define-structure spells.opt-args (export ((define/named-args
                                              define/optional-args
                                              let-optionals*
-                                             :optional)
+                                             :optional
+                                             opt-lambda)
                                              :syntax))
   (open scheme spells.error)
   (files opt-args))
