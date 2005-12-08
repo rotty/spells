@@ -1,13 +1,6 @@
-(define (u8vector->list vec)
-  (let loop ((i (- (u8vector-length vec) 1))
-             (result '()))
-    (if (< i 0)
-        result
-        (loop (- i 1) (cons (u8vector-ref vec i) result)))))
+;; Additional operations from SRFI-66, not defined SRFI-4
 
-(define (list->u8vector lst)
-  (apply u8vector lst))
-
+;; Code from SRFI-66 reference implementation (c) Michael Sperber (2005)
 (define (u8vector-copy! source source-start target target-start count)
   (if (>= source-start target-start)
       (do ((i 0 (+ i 1)))
@@ -32,8 +25,8 @@
     (and (= size (u8vector-length u8vector-2))
 	 (let loop ((i 0))
 	   (or (>= i size)
-	       (and (= (u8vector-ref u8vector-1)
-		       (u8vector-ref u8vector-2))
+	       (and (= (u8vector-ref u8vector-1 i)
+		       (u8vector-ref u8vector-2 i))
 		    (loop (+ 1 i))))))))
 
 (define (u8vector-compare u8vector-1 u8vector-2)

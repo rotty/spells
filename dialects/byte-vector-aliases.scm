@@ -1,4 +1,3 @@
-
 ;; Define byte-vectors in terms of SRFI-4 (or SRFI-66)
 (define make-byte-vector make-u8vector)
 (define byte-vector u8vector)

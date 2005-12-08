@@ -22,6 +22,7 @@
 
 (("assert.scm" spells.assert)
  ("condition.scm" spells.condition)
+ ("cut.scm" spells.cut)
  ("file-attr.scm" spells.file spells.misc)
  ("file-list.scm" spells.file-list spells.file spells.misc)
  ("port.scm" spells.port srfi-6)
@@ -32,10 +33,9 @@
  ("misc.scm" spells.misc)
  ("opt-args.scm" spells.opt-args)
  ("parameter.scm" spells.parameter)
- ("process.scm" spells.process)
+ ;;("process.scm" spells.process)
  ("table.scm" spells.table)
  ("blobs.scm" spells.blobs)
- ("delimited-readers.scm" spells.delimited-readers spells.misc srfi-6 srfi-13)
- )
+ ("delimited-readers.scm" spells.delimited-readers spells.misc srfi-6 srfi-13))
 
 ;;; tests.scm ends here

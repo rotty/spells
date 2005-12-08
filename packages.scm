@@ -321,7 +321,21 @@
   (open scheme)
   (dialect (scheme48 (open byte-vectors))
            (else (open srfi-4)))
+  (dialect (guile (re-export make-u8vector
+                             u8vector
+                             u8vector?
+                             u8vector-length
+                             u8vector-ref
+                             u8vector-set!
+                             u8vector->list
+                             list->u8vector)))
   (files byte-vectors))
+
+;;@ SRFI 26
+(define-structure spells.cut (export ((cut cute) :syntax))
+  (dialect (guile (open scheme))
+           (else (open srfi-26)))
+  (files cut))
 
 ;;@ SRFI 74
 ;;
@@ -378,7 +392,7 @@
                                        blob->sint-list
                                        uint-list->blob
                                        sint-list->blob)
-  (open scheme srfi-26 spells.byte-vectors spells.error spells.bitwise)
+  (open scheme spells.cut spells.byte-vectors spells.error spells.bitwise)
   (files blobs))
 
 ;;; packages.scm ends here
