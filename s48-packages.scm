@@ -193,8 +193,8 @@
   (open scheme)
   (files alist))
 
-(define-structure spells.pretty-print (export pretty-print)
-  (open pp))
+(define-structure spells.pretty-print (export pretty-print pp)
+  (open (modify pp (rename (p pp)))))
 
 (define-structure spells.cells (export make-cell
                                        cell?
