@@ -7,6 +7,9 @@
 (define-structure spells.format (export format)
   (open formats))
 
+(define-structure spells.cut (export ((cut cute) :syntax))
+  (open srfi-26))
+
 (define-structure spells.opt-args (export ((define/named-args
                                              define/optional-args
                                              let-optionals*

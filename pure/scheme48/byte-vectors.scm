@@ -12,6 +12,14 @@
 (define u8vector-ref byte-vector-ref)
 (define u8vector-set! byte-vector-set!)
 
-(scmxlate-include "srfi-66-ops.scm")
+(define (u8vector->list vec)
+  (let loop ((i (- (u8vector-length vec) 1))
+             (result '()))
+    (if (< i 0)
+        result
+        (loop (- i 1) (cons (u8vector-ref vec i) result)))))
+
+(define (list->u8vector lst)
+  (apply u8vector lst))
 
 ;; arch-tag: c50ab679-3546-4b9c-a383-6d2758ee7ef9
