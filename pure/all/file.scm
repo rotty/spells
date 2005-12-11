@@ -127,7 +127,7 @@
     (fold (lambda (new path)
             (let ((new-dir (string-append path *psep* new)))
               (make-directory! new-dir) new-dir))
-          "."
+          (if (absolute-path? dir) "" ".")
           subdirs)))
 
 ;;; Finding files:
