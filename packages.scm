@@ -42,13 +42,15 @@
 (define-structure spells.define-values (export ((define-values)
                                                 :syntax))
   (dialect (scheme48 (for-syntax (open scheme srfi-1 destructuring))))
-  (dialect (scheme48 (open scheme srfi-8 primitives))))
+  (dialect (scheme48 (open scheme srfi-8 primitives)))
+  (files define-values))
 
 ;;@ Optional and named arguments.
 (define-structure spells.opt-args (export ((define/named-args
                                              define/optional-args
                                              let-optionals*
-                                             :optional)
+                                             :optional
+                                             opt-lambda)
                                              :syntax))
   (open scheme spells.error)
   (dialect (mzscheme (open (lib "defmacro.ss")))
@@ -114,9 +116,10 @@
                                        cell?
                                        cell-ref
                                        cell-set!)
-  (dialect (scheme48 (open cells))))
+  (dialect (scheme48 (open cells)))
+  (files cells))
 
-;;@ Weak pointers and populations.
+;;@ Weak pointers.
 (define-structure spells.weak (export make-weak-pointer
                                       weak-pointer?
                                       weak-pointer-ref
@@ -129,7 +132,8 @@
   (dialect (scheme48 (open weak)))
   (files weak))
 
-;;@ Union of Scheme 48 byte-vectors and SRFI-66. Once SRFI-66 is
+;;@ Union of Scheme 48 byte-vectors and
+;; @uref{http://srfi.schemers.org/srfi-66/srfi-66.html, SRFI-66}. Once SRFI-66 is
 ;; finalized, and Scheme 48 implements it, the plan is to remove the
 ;; byte-vector aliases.
 (define-structure spells.byte-vectors (export make-byte-vector
@@ -231,9 +235,10 @@
   (files format))
 
 ;;@ A simple pretty-printer for S-expressions.
-(define-structure spells.pretty-print (export pretty-print)
+(define-structure spells.pretty-print (export pp)
   (open scheme)
-  (dialect (scheme48 (open pp))))
+  (dialect (scheme48 (open pp)))
+  (files pretty-print))
 
 ;;@ ASCII encoding utilities.
 (define-structure spells.ascii (export char->ascii ascii->char
@@ -256,65 +261,6 @@
   (open scheme srfi-1 spells.error)
   (files pregexp))
 
-;;; @subsection Unclassified
-
-;;@ Bitwise arithmetic.
-(define-structure spells.bitwise (export bitwise-and bitwise-ior bitwise-xor
-                                         bitwise-not
-                                         arithmetic-shift
-                                         ;;bit-count
-                                         )
-  (open scheme)
-  (dialect (scheme48 (open bitwise))))
-
-
-;; Assert the truth of an expression.
-(define-structure spells.assert (export ((assert) :syntax) cerr cout)
-  (open scheme
-        spells.error
-        spells.port)
-  (dialect (guile (open ice-9.syncase)))
-  (files assert))
-
-;;@ Hash functions.
-(define-structure spells.hash (export descriptor-hash gc-stamp)
-  (open scheme)
-  (dialect (scheme48 (open (subset primitives (memory-status))
-                           (subset architecture (memory-status-option))
-                           enumerated)))
-  (files hash))
-
-;;@ Stuff that doesn't fit somewhere else.
-(define-structure spells.misc (export
-                               identity
-                               eof-object
-                               unspecific
-                               sleep-seconds
-                               thunk?
-                               lookup-environment-variable
-                               sort-list
-                               and-map
-                               or-map)
-  (open scheme)
-  (dialect (guile (re-export thunk? and-map or-map sort-list))
-           (mzscheme (open (lib "list.ss")))
-           (scheme48 (open srfi-23
-                           (subset primitives (unspecific eof-object))
-                           i/o
-                           closures templates bitwise byte-vectors architecture
-                           posix-process-data
-                           threads
-                           sort)))
-  (files misc))
-
-;;@ Jens Axel Sogaard's @code{syntax-rules}-based pattern matcher
-(define-structure spells.match (export ((match match-lambda
-                                          match-let match-let*
-                                          match-define-values)
-                                        :syntax))
-  (open scheme spells.define-values)
-  (files match))
-
 ;;; @subsection Input/Output
 
 ;;@ Port utilities.
@@ -335,7 +281,8 @@
 ;;@ Read and write blocks of data on ports.
 (define-structure spells.block-io (export read-block write-block write-string)
   (open scheme)
-  (dialect (scheme48 (open i/o))))
+  (dialect (scheme48 (open i/o)))
+  (files block-io))
 
 
 ;;; @subsection Operating system interface
@@ -416,6 +363,66 @@
   (dialect (scheme48 (open posix-processes))
            (guile (re-export exit)))
   (files process))
+
+;;; @subsection Unclassified
+
+;;@ Bitwise arithmetic.
+(define-structure spells.bitwise (export bitwise-and bitwise-ior bitwise-xor
+                                         bitwise-not
+                                         arithmetic-shift
+                                         ;;bit-count
+                                         )
+  (open scheme)
+  (dialect (scheme48 (open bitwise)))
+  (files bitwise))
+
+
+;; Assert the truth of an expression.
+(define-structure spells.assert (export ((assert) :syntax) cerr cout)
+  (open scheme
+        spells.error
+        spells.port)
+  (dialect (guile (open ice-9.syncase)))
+  (files assert))
+
+;;@ Hash functions.
+(define-structure spells.hash (export descriptor-hash gc-stamp)
+  (open scheme)
+  (dialect (scheme48 (open (subset primitives (memory-status))
+                           (subset architecture (memory-status-option))
+                           enumerated)))
+  (files hash))
+
+;;@ Stuff that doesn't fit somewhere else.
+(define-structure spells.misc (export
+                               identity
+                               eof-object
+                               unspecific
+                               sleep-seconds
+                               thunk?
+                               lookup-environment-variable
+                               sort-list
+                               and-map
+                               or-map)
+  (open scheme)
+  (dialect (guile (re-export thunk? and-map or-map sort-list))
+           (mzscheme (open (lib "list.ss")))
+           (scheme48 (open srfi-23
+                           (subset primitives (unspecific eof-object))
+                           i/o
+                           closures templates bitwise byte-vectors architecture
+                           posix-process-data
+                           threads
+                           sort)))
+  (files misc))
+
+;;@ Jens Axel Sogaard's @code{syntax-rules}-based pattern matcher
+(define-structure spells.match (export ((match match-lambda
+                                          match-let match-let*
+                                          match-define-values)
+                                        :syntax))
+  (open scheme spells.define-values)
+  (files match))
 
 ;;; packages.scm ends here
 

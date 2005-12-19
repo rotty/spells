@@ -1,9 +1,17 @@
 ; Copyright (c) 1993-2005 by Richard Kelsey and Jonathan Rees. See
 ; file COPYING.scheme48.
 
+;;@ Create a weak pointer.
 (define (make-weak-pointer) (proc-to-be-defined))
-(define (weak-pointer-ref) (proc-to-be-defined))
-(define (weak-pointer?) (proc-to-be-defined))
+
+;;@ Return the value contained in @1, or @code{#f} if the value was
+;; garbage collected.
+(define (weak-pointer-ref weak-pointer) (proc-to-be-defined))
+
+;;@ Disjoint type predicate.
+(define (weak-pointer? thing) (proc-to-be-defined))
+
+;;@stop
 
 (define (make-population)
   (list '<population>))

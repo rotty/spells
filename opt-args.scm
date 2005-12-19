@@ -175,6 +175,13 @@
 ; This has the same interface as the OPT-LAMBDA in PLT Scheme's etc.ss
 ; library.
 
+;;@args clause...
+;;
+;; Macro that creates a procedure with default arguments. Each clause
+;; can either be an identifier, which names a variable like in regular
+;; @code{lambda}. It can also be of the form @code{(name value)},
+;; which creates an optional argument @code{name} with the default
+;; value @code{value}.
 (define-syntax opt-lambda
   (syntax-rules ()
     ((opt-lambda (?clause1 . ?clauses) ?body1 ?body ...)
