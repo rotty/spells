@@ -286,6 +286,19 @@
 
 
 ;;; @subsection Operating system interface
+;;@ Miscellaneous procedures providing access to various bits of
+;; information regarding the host running the scheme implementation.
+(define-structure spells.sysutils (export lookup-environment-variable
+                                          current-process-environment
+                                          extend-process-environment
+                                          os-name
+                                          os-node-name
+                                          os-release-name
+                                          os-version-name
+                                          machine-name)
+  (open scheme srfi-1)
+  (dialect (scheme48 (open posix-process-data posix-platform-names)))
+  (files sysutils))
 
 ;;@ File system interface.
 (define-structure spells.file (export make-path
@@ -323,7 +336,7 @@
                                        :syntax)
                                       call-with-file-and-dir)
   (open scheme srfi-1 srfi-13 srfi-16
-        spells.error spells.pregexp spells.misc)
+        spells.error spells.pregexp spells.sysutils spells.misc)
   (dialect (scheme48 (open srfi-14 sort posix threads byte-vectors i/o)
                      (for-syntax (open scheme destructuring)))
            (mzscheme (language scheme)
@@ -400,7 +413,6 @@
                                unspecific
                                sleep-seconds
                                thunk?
-                               lookup-environment-variable
                                sort-list
                                and-map
                                or-map)

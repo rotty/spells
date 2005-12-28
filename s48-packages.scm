@@ -57,7 +57,6 @@
                                       unspecific
                                       sleep-seconds
                                       thunk?
-                                      lookup-environment-variable
                                       sort-list
                                       and-map
                                       or-map
@@ -71,6 +70,19 @@
         threads
         sort)
   (files ((pure all) misc) ((pure scheme48) misc)))
+
+(define-structure spells.sysutils (export lookup-environment-variable
+                                          current-process-environment
+                                          extend-process-environment
+                                          os-name
+                                          os-node-name
+                                          os-release-name
+                                          os-version-name
+                                          machine-name)
+  ;; note: it should be POSIX-PLATFORM-NAMES instead of POSIX, but
+  ;; for some reason s48 does not recognise the former structure name
+  (open scheme srfi-1 posix-process-data posix)
+  (files ((pure all) sysutils) ((pure scheme48) sysutils)))
 
 (define-structure spells.file (export make-path
                                       normalize-path
@@ -110,7 +122,7 @@
                                       call-with-file-and-dir)
   (for-syntax (open scheme destructuring))
   (open scheme srfi-1 srfi-13 srfi-16
-        spells.error spells.pregexp spells.misc
+        spells.error spells.pregexp spells.sysutils spells.misc
         srfi-14 sort posix threads byte-vectors i/o)
   (files ((pure all) file) ((pure scheme48) file)))
 

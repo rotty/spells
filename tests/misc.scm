@@ -1,4 +1,4 @@
-;; misc.scm -- Unit tests for spells.util.misc
+;; misc.scm -- Unit tests for spells.misc
 ;; arch-tag: 4822bd68-4e16-4bbd-bca4-42277a933717
 
 ;; Copyright (C) 2005 by Free Software Foundation, Inc.

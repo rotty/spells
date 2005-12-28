@@ -1,4 +1,4 @@
-;; util.misc.scm -- Misc utilites for s48
+;; misc.scm -- Misc utilites for s48
 ;; arch-tag: 831aead4-d7a6-4a4f-b088-d86da641f130
 
 ;; Copyright (C) 2005 by Free Software Foundation, Inc.
@@ -23,6 +23,6 @@
 
 ;;; Code:
 
-(scmxlate-ignore-define sort-list lookup-environment-variable eof-object)
+(scmxlate-ignore-define sort-list eof-object)
 
-;;; util.misc.scm ends here
+;;; misc.scm ends here

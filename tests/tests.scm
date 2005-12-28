@@ -29,6 +29,7 @@
  ;;("file-traversal.scm" spells.file)
  ("file-write.scm" spells.file)
  ("file.scm" spells.file)
+ ("sysutils.scm" spells.sysutils)
  ("format.scm" spells.format)
  ("misc.scm" spells.misc)
  ("opt-args.scm" spells.opt-args)

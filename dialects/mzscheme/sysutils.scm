@@ -1,6 +1,3 @@
-;; misc.scm -- Misc utilites for Gauche
-;; arch-tag: 8a9e4047-8b99-470f-8434-42cca2087944
-
 ;; Copyright (C) 2005 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -21,11 +18,6 @@
 ;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 ;; 02110-1301, USA.
 
-;;; Code:
+(define lookup-environment-variable getenv)
 
-(define sort-list sort)
-(define sleep-seconds sys-sleep)
-(define (thunk? p) (and (procedure? p) (procedure-arity-includes? p 0)))
-
-
-;;; misc.scm ends here
+;;; sysutils.scm ends here

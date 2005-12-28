@@ -33,7 +33,6 @@
 (define (thunk? p) (and (procedure? p) (procedure-arity-includes? p 0)))
 (define and-map andmap)
 (define or-map ormap)
-(define lookup-environment-variable getenv)
 (define (eof-object) eof)
 
 ;;; util.misc.scm ends here

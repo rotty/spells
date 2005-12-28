@@ -38,10 +38,6 @@
 ;; arguments.
 (define (thunk? p) (proc-to-be-defined))
 
-;;@ Returns the value of the environment variable @1 or #f if the
-;; variable is not set.
-(define (lookup-environment-variable str) (proc-to-be-defined))
-
 ;;@ Returns the `unspecific' value, as normally returned by e.g. code
 ;; @code{(if #f #f)}.
 (define (unspecific) (proc-to-be-defined))
