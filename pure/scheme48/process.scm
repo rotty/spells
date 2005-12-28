@@ -34,7 +34,12 @@
   (output process-output)
   (errors process-errors))
 
-(define (spawn-process prog . args)
+
+(define (env->strlist env)
+  (and (list? env)
+       (map (lambda (e) (string-append (car e) "=" (cdr e))) env)))
+
+(define (spawn-process env prog . args)
   (let-values (((in-in in-out) (open-pipe))
                ((out-in out-out) (open-pipe))
                ((err-in err-out) (open-pipe)))
@@ -46,7 +51,7 @@
              (make-process id in-out out-in err-in))
             (else
              (remap-file-descriptors! in-in out-out err-out)
-             (apply exec prog args))))))
+             (exec-with-alias prog #t (env->strlist env) (cons prog args)))))))
 
 (define (wait-for-process process)
   (wait-for-child-process (process-pid process))
@@ -58,17 +63,17 @@
   (close-output-port (process-input process))
   (close-input-port (process-errors process)))
 
-(define (run-process prog . args)
+(define (run-process env prog . args)
   (let ((id (fork)))
     (cond (id
            (wait-for-child-process id)
            (values (process-id-exit-status id)
                    (process-id-terminating-signal id)))
           (else
-           (apply exec prog args)))))
+           (exec-with-alias prog #t (env->strlist env) (cons prog args))))))
 
-(define (run-process/string prog . args)
-  (let* ((process (apply spawn-process prog args))
+(define (run-process/string env prog . args)
+  (let* ((process (apply spawn-process (cons env (cons prog args))))
          (output (process-output process))
          (result (string-unfold eof-object?
                                 values
@@ -79,7 +84,7 @@
      (receive (status signal) (wait-for-process process)
        (values status signal result))))
 
-(define (open-process-input prog . args)
+(define (open-process-input env prog . args)
   (receive (in-in in-out) (open-pipe)
     (let ((id (fork)))
       (cond (id
@@ -88,9 +93,9 @@
             (else
              (close-output-port in-out)
              (remap-file-descriptors! in-in #f #f)
-             (apply exec prog args))))))
+             (exec-with-alias prog #t (env->strlist env) (cons prog args)))))))
 
-(define (open-process-output prog . args)
+(define (open-process-output env prog . args)
   (receive (out-in out-out) (open-pipe)
     (let ((id (fork)))
       (cond (id
@@ -99,10 +104,10 @@
             (else
              (close-input-port out-in)
              (remap-file-descriptors! #f out-out #f)
-             (apply exec prog args))))))
+             (exec-with-alias prog #t (env->strlist env) (cons prog args)))))))
 
-(define (call-with-process-output prog+args receiver)
-  (let ((port (apply open-process-output prog+args)))
+(define (call-with-process-output env prog+args receiver)
+  (let ((port (apply open-process-output env prog+args)))
     (receive results (receiver port)
       (close-input-port port)
       (apply values results))))
@@ -113,12 +118,12 @@
 (define (port->sexps port)
   (unfold eof-object? values (lambda (seed) (read port)) (read port)))
 
-(define (run-process/lines prog . args)
-  (call-with-process-output (cons prog args)
+(define (run-process/lines env prog . args)
+  (call-with-process-output (cons env (cons prog args))
     port->lines))
 
-(define (run-process/sexps prog . args)
-  (call-with-process-output (cons prog args)
+(define (run-process/sexps env prog . args)
+  (call-with-process-output (cons env (cons prog args))
     port->sexps))
 
 ;;; process.scm ends here
