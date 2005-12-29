@@ -27,6 +27,9 @@
 
 (testeez
  "exec-process"
- (test/equal "echo" (run-process/string #f "echo" "foo") (lines "foo")))
+ (test/equal "echo" (run-process/string #f "echo" "foo") (lines "foo"))
+ (test/equal "env"
+   (run-process/string '(("FOO" . "bar")) "/usr/bin/env")
+   (lines "FOO=bar")))
 
 ;;; process.scm ends here
