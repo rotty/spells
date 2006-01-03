@@ -1,0 +1,74 @@
+Spells -- A Scheme portability library
+===========================================================
+
+Spells stands for (S)pell's a (P)ortability (E)nvironment (L)ibrary
+for (L)ots of (S)chemes. It provides access to functionality commonly
+available on Scheme implementations, but not standardized by R5RS. It
+also implements some SRFIs on implementations that don't have
+them. 
+
+The "native" implementation of Spells is Scheme 48; the idea is that
+when you develop your code with Scheme 48, and only use the interfaces
+provided by R5RS and Spells (and possibly some widely-implemented
+SRFIs), all porting effort will be restricted to Spells; you won't
+need to touch your code to make it run on say, MzScheme.
+
+Status
+======
+
+Currently, spells is actively developed and there is some code ported
+to it:
+
+* Testeez[0], a unit testing framework
+* Prometheus[1], a Self-like object system
+* SSAX[2], the (S)XML parsing and manipulation framework
+* Andy Wingo's texinfo processing package[3]
+
+Historical bits
+===============
+
+The history of Spells, albeit short, is already twisted enough to be
+worth telling a word or two about:
+
+When Conjure[4] development started, one of the goals was a portable
+(across several Scheme implementations) implementation. Jao came up
+with portabilty system involving scmxlate[5], where one would put
+module declarations into dialect-specific files; but still had the
+list of exported names in each module's code. 
+
+When Rotty then thought about porting the bits of Conjure that existed
+at that time to Scheme 48, he realized that Jao's method wouldn't work
+out with the Scheme 48 fancy module system. Eventually, it was decided
+that the best way to go would be to implement a translator from an
+extended subset of the Scheme 48 module system language to each
+supported implementations native module system. This worked out
+nicely, but the need for the translation (which was necessary even for
+Scheme 48, since it was an *extended* subset) was unfortunate. Well,
+this translation framework, plus the library bits of the Conjure code
+was named Spells.
+
+When Jao finally decided to use Scheme 48 as his primary development
+platform (and defer Conjure's portability goal during initial
+development), it was clear that the dependency scmxlate (besides
+scmxlate being not very nice code ;) could and should be done away
+with. Hence, currently, Spells has two module language files:
+packages.scm is written in the extended subset understood by the
+scmxlate-based translator, and s48-packages.scm is directly usable
+from Scheme 48. These two share the interface definitions
+(interfaces.scm). Since Spells and Conjure development currently only
+takes place on Scheme 48, other Schemes will fall behind and bitrot;
+given the limited manpower, it seemed a better decision to move
+forward fast on one implementation and do the porting work later.
+
+Footnotes
+=========
+
+[0] http://www.neilvandyke.org/testeez/
+[1] http://www.forcix.cx/software/prometheus.html
+[2] http://ssax.sourceforge.net/
+[3] http://wingolog.org/software/guile-lib/
+[4] http://home.gna.org/conjure/
+[5] http://www.ccs.neu.edu/home/dorai/scmxlate/scmxlate.html
+
+--
+Andreas Rottmann <a.rottmann@gmx.at>, 2006-01-03

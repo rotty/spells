@@ -1,0 +1,26 @@
+* Language facilities
+
+- spells.opt-args: Clean up.
+
+  There's no need to have so many optional argument macros (except to
+  support legacy code).
+
+* Operating system interface
+
+- spells.file: Rework, based on Riastradh's filesys proposal.
+- spells.file-list: Remove?
+- spells.pathname: Implement, based on Riastradh's pathname proposal.
+
+* Text-related
+
+- spells.ascii
+
+   Make clear that "ascii" can in fact be an unspecified
+   extension of ASCII (i.e. Latin-1 for Scheme 48).
+
+* Documentation
+
+Documentation is missing for these structures:
+
+match, define-values, cells, weak, byte-vectors, blobs, pretty-print,
+bitwise, block-io, process

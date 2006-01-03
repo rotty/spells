@@ -1,7 +1,7 @@
 ;; packages.scm -- Utility packages
 ;; arch-tag: C324DB01-215B-4644-8C05-902E3404AAEA
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005-2006 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>
 ;; Start date: Fri May 27, 2005 23:40
@@ -30,8 +30,7 @@
 ;;; @subsection Language facilities
 
 ;;@ @uref{http://srfi.schemers.org/srfi-39/srfi-39.html, SRFI 39} - Parameter objects.
-(define-structure spells.parameter (export make-parameter
-                                           ((parameterize) :syntax))
+(define-structure spells.parameter spells.srfi-39-interface
   (open scheme)
   (dialect (scheme48 (open srfi-39))
            (guile (open srfi-39)))
@@ -46,12 +45,7 @@
   (files define-values))
 
 ;;@ Optional and named arguments.
-(define-structure spells.opt-args (export ((define/named-args
-                                             define/optional-args
-                                             let-optionals*
-                                             :optional
-                                             opt-lambda)
-                                             :syntax))
+(define-structure spells.opt-args spells.opt-args-interface
   (open scheme spells.error)
   (dialect (mzscheme (open (lib "defmacro.ss")))
            (guile (open ice-9.optargs)))
@@ -93,12 +87,7 @@
 ;;; @subsection Data structures
 
 ;;@ Simple hash tables.
-(define-structure spells.table (export make-table
-                                       table?
-                                       table-ref
-                                       table-set!
-                                       table-walk
-                                       table->alist)
+(define-structure spells.table spells.table-interface
   (open scheme srfi-16)
   (dialect (scheme48 (open srfi-23
                            (modify tables (prefix s48:))))
@@ -112,22 +101,12 @@
 
 
 ;;@ Mutable cells.
-(define-structure spells.cells (export make-cell
-                                       cell?
-                                       cell-ref
-                                       cell-set!)
+(define-structure spells.cells spells.cells-interface
   (dialect (scheme48 (open cells)))
   (files cells))
 
 ;;@ Weak pointers.
-(define-structure spells.weak (export make-weak-pointer
-                                      weak-pointer?
-                                      weak-pointer-ref
-                                      
-                                      make-population
-                                      add-to-population!
-                                      population->list
-                                      walk-population)
+(define-structure spells.weak spells.weak-interface
   (open scheme)
   (dialect (scheme48 (open weak)))
   (files weak))
@@ -136,25 +115,7 @@
 ;; @uref{http://srfi.schemers.org/srfi-66/srfi-66.html, SRFI-66}. Once SRFI-66 is
 ;; finalized, and Scheme 48 implements it, the plan is to remove the
 ;; byte-vector aliases.
-(define-structure spells.byte-vectors (export make-byte-vector
-                                              byte-vector
-                                              byte-vector?
-                                              byte-vector-length
-                                              byte-vector-ref
-                                              byte-vector-set!
-
-                                              make-u8vector
-                                              u8vector
-                                              u8vector?
-                                              u8vector-length
-                                              u8vector-ref
-                                              u8vector-set!
-                                              u8vector->list
-                                              list->u8vector
-                                              u8vector=?
-                                              u8vector-compare
-                                              u8vector-copy!
-                                              u8vector-copy)
+(define-structure spells.byte-vectors spells.byte-vectors-interface
   (open scheme)
   (dialect (scheme48 (open byte-vectors))
            (else (open srfi-4)))
@@ -170,57 +131,7 @@
 
 ;; @uref{http://srfi.schemers.org/srfi-74/srfi-74.html, SRFI 74} -
 ;; Octet-Addressed Binary Blocks.
-(define-structure spells.blobs (export ((endianness) :syntax)
-                                       blob?
-                                       make-blob
-                                       blob-length
-                                       
-                                       blob-u8-ref
-                                       blob-s8-ref
-                                       blob-u8-set!
-                                       blob-s8-set!
-                                       
-                                       blob-uint-ref
-                                       blob-sint-ref
-                                       blob-uint-set!
-                                       blob-sint-set!
-                                       
-                                       blob-u16-ref
-                                       blob-s16-ref
-                                       blob-u16-native-ref
-                                       blob-s16-native-ref
-                                       blob-u16-set!
-                                       blob-s16-set!
-                                       blob-u16-native-set! 
-                                       blob-s16-native-set! 
-                                       
-                                       blob-u32-ref
-                                       blob-s32-ref
-                                       blob-u32-native-ref
-                                       blob-s32-native-ref
-                                       blob-u32-set!
-                                       blob-s32-set!
-                                       blob-u32-native-set! 
-                                       blob-s32-native-set! 
-                                       
-                                       blob-u64-ref
-                                       blob-s64-ref
-                                       blob-u64-native-ref
-                                       blob-s64-native-ref
-                                       blob-u64-set!
-                                       blob-s64-set!
-                                       blob-u64-native-set! 
-                                       blob-s64-native-set! 
-                                       
-                                       blob=?
-                                       blob-copy!
-                                       blob-copy
-                                       blob->u8-list
-                                       u8-list->blob
-                                       blob->uint-list
-                                       blob->sint-list
-                                       uint-list->blob
-                                       sint-list->blob)
+(define-structure spells.blobs spells.blob-interface
   (open scheme spells.cut spells.byte-vectors spells.error spells.bitwise)
   (files blobs))
 
@@ -241,10 +152,7 @@
   (files pretty-print))
 
 ;;@ ASCII encoding utilities.
-(define-structure spells.ascii (export char->ascii ascii->char
-                                       ascii-limit ascii-whitespaces
-                                       ascii-upper? ascii-lower?
-                                       ascii-uppercase ascii-lowercase)
+(define-structure spells.ascii spells.ascii-interface
   (open scheme)
   (dialect (scheme48 (open ascii)))
   (files ascii))
@@ -252,25 +160,14 @@
 ;;@ Dorai Sitaram's portable
 ;; @uref{http://www.ccs.neu.edu/home/dorai/pregexp/pregexp.html,regular
 ;; expression library}.
-(define-structure spells.pregexp (export pregexp
-                                         pregexp-match-positions
-                                         pregexp-match
-                                         pregexp-split
-                                         pregexp-replace
-                                         pregexp-replace*)
+(define-structure spells.pregexp spells.pregexp-interface
   (open scheme srfi-1 spells.error)
   (files pregexp))
 
 ;;; @subsection Input/Output
 
 ;;@ Port utilities.
-(define-structure spells.port (export current-error-port 
-                                      with-output-to-port
-                                      with-input-from-port
-                                      with-current-ports
-                                      force-output
-                                      open-output-file/options
-                                      ((file-options) :syntax))
+(define-structure spells.port spells.port-interface
   (open scheme)
   (dialect
    (scheme48 (open i/o
@@ -286,55 +183,28 @@
 
 
 ;;; @subsection Operating system interface
+
 ;;@ Miscellaneous procedures providing access to various bits of
 ;; information regarding the host running the scheme implementation.
-(define-structure spells.sysutils (export lookup-environment-variable
-                                          current-process-environment
-                                          extend-process-environment
-                                          os-name
-                                          os-node-name
-                                          os-release-name
-                                          os-version-name
-                                          machine-name)
+(define-structure spells.sysutils spells.sysutils-interface
   (open scheme srfi-1)
   (dialect (scheme48 (open posix-process-data posix-platform-names)))
   (files sysutils))
 
+;;@ Process interface.
+(define-structure spells.process spells.process-interface
+  (all-dialects-except mzscheme)
+  (open scheme)
+  (dialect (scheme48 (open posix-processes))
+           (guile (re-export exit)))
+  (files process))
+
 ;;@ File system interface.
-(define-structure spells.file (export make-path
-                                      normalize-path
-                                      absolute-path?
-                                      dot-or-dotdot?
-                                      file-extension
-                                      file-basename
-                                      file-dirname
-                                      append-extension
-                                      file?
-                                      directory?
-                                      file-is-readable?
-                                      file-is-executable?
-                                      file-modification-time
-                                      file-modification-time>
-                                      file-modification-time<
-                                      find-exec-path
-                                      find-files
-                                      copy-file!
-                                      rename-file!
-                                      delete-file!
-                                      current-directory
-                                      make-directory!
-                                      make-directory*
-                                      delete-directory!
-                                      fold-dirent
-                                      list-dirent
-                                      map-dirent
-                                      for-each-dirent
-                                      filter-dirent
-                                      filter-not-dirent
-                                      install-file
-                                      ((with-current-directory)
-                                       :syntax)
-                                      call-with-file-and-dir)
+(define-structure spells.filesys spells.filesys-interface
+  (files filesys))
+
+;;@ File system interface (deprecated).
+(define-structure spells.file spells.file-interface
   (open scheme srfi-1 srfi-13 srfi-16
         spells.error spells.pregexp spells.sysutils spells.misc)
   (dialect (scheme48 (open srfi-14 sort posix threads byte-vectors i/o)
@@ -344,38 +214,13 @@
            (gauche (open file.util)))
   (files file ((pure all) file)))
 
-;;@ File lists.
-(define-structure spells.file-list (export
-                                    make-file-list
-                                    add-to-file-list!
-                                    add-to-file-list/dir!
-                                    delete-file-list
-                                    file-list-for-each
-                                    file-list-map
-                                    file-list-least-modification-time
-                                    file-list-greatest-modification-time)
+;;@ File lists (deprecated).
+(define-structure spells.file-list spells.file-list-interface
   (open scheme srfi-1
         spells.error
         spells.pregexp spells.misc spells.file)
   (dialect (mzscheme (language scheme)))
   (files file-list))
-
-;;@ Low-level process interface.
-(define-structure spells.process (export fork
-                                         process-id?
-                                         process-id=?
-                                         process-id->integer
-                                         integer->process-id
-                                         process-id-exit-status
-                                         wait-for-child-process
-                                         exec
-                                         exec-file
-                                         exit)
-  (all-dialects-except mzscheme)
-  (open scheme)
-  (dialect (scheme48 (open posix-processes))
-           (guile (re-export exit)))
-  (files process))
 
 ;;; @subsection Unclassified
 
@@ -390,7 +235,7 @@
   (files bitwise))
 
 
-;; Assert the truth of an expression.
+;;@ Assert the truth of an expression.
 (define-structure spells.assert (export ((assert) :syntax) cerr cout)
   (open scheme
         spells.error
@@ -407,15 +252,7 @@
   (files hash))
 
 ;;@ Stuff that doesn't fit somewhere else.
-(define-structure spells.misc (export
-                               identity
-                               eof-object
-                               unspecific
-                               sleep-seconds
-                               thunk?
-                               sort-list
-                               and-map
-                               or-map)
+(define-structure spells.misc spells.misc-interface
   (open scheme)
   (dialect (guile (re-export thunk? and-map or-map sort-list))
            (mzscheme (open (lib "list.ss")))
@@ -429,10 +266,7 @@
   (files misc))
 
 ;;@ Jens Axel Sogaard's @code{syntax-rules}-based pattern matcher
-(define-structure spells.match (export ((match match-lambda
-                                          match-let match-let*
-                                          match-define-values)
-                                        :syntax))
+(define-structure spells.match spells.match-interface
   (open scheme spells.define-values)
   (files match))
 
