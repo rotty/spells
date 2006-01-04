@@ -51,6 +51,21 @@
         sort)
   (files ((pure all) misc) ((pure scheme48) misc)))
 
+
+(define-structure spells.pathname spells.pathname-interface
+  (open scheme srfi-8 srfi-13 srfi-14
+        spells.error
+        spells.record-types)
+  (files ((pure scheme48) pathname)))
+
+(define-structure spells.filesys spells.filesys-interface
+  (open scheme srfi-8
+        posix-files
+        (modify posix-time (prefix posix:))
+        spells.pathname
+        spells.time-lib)
+  (files ((pure scheme48) filesys)))
+
 (define-structure spells.sysutils spells.sysutils-interface
   ;; note: it should be POSIX-PLATFORM-NAMES instead of POSIX, but
   ;; for some reason s48 does not recognise the former structure name

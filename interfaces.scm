@@ -146,6 +146,36 @@
              opt-lambda)
            :syntax)))
 
+(define-interface spells.pathname-interface
+  (export make-filename
+          x->filename
+          filename?
+          filename-name
+          filename-extension
+          filename-generation
+          filename-with-name
+          filename-with-extension
+          filename-with-generation
+          filename-components
+
+          make-pathname
+          pathname?
+          x->pathname
+          x->namelist
+          x->namestring
+          
+          pathname-host
+          pathname-base
+          pathname-directory
+          pathname-file
+          pathname-with-host
+          pathname-with-base
+          pathname-with-directory
+          pathname-with-file
+          pathname-components
+          directory-pathname?
+          pathname-as-directory))
+
 ;; Legacy interface
 (define-interface spells.file-interface
   (export make-path

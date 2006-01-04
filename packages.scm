@@ -184,6 +184,10 @@
 
 ;;; @subsection Operating system interface
 
+;;@ File system interface.
+(define-structure spells.filesys spells.filesys-interface
+  (files filesys))
+
 ;;@ Miscellaneous procedures providing access to various bits of
 ;; information regarding the host running the scheme implementation.
 (define-structure spells.sysutils spells.sysutils-interface
@@ -198,10 +202,6 @@
   (dialect (scheme48 (open posix-processes))
            (guile (re-export exit)))
   (files process))
-
-;;@ File system interface.
-(define-structure spells.filesys spells.filesys-interface
-  (files filesys))
 
 ;;@ File system interface (deprecated).
 (define-structure spells.file spells.file-interface
