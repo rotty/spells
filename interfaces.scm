@@ -134,8 +134,8 @@
                       spells.srfi-36-interface
                       spells.condition-extras-interface))
 
-(define-interface spells.define-record-type-interface
-  (export (define-record-type :syntax)
+(define-interface spells.record-types-interface
+  (export ((define-record-type define-record-type*) :syntax)
           define-record-discloser))
 
 (define-interface spells.opt-args-interface

@@ -19,6 +19,8 @@ spells.condition       Richard Kelsey, Michael Sperber:
 		       http://srfi.schemers.org/srfi-34/srfi-34.html
 		       http://srfi.schemers.org/srfi-35/srfi-35.html
 
+spells.record-types    define=record-type* by Taylor Campbell
+
 spells.misc	       Jose Antonio Ortega Ruiz <jao@gnu.org>
 spells.file	       Jose Antonio Ortega Ruiz <jao@gnu.org>
 spells.file-list       Jose Antonio Ortega Ruiz <jao@gnu.org>

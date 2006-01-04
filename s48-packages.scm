@@ -37,7 +37,6 @@
         srfi-9
         signals
         ascii
-        define-record-types
         (modify posix-time (prefix posix:)))
   (files ((pure scheme48) srfi-19)))
 
@@ -75,7 +74,7 @@
   (open scheme srfi-1 srfi-6 srfi-8 srfi-11 srfi-13
         posix-processes
         posix-i/o
-        spells.define-record-type
+        spells.record-types
         spells.byte-vectors
         spells.delimited-readers)
   (files ((pure scheme48) process)))
@@ -177,8 +176,16 @@
         spells.opt-args)
   (files ((pure scheme48) delimited-readers)))
 
-(define-structure spells.define-record-type spells.define-record-type-interface
+(define-structure spells.define-record-type*-expander (export expand-define-record-type*)
+  (open scheme destructuring fluids signals receiving)
+  (files ((pure scheme48) defrectype*)))
+
+(define-structure spells.record-types spells.record-types-interface
   (open scheme srfi-9
-        (subset define-record-types (define-record-discloser))))
+        (subset define-record-types (define-record-discloser)))
+  (for-syntax (open scheme spells.define-record-type*-expander))
+  (begin (define-syntax define-record-type*
+           expand-define-record-type*
+           (BEGIN DEFINE DEFINE-RECORD-TYPE))))
 
 ;; arch-tag: b134cf62-6fc4-47ed-8659-c36a7c613e71
