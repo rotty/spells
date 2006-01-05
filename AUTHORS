@@ -20,6 +20,12 @@ spells.condition       Richard Kelsey, Michael Sperber:
 		       http://srfi.schemers.org/srfi-35/srfi-35.html
 
 spells.record-types    define=record-type* by Taylor Campbell
+spells.pathname	       Andreas Rottmann <rotty@debian.org>; based on the
+		       proposal by Taylor Campbell
+                       http://mumble.net/~campbell/proposals/pathname.text
+spells.filesys         Andreas Rottmann <rotty@debian.org>; based on the 
+                       proposal by Taylor Campbell
+		       http://mumble.net/~campbell/proposals/filesys.text
 
 spells.misc	       Jose Antonio Ortega Ruiz <jao@gnu.org>
 spells.file	       Jose Antonio Ortega Ruiz <jao@gnu.org>
