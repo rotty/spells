@@ -29,7 +29,7 @@
   (open scheme srfi-1 srfi-9 srfi-23 conditions srfi-34 srfi-36)
   (files ((pure scheme48) condition)))
 
-(define-structure spells.time-lib spells.srfi-19-interface
+(define-structure spells.time-lib spells.time-lib-interface
   (open scheme
         (subset srfi-1 (reverse!))
         srfi-6
@@ -38,7 +38,7 @@
         signals
         ascii
         (modify posix-time (prefix posix:)))
-  (files ((pure scheme48) srfi-19)))
+  (files ((pure scheme48) srfi-19) ((pure all) time-lib)))
 
 (define-structure spells.misc spells.misc-interface
   (open scheme srfi-23

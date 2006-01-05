@@ -85,6 +85,14 @@
           date->string
           string->date))
 
+(define-interface spells.time-lib-extras-interface
+  (export posix-timestamp->time-utc
+          time-utc->posix-timestamp))
+
+(define-interface spells.time-lib-interface
+  (compound-interface spells.srfi-19-interface
+                      spells.time-lib-extras-interface))
+
 (define-interface spells.srfi-34-interface
   (export with-exception-handler
           raise
