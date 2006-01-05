@@ -131,7 +131,7 @@
 
 ;; @uref{http://srfi.schemers.org/srfi-74/srfi-74.html, SRFI 74} -
 ;; Octet-Addressed Binary Blocks.
-(define-structure spells.blobs spells.blob-interface
+(define-structure spells.blobs spells.blobs-interface
   (open scheme spells.cut spells.byte-vectors spells.error spells.bitwise)
   (files blobs))
 
