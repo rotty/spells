@@ -38,6 +38,7 @@
  ("process.scm" spells.process)
  ("table.scm" spells.table)
  ("blobs.scm" spells.blobs)
- ("delimited-readers.scm" spells.delimited-readers spells.misc srfi-6 srfi-13))
+ ("delimited-readers.scm" spells.delimited-readers spells.misc srfi-6 srfi-13)
+ ("operations.scm" spells.operations))
 
 ;;; tests.scm ends here

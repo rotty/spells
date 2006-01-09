@@ -84,6 +84,11 @@
            (else (open srfi-23)))
   (files error))
 
+;;@ A simple object system.
+(define-structure spells.operations spells.operations-interface
+  (open scheme spells.error)
+  (files operations))
+
 ;;; @subsection Data structures
 
 ;;@ Simple hash tables.

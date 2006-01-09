@@ -203,4 +203,10 @@
            expand-define-record-type*
            (BEGIN DEFINE DEFINE-RECORD-TYPE))))
 
+(define-structure spells.operations spells.operations-interface
+  (open scheme
+        spells.error)
+  (files operations))
+
+
 ;; arch-tag: b134cf62-6fc4-47ed-8659-c36a7c613e71

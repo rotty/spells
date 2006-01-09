@@ -424,4 +424,9 @@
              match-define-values)
            :syntax)))
 
+(define-interface spells.operations-interface
+  (export ((object
+            operation
+            define-operation) :syntax)))
+
 ;; arch-tag: a4a455e7-5c3e-4157-b598-a531e44a9e78
