@@ -26,17 +26,20 @@
 ;;; Code:
 
 ;; Auxiliary syntax
-(define-syntax method-clauses->alist
+(define-syntax method-clauses->handler
   (syntax-rules ()
-    ((method-clauses->alist ((?op ?param ...) ?body ...) ...)
-     (list (cons ?op (lambda (?param ...) ?body ...)) ...))))
+    ((method-clauses->handler ((?op ?param ...) ?body ...) ...)
+     (let ((methods (list (cons ?op (lambda (?param ...) ?body ...)) ...)))
+       (lambda (op)
+         (cond ((assq op methods) => cdr)
+               (else #f)))))))
 
 (define-syntax object
   (syntax-rules ()
     ((object ?proc ?method-clause ...)
-     (make-object ?proc (method-clauses->alist ?method-clause ...)))))
+     (make-object ?proc (method-clauses->handler ?method-clause ...)))))
 
-(define %get-handler (list '%get-method))
+(define %get-handler (list '%get-handler))
 
 (define (make-object proc handler)
   (lambda args
@@ -51,7 +54,7 @@
 (define-syntax operation
   (syntax-rules ()
     ((operation ?default ?method-clause ...)
-     (make-operation ?default (method-clauses->alist ?method-clause ...)))))
+     (make-operation ?default (method-clauses->handler ?method-clause ...)))))
 
 (define (make-operation default handler)
   (letrec ((op (make-object
