@@ -1,3 +1,5 @@
+;; -*- Mode: Scheme; scheme48-package: (config); -*-
+
 (define-interface spells.srfi-19-interface
   (export time-duration ;; Constants
           time-monotonic

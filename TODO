@@ -5,7 +5,7 @@
   There's no need to have so many optional argument macros (except to
   support legacy code).
 
-* Operating system interface
+o [rotty] Operating system interface
 
 - spells.file: Rework, based on Riastradh's filesys proposal.
 - spells.file-list: Remove?

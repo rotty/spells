@@ -1,3 +1,5 @@
+;; -*- Mode: Scheme; scheme48-package: (config); -*-
+
 (define-structure spells.assert (export ((assert) :syntax) cerr cout)
   (open scheme
         spells.error
