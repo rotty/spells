@@ -143,7 +143,7 @@
                       spells.condition-extras-interface))
 
 (define-interface spells.record-types-interface
-  (export ((define-record-type define-record-type*) :syntax)
+  (export ((define-record-type define-record-type* define-functional-fields) :syntax)
           define-record-discloser))
 
 (define-interface spells.opt-args-interface

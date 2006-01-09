@@ -191,17 +191,21 @@
         spells.opt-args)
   (files ((pure scheme48) delimited-readers)))
 
-(define-structure spells.define-record-type*-expander (export expand-define-record-type*)
-  (open scheme destructuring fluids signals receiving)
+(define-structure spells.define-record-type*-expander (export expand-define-record-type*
+                                                              expand-define-functional-fields)
+  (open scheme srfi-1 destructuring fluids signals receiving)
   (files ((pure scheme48) defrectype*)))
 
 (define-structure spells.record-types spells.record-types-interface
-  (open scheme srfi-9
+  (open scheme srfi-8 srfi-9
         (subset define-record-types (define-record-discloser)))
   (for-syntax (open scheme spells.define-record-type*-expander))
   (begin (define-syntax define-record-type*
            expand-define-record-type*
-           (BEGIN DEFINE DEFINE-RECORD-TYPE))))
+           (BEGIN DEFINE DEFINE-RECORD-TYPE)))
+  (begin (define-syntax define-functional-fields
+           expand-define-functional-fields
+           (BEGIN DEFINE RECEIVE))))
 
 (define-structure spells.operations spells.operations-interface
   (open scheme

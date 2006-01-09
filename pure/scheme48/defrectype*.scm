@@ -111,8 +111,45 @@
   (symbol-append type-name '- tag))
 
 (define (make-field-setter type-name tag)
-  (symbol-append 'SET- type-name '- tag '!))
+  (symbol-append 'set- type-name '- tag '!))
+
+(define (make-field-modifier type-name tag)
+  (symbol-append type-name "-modify-" tag))
+
+(define (make-field-replacer type-name tag)
+  (symbol-append type-name "-with-" tag))
+
+(define (make-field-default type-name tag)
+  (symbol-append type-name "-default-" tag))
 
 (define (symbol-append . symbols)
-  (string->symbol (apply string-append (map symbol->string symbols))))
+  (string->symbol (apply string-append
+                         (map (lambda (x)
+                                (cond ((string? x) x)
+                                      (else (symbol->string x))))
+                              symbols))))
 
+(define (expand-define-functional-fields form r compare)
+  (destructure (( (keyword type-name . fields) form))
+    (let ((obj (r 'OBJ))
+          (value (r 'VALUE))
+          (modifier (r 'MODIFIER))
+          (unconser (symbol-append type-name "-components"))
+          (conser (symbol-append "make-" type-name)))
+      `(,(r 'BEGIN)
+        (,(r 'DEFINE) (,unconser ,obj)
+         (,(r 'VALUES) ,@(map (lambda (f)
+                                `(,(make-field-accessor type-name f) ,obj))
+                              fields)))
+        ,@(append-map
+           (lambda (field)
+             `((,(r 'DEFINE) (,(make-field-replacer type-name field) ,obj ,value)
+                (,(r 'RECEIVE) ,fields (,unconser ,obj)
+                 (,conser ,@(map (lambda (f) (if (eq? f field) value f)) fields))))
+               (,(r 'DEFINE) (,(make-field-modifier type-name field) ,obj ,modifier)
+                (,(make-field-replacer type-name field)
+                 ,obj (,modifier (,(make-field-accessor type-name field) ,obj))))
+               (,(r 'DEFINE) (,(make-field-default type-name field) ,obj ,value)
+                (,(make-field-modifier type-name field) ,obj (,(r 'LAMBDA) (v)
+                                                              (,(r 'OR) v ,value))))))
+           fields)))))
