@@ -214,5 +214,13 @@
         spells.error)
   (files operations))
 
+(define-structure spells.logging spells.logging-interface
+  (open scheme srfi-1 srfi-8
+        spells.match
+        spells.error
+        spells.port
+        spells.opt-args
+        spells.record-types)
+  (files logging))
 
 ;; arch-tag: b134cf62-6fc4-47ed-8659-c36a7c613e71

@@ -431,4 +431,16 @@
             operation
             define-operation) :syntax)))
 
+(define-interface spells.logging-interface
+  (export make-log
+
+          log-entry?
+          log-entry-level
+          log-entry-level-name
+          log-entry-object
+
+          default-log-formatter
+          
+          configure-logger))
+
 ;; arch-tag: a4a455e7-5c3e-4157-b598-a531e44a9e78
