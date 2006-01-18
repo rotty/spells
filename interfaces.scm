@@ -439,6 +439,8 @@
           log-entry-level-name
           log-entry-object
 
+          make-log-handler
+          
           default-log-formatter
           
           configure-logger))

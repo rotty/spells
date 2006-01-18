@@ -34,11 +34,14 @@
     (list 'logger (logger-name l))))
 
 (define-record-type* log-handler
-  (make-log-handler proc threshold filters)
+  (%make-log-handler proc threshold filters)
   ())
 
+(define/optional-args (make-log-handler proc (optional (threshold #f) (filters '())))
+  (%make-log-handler proc (numeric-level threshold) filters))
+
 (define-record-type* log-entry
-  (make-log-entry logger level (%object))
+  (make-log-entry logger level time (%object))
   ())
 
 (define (log-entry-object entry)
@@ -115,9 +118,6 @@
 
 ;;; Builtin handlers & formatters
 
-(define (make-port-log-handler port formatter threshold filters)
-  (make-log-handler (lambda (entry) (formatter entry port)) threshold filters))
-
 (define (default-log-formatter entry port)
   (display #\( port)
   (do ((name (logger-name (log-entry-logger entry)) (cdr name)))
@@ -126,7 +126,7 @@
     (if (not (null? (cdr name)))
         (display #\. port)))
   (display ": [" port)
-  (display (log-entry-level-name)  port)
+  (display (log-entry-level-name entry)  port)
   (display "] " port)
   (display (log-entry-object entry) port)
   (display #\) port)
@@ -136,9 +136,9 @@
 
 (define *root-logger* (make-logger '(root) #f))
 
-(define *default-config*
-  `((port ,(current-error-port)
-          (formatter ,default-log-formatter))))
+(define (*default-config*)
+  `((handlers ,(make-log-handler
+                (lambda (entry) (default-log-formatter entry (current-output-port)))))))
 
 ;; This is mutated, need to think about thread safety
 (define *logger-tree* (list 'root *root-logger*))
@@ -158,6 +158,14 @@
         (else
          (error "invalid level" level))))
 
+(define (config-ref config key default)
+  (cond ((assq key config) => cdr)
+        (else default)))
+
+(define (config-ref* config key default)
+  (cond ((assq key config) => cadr)
+        (else default)))
+
 ;;; Public interface
 
 ;;@ Create a logging procedure.
@@ -173,45 +181,16 @@
   (let ((level (numeric-level level))
         (logger (get-logger name)))
     (lambda (obj)
-      (log logger (make-log-entry logger level obj)))))
+      (log logger (make-log-entry logger level (current-time) obj)))))
 
 
-;; <config> -->
-;;            <handler-clause>
-;;          | (threshold <level>)
-;; <handler-clause> -->
-;;            (port <expression> <handler-detail>*)
-;; <handler-detail> -->
-;;          | (threshold <level>)
-;;          | (formatter <expression>)
-;;
-(define/optional-args (configure-logger name (optional (config *default-config*)))
-  (receive (handlers threshold) (eval-logger-details config)
-    (let ((logger (get-logger name)))
-      (set-logger-handlers! logger handlers)
-      (set-logger-threshold! logger threshold))))
-
-(define (eval-logger-details details)
-  (let loop ((details details) (handlers '()) (threshold #f))
-    (if (null? details)
-        (values handlers (numeric-level threshold))
-        (match (car details)
-          ((list-rest 'port port details)
-           (receive (formatter threshold) (eval-handler-details details)
-             (loop (cdr details)
-                   (cons (make-port-log-handler port formatter threshold '()) handlers)
-                   threshold)))
-          ((list 'threshold threshold)
-           (loop (cdr details) handlers threshold))
-          (else
-           (error "invalid logger configuration clause" (car details)))))))
-
-(define (eval-handler-details details)
-  (let loop ((details details) (formatter default-log-formatter) (threshold #f))
-    (if (null? details)
-        (values formatter (numeric-level threshold))
-        (match (car details)
-          ((list 'threshold threshold) (loop (cdr details) formatter threshold))
-          ((list 'formatter formatter) (loop (cdr details) formatter threshold))
-          (else
-           (error "invalid log handler configuration clause" (car details)))))))
+;; <config> --> (<config-clause>*)
+;; <config-clause> -->
+;;          | (handlers <handler>*)
+;;          | (threshold <int>)
+;;          | (propagate? <bool>)
+(define/optional-args (configure-logger name (optional (config (*default-config*))))
+  (let ((logger (get-logger name)))
+    (set-logger-handlers! logger (config-ref config 'handlers '()))
+    (set-logger-threshold! logger (config-ref* config 'threshold #f))
+    (set-logger-propagate?! logger (config-ref* config 'propagate? #t))))

@@ -215,10 +215,9 @@
   (files operations))
 
 (define-structure spells.logging spells.logging-interface
-  (open scheme srfi-1 srfi-8
-        spells.match
+  (open scheme srfi-1
+        (subset spells.time-lib (current-time))
         spells.error
-        spells.port
         spells.opt-args
         spells.record-types)
   (files logging))
