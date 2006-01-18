@@ -1,7 +1,7 @@
 ;;@ A portability library. It offers a single interface to
 ;; functionality commonly present, but not standardized in various
 ;; Scheme implementations.
-(define-system spells (0 1)
+(define-system spells
   (config-files interfaces s48-packages)
   (spedl-files interfaces packages))
 
