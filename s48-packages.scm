@@ -60,13 +60,20 @@
         spells.record-types)
   (files ((pure scheme48) pathname)))
 
+(define-structure spells.namestring spells.namestring-interface
+  (open scheme srfi-1 srfi-13 srfi-14
+        spells.error
+        spells.pregexp)
+  (files ((pure all) namestring)))
+
 (define-structure spells.filesys spells.filesys-interface
   (open scheme srfi-8
         posix-files
         (modify posix-time (prefix posix:))
-        spells.pathname
+        spells.condition
+        spells.namestring ;; will be replaced by spells.pathname
         spells.time-lib)
-  (files ((pure scheme48) filesys)))
+  (files ((pure scheme48) filesys) ((pure all) filesys)))
 
 (define-structure spells.sysutils spells.sysutils-interface
   ;; note: it should be POSIX-PLATFORM-NAMES instead of POSIX, but
@@ -78,6 +85,8 @@
   (for-syntax (open scheme destructuring))
   (open scheme srfi-1 srfi-13 srfi-16
         spells.error spells.pregexp spells.sysutils spells.misc
+        spells.filesys
+        spells.namestring
         srfi-14 sort posix threads byte-vectors i/o)
   (files ((pure all) file) ((pure scheme48) file)))
 

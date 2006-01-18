@@ -1,15 +1,31 @@
 * Language facilities
 
-- spells.opt-args: Clean up.
+- spells.opt-args
 
-  There's no need to have so many optional argument macros (except to
-  support legacy code).
+   Do we really need to have so many optional argument macros (except
+   to support legacy code?). Actually, inside spells, I'll forbid use
+   of anything except DEFINE/OPTIONAL-ARGS.
 
 o [rotty] Operating system interface
 
-- spells.file: Rework, based on Riastradh's filesys proposal.
-- spells.file-list: Remove?
-- spells.pathname: Implement, based on Riastradh's pathname proposal.
+This needs a restructuring; I have the following in mind:
+
+- spells.filesys
+
+  Implement, based on Riastradh's filesys proposal.
+
+- spells.file
+
+   This should eventually go away. As a temporary measure, until
+   pathnames are ready (I want to wait for Riastradh's T stuff), move
+   the namestring-related parts to spells.namestring; then
+   spells.filesys + spells.namestring should be able to replace
+   spells.file, modulo some library-level procedures, which should be
+   added to spells.filesys.
+
+- spells.file-list
+
+   Remove; lift into conjure.
 
 * Text-related
 

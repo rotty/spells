@@ -1,8 +1,8 @@
 ;; -*- Mode: Scheme; scheme48-package: spells.filesys; -*-
 
-;; This converts @1 into a representation acceptable to s48
-;; (namestring in 1.3)
-(define x->f x->namestring)
+;; When spells.pathname is ready, this will be defined to X->PATHNAME.
+(define x->f values)
+(define x->namestring values)
 
 (define (file-exists? pathname)
   (accessible? (x->f pathname) (access-mode exists)))
@@ -45,9 +45,9 @@
 
 (define (directory-fold* pathname combiner . seeds)
   (let ((stream (open-directory-stream (x->f pathname)))
-        (pathname (pathname-as-directory (x->pathname pathname))))
+        (namestring (x->namestring pathname)))
     (define (full-pathname entry)
-      (pathname-with-file pathname (x->filename entry)))
+      (make-path namestring entry))
     (dynamic-wind
         (lambda () #t)
         (lambda ()
@@ -63,23 +63,3 @@
                          (apply values new-seeds)))))))
         (lambda () (close-directory-stream stream)))))
 
-(define (directory-fold pathname combiner . seeds)
-  (apply
-   directory-fold* pathname
-   (lambda (dir-entry . seeds)
-     (receive new-seeds (apply combiner dir-entry seeds)
-       (apply values #t new-seeds)))
-   seeds))
-
-;; Naive implementation in terms of DIRECTORY-FOLD
-(define (directory-fold-tree pathname file-combiner dir-combiner . seeds)
-  (apply directory-fold pathname
-         (lambda (pathname . seeds)
-           (if (file-directory? pathname)
-               (receive new-seeds
-                   (apply dir-combiner pathname seeds)
-                 (apply directory-fold-tree pathname
-                        file-combiner dir-combiner
-                        new-seeds))
-               (apply file-combiner pathname seeds)))
-         seeds))

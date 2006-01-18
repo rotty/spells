@@ -187,8 +187,9 @@
           pathname-as-directory))
 
 ;; Legacy interface
-(define-interface spells.file-interface
+(define-interface spells.namestring-interface
   (export make-path
+          split-path
           normalize-path
           absolute-path?
           dot-or-dotdot?
@@ -197,8 +198,10 @@
           replace-extension
           file-basename
           file-dirname
-          append-extension
-          file?
+          append-extension))
+
+(define-interface spells.file-op-interface
+  (export file?
           directory?
           file-is-readable?
           file-is-executable?
@@ -225,6 +228,12 @@
            :syntax)
           call-with-file-and-dir))
 
+;; Legacy interface
+(define-interface spells.file-interface
+  (compound-interface spells.namestring-interface
+                      spells.file-op-interface))
+
+;; Legacy interface
 (define-interface spells.file-list-interface
   (export make-file-list
           add-to-file-list!

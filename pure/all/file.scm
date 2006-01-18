@@ -1,7 +1,7 @@
 ;; file-utils.in.scm -- POSIX file access
 ; arch-tag: c47fda5c-b01e-454e-83c5-be076defe54c
 
-;; Copyright (C) 2004, 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005-2006 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Mon Oct 25, 2004 10:25
@@ -27,73 +27,8 @@
 
 ;;; Code:
 
-;;; Path and filenames handling:
-
-;; Separators used in pathnames
-(define *psep* "/")
-(define *psepc* #\/)
-
-;;@ Create a normalized path name, simplifying double slashes and
-;; @file{.} and @file{..} occurrences.
-(define (normalize-path f)
-  (define (norm cur rest)
-    (if (null? rest) (reverse cur)
-        (let ((n (car rest))
-              (l (cdr rest)))
-          (cond
-           ((or (string-null? n)
-                (string=? n ".")) (norm cur l))
-           ((string=? n "..")
-            (norm (cond
-                   ((or (null? cur)
-                        (string=? (car cur) "..")) (cons n cur))
-                   (else (cdr cur)))
-                  l))
-           ((not (string-skip n #\.))
-            (error "Malformed pathname" f))
-           (else (norm (cons n cur) l))))))
-  (let* ((nodes (string-split f *psepc*))
-         (nnodes (norm '() nodes))
-         (abs? (absolute-path? f))
-         (nn (if (and (null? nnodes) (not abs?)) (list ".") nnodes))
-         (fn (string-join nn *psep*)))
-    (if abs? (string-append *psep* fn) fn)))
-
-;;@ Create a path name from a list of components.
-(define make-path
-  (lambda x (normalize-path (string-join x *psep*))))
-
-;; aux function
-(define (make-match-proc rx pos nm-k)
-  (let ((rx (pregexp rx)))
-    (lambda (f)
-      (let ((m (pregexp-match rx f)))
-        (or (and m (list-ref m pos)) (nm-k f))))))
-
-;;@ Get the given filename's extension, without the leading dot.
-;; For instance
-;; @example
-;;   (file-extension "foo.bar") => "bar"
-;; @end example
-(define file-extension
-  (make-match-proc ".+(\\.)([^./]*)$" 2 (lambda (f) "")))
-
-;;@ Return the given filename without extension.
-;; E.g.
-;; @example
-;;   (file-name-sans-extension "/foo/bar/baz.c") => "/foo/bar/baz"
-;; @end example
-(define file-name-sans-extension
-  (make-match-proc "(.+)(\\.[^./]+)$" 1 (lambda (f) f)))
-
-;;@ Convenience procedure to substitute a file name's extension.
-(define (replace-extension filename new-extension)
-  (append-extension (file-name-sans-extension filename) new-extension))
-
-;;@ Append extension to file if it has not already got it.
-(define (append-extension f ext)
-  (if (string=? ext (file-extension f)) f (string-append f "." ext)))
-
+(define (string-split s c)
+  (string-tokenize s (char-set-complement (char-set c))))
 
 ;;@ Convenience functions for timestamp comparisons
 (define (file-modification-time< f1 f2) (fmt f1 f2 <))
@@ -101,13 +36,6 @@
 
 (define (fmt f1 f2 pred) (pred (file-modification-time f1)
                                (file-modification-time f2)))
-
-;;@ Test whether the given pathname is absolute.
-(define (absolute-path? f) (string-prefix? *psep* f))
-
-;;@ Test wheter a pathname is . or ..
-(define (dot-or-dotdot? f)
-  (or (string=? "." f) (string=? ".." f)))
 
 ;;; Directories:
 
@@ -123,9 +51,9 @@
 
 ;;@ Create directories, with intermediary ones when needed.
 (define (make-directory* dir)
-  (let ((subdirs (remove string-null? (string-split dir *psepc*))))
+  (let ((subdirs (split-path dir)))
     (fold (lambda (new path)
-            (let ((new-dir (string-append path *psep* new)))
+            (let ((new-dir (make-path path new)))
               (make-directory! new-dir) new-dir))
           (if (absolute-path? dir) "" ".")
           subdirs)))
