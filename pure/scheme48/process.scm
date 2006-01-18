@@ -1,5 +1,5 @@
 ;; process.scm -*- scheme48-package: spells.process -*-
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005-2006 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Wed Nov 09, 2005 02:33
@@ -119,11 +119,11 @@
   (unfold eof-object? values (lambda (seed) (read port)) (read port)))
 
 (define (run-process/lines env prog . args)
-  (call-with-process-output (cons env (cons prog args))
+  (call-with-process-output env (cons prog args)
     port->lines))
 
 (define (run-process/sexps env prog . args)
-  (call-with-process-output (cons env (cons prog args))
+  (call-with-process-output env (cons prog args)
     port->sexps))
 
 ;;; process.scm ends here

@@ -1,7 +1,7 @@
 ;; process.scm -- unit tests for process.scm
 ;; arch-tag: 1a073af6-85ae-4ca1-86f1-03a7bbaae8f4
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005-2006 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann
 ;; Start date: Fri May 20, 2005 23:22
@@ -26,8 +26,20 @@
   (values 0 #f (string-join strings (string #\newline) 'suffix)))
 
 (testeez
- "exec-process"
- (test/equal "echo" (run-process/string #f "echo" "foo") (lines "foo"))
+ "run-process"
+ (test/equal "echo"
+   (run-process/string #f "echo" "foo")
+   (lines "foo"))
+ (test/equal "echo -e"
+   (run-process/string #f "echo" "-e" "foo\\nbar")
+   (lines "foo" "bar"))
+ (test/equal "echo -e (lines)"
+   (run-process/lines #f "echo" "-e" "foo\\nbar")
+   '("foo" "bar"))
+ (test/equal "echo (sexps)"
+   (run-process/sexps #f "echo" "(hello world)")
+   '((hello world)))
+ 
  (test/equal "env"
    (run-process/string '(("FOO" . "bar")) "/usr/bin/env")
    (lines "FOO=bar")))
