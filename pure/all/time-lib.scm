@@ -27,4 +27,4 @@
   (add-duration *posix-epoch* (make-time time-duration 0 timestamp)))
 
 (define (time-utc->posix-timestamp time-utc)
-  (time-difference time-utc *posix-epoch*))
+  (time-second (time-difference time-utc *posix-epoch*)))

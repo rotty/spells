@@ -1,19 +1,16 @@
+;; -*- Mode: Scheme; scheme48-package: spells.file; -*-
+
 ;; Implementations
 
-(define (file-type-check f pred)
-  (and (accessible? f (access-mode exists))
-       (pred (file-type-name (file-info-type (get-file-info f))))))
-
-(define (file? f) (file-type-check f (lambda (type)
-                                      (not (eq? type 'directory)))))
-(define (file-is-readable? f) (accessible? f (access-mode read)))
+(define file? fs:file-regular?)
+(define file-is-readable? fs:file-readable?)
 (define (file-is-executable? f) (accessible? f (access-mode execute)))
 (define (file-modification-time f)
-  (time-seconds (file-info-last-modification (get-file-info f))))
+  (time-utc->posix-timestamp (fs:file-modification-time f)))
 (define (directory? f)
-  (file-type-check f (lambda (type) (eq? type 'directory))))
-(define (delete-file! f) (if (file? f) (unlink f)))
-(define rename-file! rename)
+  (fs:file-directory? f))
+(define (delete-file! f) (fs:delete-file f))
+(define rename-file! fs:rename-file)
 
 (define (copy-file! old-file new-file) 
    (let* ((old-info (get-file-info old-file)) 
@@ -30,13 +27,11 @@
      (close-input-port old-port) 
      (close-output-port new-port)))
 
-(define (make-directory! dir)
-  (if (not (accessible? dir (access-mode exists)))
-      (make-directory dir (file-mode owner))))
+(define (make-directory! f)
+  (if (not (fs:file-exists? f))
+      (fs:create-directory f)))
 
-(define (delete-directory! dir)
-  (if (directory? dir)
-      (remove-directory dir)))
+(define delete-directory! fs:delete-file)
 
 (define (current-directory . set-opt)
   (if (null? set-opt)
@@ -64,6 +59,5 @@
                   (else (loop (read-directory-stream stream)
                               (cons entry res))))))
         (lambda () (close-directory-stream stream)))))
-
 
 ;; arch-tag: c643aa5f-39c0-40b1-97db-591f6bfa1d2b

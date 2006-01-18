@@ -1,7 +1,7 @@
 ;; file-attr.scm -- file.scm unit tests (file attributes)
 ;; arch-tag: f19f7786-303f-11d9-8bf0-00404513c0a4
 
-;; Copyright (C) 2004, 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005-2006 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sat Nov 06, 2004 23:05

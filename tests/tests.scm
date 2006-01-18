@@ -23,7 +23,7 @@
 (("assert.scm" spells.assert)
  ("condition.scm" spells.condition)
  ("cut.scm" spells.cut)
- ("file-attr.scm" spells.file spells.misc)
+ ("file-attr.scm" spells.file spells.misc spells.namestring)
  ("file-list.scm" spells.file-list spells.file spells.misc)
  ("port.scm" spells.port srfi-6)
  ;;("file-traversal.scm" spells.file)

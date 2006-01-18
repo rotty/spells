@@ -200,7 +200,8 @@
           file-dirname
           append-extension))
 
-(define-interface spells.file-op-interface
+;; Legacy interface
+(define-interface spells.file-interface
   (export file?
           directory?
           file-is-readable?
@@ -227,11 +228,6 @@
           ((with-current-directory)
            :syntax)
           call-with-file-and-dir))
-
-;; Legacy interface
-(define-interface spells.file-interface
-  (compound-interface spells.namestring-interface
-                      spells.file-op-interface))
 
 ;; Legacy interface
 (define-interface spells.file-list-interface

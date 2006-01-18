@@ -85,15 +85,16 @@
   (for-syntax (open scheme destructuring))
   (open scheme srfi-1 srfi-13 srfi-16
         spells.error spells.pregexp spells.sysutils spells.misc
-        spells.filesys
+        (modify spells.filesys (prefix fs:))
         spells.namestring
+        spells.time-lib
         srfi-14 sort posix threads byte-vectors i/o)
   (files ((pure all) file) ((pure scheme48) file)))
 
 (define-structure spells.file-list spells.file-list-interface
   (open scheme srfi-1
         spells.error
-        spells.pregexp spells.misc spells.file)
+        spells.pregexp spells.misc spells.namestring spells.file)
   (files file-list))
 
 (define-structure spells.process spells.process-interface

@@ -11,7 +11,10 @@
   (make-directory (x->f pathname) (file-mode owner)))
 
 (define (delete-file pathname)
-  (if (file-exists? pathname) (unlink (x->f pathname))))
+  (if (file-exists? pathname)
+      (if (file-regular? pathname)
+          (unlink (x->f pathname))
+          (remove-directory (x->f pathname)))))
 
 (define (rename-file source-pathname target-pathname)
   (rename (x->f source-pathname) (x->f target-pathname)))
@@ -19,7 +22,7 @@
 (define (file-type-check pathname type)
   (let ((f (x->f pathname)))
     (and (accessible? f (access-mode exists))
-         (eq? type (file-type-name f (file-info-type (get-file-info f)))))))
+         (eq? type (file-type-name (file-info-type (get-file-info f)))))))
 
 (define (file-regular? pathname)
   (file-type-check pathname 'regular))
