@@ -81,7 +81,10 @@
            (values (process-id-exit-status id)
                    (process-id-terminating-signal id)))
           (else
-           (exec-with-alias prog #t (env->strlist env) (cons prog args))))))
+           (if env
+               (apply exec-with-environment
+                      (cons prog (cons (env->strlist env) args)))
+               (exec prog args))))))
 
 (define (run-process/string env prog . args)
   (let* ((process (apply spawn-process (cons env (x->strlist (cons prog args)))))
