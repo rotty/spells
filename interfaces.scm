@@ -201,11 +201,11 @@
           make-pathname
           pathname?
           x->pathname
-          pathname=?
-          pathname<?
-          pathname>?
+          x->namelist
+          x->namestring
           
-          pathname-origin
+          pathname-host
+          pathname-base
           pathname-directory
           pathname-file
           pathname-with-origin
@@ -246,7 +246,7 @@
           file-executable?
           file-modification-time
           file-size-in-bytes
-
+          
           directory-fold*
           directory-fold
           directory-fold-tree
@@ -325,7 +325,6 @@
           process-input
           process-output
           process-errors
-          
           spawn-process
           wait-for-process
           close-process-ports
@@ -504,9 +503,9 @@
           log-entry-object
 
           make-log-handler
-          
+
           default-log-formatter
-          
+
           configure-logger))
 
 (define-interface spells.streams-interface
