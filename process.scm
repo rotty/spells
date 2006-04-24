@@ -1,7 +1,7 @@
 ;; process.scm -- System processes
 ;; arch-tag: fb918dfe-e2b8-4440-a8e4-1759f3fb5342
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005-2006 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Fri May 20, 2005 23:12
@@ -26,42 +26,54 @@
 
 ;;; Code:
 
-;;@ Create a new child process. In the parent process, return the
-;; child's process id, in the child, return #f.
-(define (fork) (proc-to-be-defined))
+;;@ Run @2 with the environment @1 and arguments @3
+;; asynchronously. The return value is a process descriptor to be
+;; passed to @ref{spells.process wait-for-process,wait-for-process},
+;; @ref{spells.process close-process-ports,}, @ref{spells.process
+;; process-input,process-input}, @ref{spells.process,
+;; process-output,process-output}.
+(define (spawn-process env prog . args)
+  (proc-to-define))
 
-;;@ Process id type predicate.
-(define (process-id? object) (proc-to-be-defined))
+;;@ Wait for termination of @1, which must have been created by
+;; @ref{spells.process spawn-process,spawn-process}.
+(define (wait-for-process process)
+  (proc-to-define))
 
-;;@ Test wether two process ids are the same.
-(define (process-id=? pid-a pid-b) (proc-to-be-defined))
+;;@ Run @2 with the environment @1 and arguments @3 synchronously (@0
+;; returns after the process has terminated).
+(define (run-process env prog . args)
+  (proc-to-define))
 
-;;@ Convert a process id object to an POSIX PID integer.
-(define (process-id->integer pid) (proc-to-be-defined))
+;;@ Run @2 with the environment @1 and arguments @3 synchronously (@0
+;; returns after the process has terminated). The return values are
+;; the exit status, terminating signal (if the process has been
+;; terminated by a signal and the standard output captured in a
+;; string.
+;;
+;; Using @code{srfi-8}, @0 can be used as follows:
+;; @lisp
+;; (receive (status signal output) (run-process/string #f "cat /etc/hostname")
+;;   ...)
+;; @end lisp
+(define (run-process/string env prog . args)
+  (proc-to-define))
 
-;;@ Convert a POSIX PID integer to a process id object.
-(define (integer->process-id integer) (proc-to-be-defined))
+;;@stop
 
-;;@ Return the exit status of @1, or #f if the process is still
-;; running.
-(define (process-id-exit-status pid) (proc-to-be-defined))
+(define (open-process-input env prog . args)
+  (proc-to-define))
 
-;;@ Return the exit status of @1, or #f if the process is still
-;; running.
-(define (process-id-terminating-signal pid) (proc-to-be-defined))
+(define (open-process-output env prog . args)
+  (proc-to-define))
 
-;;@ Block until @1 has terminated.
-(define (wait-for-child-process pid) (proc-to-be-defined))
+(define (call-with-process-output env prog+args receiver)
+  (proc-to-define))
 
-;;@ Execute @1 with @2 as arguments, searching the PATH
-;;environment variable. This function does not return.
-(define (exec program . args) (proc-to-be-defined))
+(define (run-process/lines env prog . args)
+  (proc-to-define))
 
-;;@ Execute @1 with @2 as arguments, without searching the PATH
-;;environment variable. This function does not return.
-(define (exec-file program . args) (proc-to-be-defined))
-
-;;@ Exit with exit status @1.
-(define (exit status) (proc-to-be-defined))
+(define (run-process/sexps env prog . args)
+  (proc-to-define))
 
 ;;; process.scm ends here
