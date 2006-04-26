@@ -65,7 +65,7 @@
                         (default
                           (apply default obj args))
                         (else
-                         (error "operation has not available" obj op))))
+                         (error "operation is not available" obj op))))
                 handler)))
     op))
 
@@ -74,4 +74,4 @@
     ((define-operation (?name ?arg ...))
      (define ?name (operation #f)))
     ((define-operation (?name ?arg ...) ?body1 ?body ...)
-     (define ?name (operation (lambda (?arg ...) ?body ...))))))
+     (define ?name (operation (lambda (?arg ...) ?body1 ?body ...))))))
