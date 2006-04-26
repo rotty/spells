@@ -55,10 +55,12 @@
 
 
 (define-structure spells.pathname spells.pathname-interface
-  (open scheme srfi-8 srfi-13 srfi-14
+  (open scheme srfi-1 srfi-8 srfi-13 srfi-14
         spells.error
-        spells.record-types)
-  (files ((pure scheme48) pathname)))
+        spells.opt-args
+        spells.record-types
+        spells.operations)
+  (files pathname))
 
 (define-structure spells.namestring spells.namestring-interface
   (open scheme srfi-1 srfi-13 srfi-14

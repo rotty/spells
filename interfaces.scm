@@ -157,34 +157,33 @@
            :syntax)))
 
 (define-interface spells.pathname-interface
-  (export make-filename
-          x->filename
-          filename?
-          filename-name
-          filename-extension
-          filename-generation
-          filename-with-name
-          filename-with-extension
-          filename-with-generation
-          filename-components
+  (export make-file
+          file?
+          file-name
+          file-type
+          file-types
+          file-version
 
           make-pathname
           pathname?
           x->pathname
-          x->namelist
-          x->namestring
-          
-          pathname-host
-          pathname-base
+
+          pathname-origin
           pathname-directory
           pathname-file
-          pathname-with-host
-          pathname-with-base
+          pathname-with-origin
           pathname-with-directory
           pathname-with-file
-          pathname-components
+          pathname-default
+          merge-pathnames
           directory-pathname?
-          pathname-as-directory))
+          pathname-as-directory
+          pathname-container
+          
+          directory-namestring
+          file-namestring
+          origin-namestring
+          x->namestring))
 
 ;; Legacy interface
 (define-interface spells.namestring-interface
