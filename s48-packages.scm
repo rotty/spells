@@ -73,7 +73,7 @@
         posix-files
         (modify posix-time (prefix posix:))
         spells.condition
-        spells.namestring ;; will be replaced by spells.pathname
+        spells.pathname
         spells.time-lib)
   (files ((pure scheme48) filesys) ((pure all) filesys)))
 

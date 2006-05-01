@@ -55,6 +55,13 @@
   (really-make-pathname origin directory file)
   ())
 
+(define-record-discloser pathname
+  (lambda (pathname)
+    (list 'pathname
+          (pathname-origin pathname)
+          (pathname-directory pathname)
+          (pathname-file pathname))))
+
 (define (make-pathname origin directory file)
   (really-make-pathname origin
                         directory
@@ -91,6 +98,10 @@
   (name file-name)
   (type file-types)
   (version file-version))
+
+(define-record-discloser file
+  (lambda (file)
+    (list 'file (file-name file) (file-types file) (file-version file))))
 
 ;;@ Make a pathname file with the given components.  is the file's
 ;; name, a string or a symbol.  @var{type} is the file's type or
@@ -256,7 +267,7 @@
         (else (error "Unable to coerce to a namestring: %S" object))))
 
 (define (pathname->namestring pathname fs-type)
-  (fs-type/x->namestring fs-type pathname))
+  (fs-type/pathname->namestring fs-type pathname))
 
 ;;@ Return a string for PATHNAME's origin according to FS-TYPE.
 ;; If FS-TYPE is not supplied, it defaults to the local file system type.
@@ -299,31 +310,66 @@
 (define-operation (fs-type/directory-namestring fs-type))
 (define-operation (fs-type/file-namestring fs-type))
 
-(define-operation (fs-type/x->namestring fs-type pathname)
+(define-operation (fs-type/pathname->namestring fs-type pathname)
   (string-append (origin-namestring pathname)
                  (directory-namestring pathname)
-                 "/"
                  (file-namestring pathname)))
+
+(define (string-split s c start)
+  (string-tokenize s (char-set-complement (char-set c))))
 
 (define unix-file-system-type
   (object #f
     ((fs-type/origin-namestring self pathname)
      (let ((origin (pathname-origin pathname)))
-       (cond ((eqv? origin #f) ".")
+       (cond ((eqv? origin #f) "")
              ((or (eq? origin '/) (equal? origin "/")) "/")
              (else
               (error "invalid origin for unix file system" origin)))))
     
     ((fs-type/directory-namestring self pathname)
-     (string-join (pathname-directory pathname) "/"))
+     (let ((dir (pathname-directory pathname)))
+       (if (null? dir)
+           ""
+           (string-append (string-join dir "/") "/"))))
+
+    ((fs-type/pathname->namestring self pathname)
+     (string-append (fs-type/origin-namestring self pathname)
+                    (fs-type/directory-namestring self pathname)
+                    (fs-type/file-namestring self pathname)))
     
     ((fs-type/file-namestring self pathname)
      (let ((file (pathname-file pathname)))
-       (string-concatenate
-        (cons (file-name file)
-              (if (file-types file)
-                  (list "." (string-join (file-types file) "."))
-                  '())))))))
+       (if (not file)
+           ""
+           (string-concatenate
+            (cons (file-name file)
+                  (if (null? (file-types file))
+                      '()
+                      (list "." (string-join (file-types file) "."))))))))
+    
+    ((fs-type/parse-namestring self namestring)
+     (let ((parts (remove string-null? (string-split namestring #\/ 0)))
+           (absolute? (string-prefix? "/" namestring))
+           (directory? (string-suffix? "/" namestring)))
+       (make-pathname
+        (if absolute? '/ #f)
+        (if directory? parts (drop-right parts 1))
+        (if directory?
+            #f
+            (let ((file-part (last parts)))
+              (receive (prefix file-parts)
+                  (cond ((string-every #\. file-part)
+                         (values "" (list file-part)))
+                        ((string-skip file-part #\.)
+                         => (lambda (idx)
+                              (values (substring/shared file-part 0 idx)
+                                      (string-split file-part #\. idx))))
+                        (else (values "" (string-split file-part #\. 0))))
+                (if (and (null? file-parts) (string-null? prefix))
+                    #f
+                    (make-file (string-append prefix (first file-parts))
+                               (cdr file-parts)))))))))))
 
 (define (local-file-system-type)
   unix-file-system-type)

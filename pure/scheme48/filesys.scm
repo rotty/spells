@@ -1,8 +1,7 @@
 ;; -*- Mode: Scheme; scheme48-package: spells.filesys; -*-
 
 ;; When spells.pathname is ready, this will be defined to X->PATHNAME.
-(define x->f values)
-(define x->namestring values)
+(define x->f x->namestring)
 
 (define (file-exists? pathname)
   (accessible? (x->f pathname) (access-mode exists)))
@@ -50,7 +49,7 @@
   (let ((stream (open-directory-stream (x->f pathname)))
         (namestring (x->namestring pathname)))
     (define (full-pathname entry)
-      (make-path namestring entry))
+      (pathname-with-file pathname entry))
     (dynamic-wind
         (lambda () #t)
         (lambda ()
@@ -65,4 +64,3 @@
                          (loop (read-directory-stream stream) new-seeds)
                          (apply values new-seeds)))))))
         (lambda () (close-directory-stream stream)))))
-
