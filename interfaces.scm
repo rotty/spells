@@ -167,7 +167,8 @@
           make-pathname
           pathname?
           x->pathname
-
+          pathname=?
+          
           pathname-origin
           pathname-directory
           pathname-file

@@ -213,8 +213,7 @@
                        (let ((directory (pathname-directory pathname)))
                          (if directory
                              (append directory (list file))
-                             (list file)))
-                       )
+                             (list file))))
         pathname)))
 
 ;;@ Return a pathname of the directory that contains PATHNAME.
@@ -241,6 +240,21 @@
 ;; This is currently unimplemented and will simply return PATHNAME."
 (define (expand-pathname pathname)
   (error "Unimplemented: %S" `(expand-pathname ',pathname)))
+
+;;@ Compare the pathnames @1 and @2 and return @code{#t} if they refer
+;; to the same filesystem entity.
+;;
+;; FIXME: doesn't deal with versions.
+(define (pathname=? x y)
+  (and (equal? (pathname-origin x) (pathname-origin y))
+       (equal? (pathname-directory x) (pathname-directory y))
+       (or (and (eqv? (pathname-file x) #f)
+                (eqv? (pathname-file y) #f))
+           (and (pathname-file x) (pathname-file y)
+                (equal? (file-name (pathname-file x))
+                        (file-name (pathname-file y)))
+                (equal? (file-types (pathname-file x))
+                        (file-types (pathname-file y)))))))
 
 
 ;;;; Namestrings
