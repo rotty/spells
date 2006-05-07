@@ -168,6 +168,8 @@
           pathname?
           x->pathname
           pathname=?
+          pathname<?
+          pathname>?
           
           pathname-origin
           pathname-directory
@@ -186,60 +188,6 @@
           origin-namestring
           x->namestring))
 
-;; Legacy interface
-(define-interface spells.namestring-interface
-  (export make-path
-          split-path
-          normalize-path
-          absolute-path?
-          dot-or-dotdot?
-          file-extension
-          file-name-sans-extension
-          replace-extension
-          file-basename
-          file-dirname
-          append-extension))
-
-;; Legacy interface
-(define-interface spells.file-interface
-  (export file?
-          directory?
-          file-is-readable?
-          file-is-executable?
-          file-modification-time
-          file-modification-time>
-          file-modification-time<
-          find-exec-path
-          find-files
-          copy-file!
-          rename-file!
-          delete-file!
-          current-directory
-          make-directory!
-          make-directory*
-          delete-directory!
-          fold-dirent
-          list-dirent
-          map-dirent
-          for-each-dirent
-          filter-dirent
-          filter-not-dirent
-          install-file
-          ((with-current-directory)
-           :syntax)
-          call-with-file-and-dir))
-
-;; Legacy interface
-(define-interface spells.file-list-interface
-  (export make-file-list
-          add-to-file-list!
-          add-to-file-list/dir!
-          delete-file-list
-          file-list-for-each
-          file-list-map
-          file-list-least-modification-time
-          file-list-greatest-modification-time))
-
 (define-interface spells.table-interface
   (export make-table
           table?
@@ -251,12 +199,17 @@
 (define-interface spells.filesys-interface
   (export file-exists?
           create-directory
+          create-directory*
           delete-file
           rename-file
+          copy-file
+          install-file
+          
           file-regular?
           file-directory?
           file-readable?
           file-writable?
+          file-executable?
           file-modification-time
           file-size-in-bytes
           
@@ -266,19 +219,30 @@
 
           file-unreachable-error?
           file-unreachable-error-pathname
-          file-unreachable-error-operator))
+          file-unreachable-error-operator
+
+          working-directory
+          with-working-directory
+          
+          call-with-input-file-and-directory))
 
 (define-interface spells.process-interface
   (export process?
           process-input
           process-output
           process-errors
+          
           spawn-process
+          wait-for-process
+          close-process-ports
+
+          call-with-process-input
+          call-with-process-output
+          
           run-process
           run-process/string
           run-process/lines
-          run-process/sexps
-          wait-for-process))
+          run-process/sexps))
 
 (define-interface spells.misc-interface
   (export identity
@@ -296,6 +260,7 @@
   (export lookup-environment-variable
           current-process-environment
           extend-process-environment
+          find-exec-path
           os-name
           os-node-name
           os-release-name

@@ -35,10 +35,10 @@
    (lines "foo" "bar"))
  (test/equal "echo -e (lines)"
    (run-process/lines #f "echo" "-e" "foo\\nbar")
-   '("foo" "bar"))
+   (values 0 #f '("foo" "bar")))
  (test/equal "echo (sexps)"
    (run-process/sexps #f "echo" "(hello world)")
-   '((hello world)))
+   (values 0 #f '((hello world))))
  
  (test/equal "env"
    (run-process/string '(("FOO" . "bar")) "/usr/bin/env")

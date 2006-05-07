@@ -1,5 +1,5 @@
 ;; sysutils.scm -*- scheme48-package: spells.sysutils -*-
-;; Copyright (C) 2005 by Jose Antonio Ortega 
+;; Copyright (C) 2005-2006 by Jose Antonio Ortega 
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>  
 ;; Start date: Wed Dec 28, 2005 00:57 
@@ -27,5 +27,17 @@
     (append env current-env)))
 
 
+(define (string-split string char)
+  (string-tokenize string (char-set-complement (char-set char))))
+
+(define (find-exec-path f)
+  (let ((f (x->pathname f)))
+    (if (pathname-origin f)
+        (and (file-executable? f) f)
+        (let loop ((path
+                    (remove string-null? (string-split (lookup-environment-variable "PATH") #\:))))
+          (if (null? path) #f
+              (let ((fp (merge-pathnames f (car path))))
+                (if (file-executable? fp) fp (loop (cdr path)))))))))
 
 ;;; sysutils.scm ends here

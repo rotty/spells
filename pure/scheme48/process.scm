@@ -59,9 +59,12 @@
           (process-id-terminating-signal (process-pid process))))
 
 (define (close-process-ports process)
-  (close-input-port (process-output process))
-  (close-output-port (process-input process))
-  (close-input-port (process-errors process)))
+  (let ((input (process-input process))
+        (output (process-output process))
+        (errors (process-errors process)))
+    (if input (close-output-port input))
+    (if output (close-input-port output))
+    (if errors (close-input-port errors))))
 
 (define (run-process env prog . args)
   (let ((id (fork)))
@@ -81,15 +84,15 @@
                                   (read-char output))
                                 (read-char output))))
     (close-process-ports process)
-     (receive (status signal) (wait-for-process process)
-       (values status signal result))))
+    (receive (status signal) (wait-for-process process)
+      (values status signal result))))
 
 (define (open-process-input env prog . args)
   (receive (in-in in-out) (open-pipe)
     (let ((id (fork)))
       (cond (id
              (close-input-port in-in)
-             in-out)
+             (make-process id in-out #f #f))
             (else
              (close-output-port in-out)
              (remap-file-descriptors! in-in #f #f)
@@ -100,17 +103,26 @@
     (let ((id (fork)))
       (cond (id
              (close-output-port out-out)
-             out-in)
+             (make-process id #f out-in #f))
             (else
              (close-input-port out-in)
              (remap-file-descriptors! #f out-out #f)
              (exec-with-alias prog #t (env->strlist env) (cons prog args)))))))
 
+(define (call-with-process-input env prog+args receiver)
+  (let* ((process (apply open-process-input env prog+args))
+         (port (process-input process)))
+    (receiver port)
+    (close-process-ports process)
+    (wait-for-process process)))
+
 (define (call-with-process-output env prog+args receiver)
-  (let ((port (apply open-process-output env prog+args)))
+  (let* ((process (apply open-process-output env prog+args))
+         (port (process-output process)))
     (receive results (receiver port)
-      (close-input-port port)
-      (apply values results))))
+      (close-process-ports process)
+      (receive status+signal (wait-for-process process)
+        (apply values (append status+signal results))))))
 
 (define (port->lines port)
   (unfold eof-object? values (lambda (seed) (read-line port)) (read-line port)))

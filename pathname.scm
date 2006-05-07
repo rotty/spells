@@ -86,8 +86,14 @@
   (cond ((symbol?   object) (make-pathname #f '() object))
         ((string?   object) (parse-namestring object fs-type))
         ((pathname? object) object)
-        (else (error "%S cannot be coerced to a pathname."
-                  object))))
+        ((pair? object)
+         (if (pair? (car object))
+             (make-pathname #f (car object)
+                            (if (null? (cdr object))
+                                #f
+                                (make-file (cadr object) #f)))
+             (make-pathname #f (drop-right object 1) (make-file (last object) #f))))
+        (else (error "cannot coerce to a pathname" object))))
 
 
 ;;;; Files
@@ -181,10 +187,20 @@
                              (else (append directory-default directory)))
                        file))))
 
+;;@ Return a file by merging @1 with @2.
 (define (merge-files file defaults-file)
-  "Return a file by merging FILE with DEFAULTS-FILE."
-  ;++ lose
-  (or file defaults-file))
+  (cond ((not file)          defaults-file)
+        ((not defaults-file) file)
+        (else
+         (let ((name (file-name file))
+               (defaults-name (file-name defaults-file))
+               (types (file-types file))
+               (defaults-types (file-types defaults-file))
+               (version (file-version file))
+               (defaults-version (file-version defaults-file)))
+           (make-file (or name defaults-name)
+                      (if (null? types) defaults-types types)
+                      (or version defaults-version))))))
 
 ;;@ Return a pathname whose merging with RELATIVE produces PATHNAME.
 ;; This is currently unimplemented and will simply return PATHNAME."
@@ -233,6 +249,7 @@
                    (error "Unable to find pathname's container: %S"
                           pathname)
                    (loop expansion))))))))
+
 
 ;;;; Pathname Expansion
 
@@ -244,7 +261,7 @@
 ;;@ Compare the pathnames @1 and @2 and return @code{#t} if they refer
 ;; to the same filesystem entity.
 ;;
-;; FIXME: doesn't deal with versions.
+;; FIXME: doesn't deal with versions, 
 (define (pathname=? x y)
   (and (equal? (pathname-origin x) (pathname-origin y))
        (equal? (pathname-directory x) (pathname-directory y))
@@ -255,6 +272,29 @@
                         (file-name (pathname-file y)))
                 (equal? (file-types (pathname-file x))
                         (file-types (pathname-file y)))))))
+
+(define (%->string obj)
+  (cond ((string? obj) obj)
+        ((symbol? obj) (symbol->string obj))
+        (else (error "cannot coerce to string" obj))))
+
+(define (make-pathname-file-comp pred)
+  (lambda (x y)
+    (let ((file-x (pathname-file x))
+          (file-y (pathname-file y)))
+      (cond ((pathname=? x y) #f)
+            ((and file-x (file-name file-x)
+                  file-y (file-name file-y)
+                  (equal? (pathname-origin x)
+                          (pathname-origin y))
+                  (equal? (map %->string (pathname-directory x))
+                          (map %->string (pathname-directory y))))
+             (pred (%->string (file-name file-x)) (%->string (file-name file-y))))
+            (else
+             #f)))))
+
+(define pathname<? (make-pathname-file-comp string<?))
+(define pathname>? (make-pathname-file-comp string>?))
 
 
 ;;;; Namestrings
@@ -329,6 +369,9 @@
                  (directory-namestring pathname)
                  (file-namestring pathname)))
 
+(define-operation (fs-type/parse-file-namestring fs-type namestring)
+  (make-file namestring '() #f))
+
 (define (string-split s c start)
   (string-tokenize s (char-set-complement (char-set c))))
 
@@ -344,12 +387,15 @@
     ((fs-type/directory-namestring self pathname)
      (let ((dir (pathname-directory pathname)))
        (if (null? dir)
-           ""
+           "."
            (string-append (string-join dir "/") "/"))))
 
     ((fs-type/pathname->namestring self pathname)
+     
      (string-append (fs-type/origin-namestring self pathname)
-                    (fs-type/directory-namestring self pathname)
+                    (if (null? (pathname-directory pathname))
+                        ""
+                        (fs-type/directory-namestring self pathname))
                     (fs-type/file-namestring self pathname)))
     
     ((fs-type/file-namestring self pathname)
@@ -372,18 +418,21 @@
         (if directory?
             #f
             (let ((file-part (last parts)))
-              (receive (prefix file-parts)
-                  (cond ((string-every #\. file-part)
-                         (values "" (list file-part)))
-                        ((string-skip file-part #\.)
-                         => (lambda (idx)
-                              (values (substring/shared file-part 0 idx)
-                                      (string-split file-part #\. idx))))
-                        (else (values "" (string-split file-part #\. 0))))
-                (if (and (null? file-parts) (string-null? prefix))
-                    #f
-                    (make-file (string-append prefix (first file-parts))
-                               (cdr file-parts)))))))))))
+              (fs-type/parse-file-namestring self file-part))))))))
+
+(define (parse-file-part/types file-part)
+  (receive (prefix file-parts)
+      (cond ((string-every #\. file-part)
+             (values "" (list file-part)))
+            ((string-skip file-part #\.)
+             => (lambda (idx)
+                  (values (substring/shared file-part 0 idx)
+                          (string-split file-part #\. idx))))
+            (else (values "" (string-split file-part #\. 0))))
+    (if (and (null? file-parts) (string-null? prefix))
+        #f
+        (make-file (string-append prefix (first file-parts))
+                          (cdr file-parts)))))
 
 (define (local-file-system-type)
   unix-file-system-type)

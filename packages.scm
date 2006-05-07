@@ -208,25 +208,6 @@
            (guile (re-export exit)))
   (files process))
 
-;;@ File system interface (deprecated).
-(define-structure spells.file spells.file-interface
-  (open scheme srfi-1 srfi-13 srfi-16
-        spells.error spells.pregexp spells.sysutils spells.misc)
-  (dialect (scheme48 (open srfi-14 sort posix threads byte-vectors i/o)
-                     (for-syntax (open scheme destructuring)))
-           (mzscheme (language scheme)
-                     (open srfi-14))
-           (gauche (open file.util)))
-  (files file ((pure all) file)))
-
-;;@ File lists (deprecated).
-(define-structure spells.file-list spells.file-list-interface
-  (open scheme srfi-1
-        spells.error
-        spells.pregexp spells.misc spells.file)
-  (dialect (mzscheme (language scheme)))
-  (files file-list))
-
 ;;; @subsection Unclassified
 
 ;;@ Bitwise arithmetic.

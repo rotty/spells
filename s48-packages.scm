@@ -62,42 +62,25 @@
         spells.operations)
   (files pathname))
 
-(define-structure spells.namestring spells.namestring-interface
-  (open scheme srfi-1 srfi-13 srfi-14
-        spells.error
-        spells.pregexp)
-  (files ((pure all) namestring)))
-
 (define-structure spells.filesys spells.filesys-interface
-  (open scheme srfi-8
+  (for-syntax (open scheme destructuring))
+  (open scheme srfi-1 srfi-8
         posix-files
         (modify posix-time (prefix posix:))
+        spells.byte-vectors
         spells.condition
         spells.pathname
-        spells.time-lib)
+        spells.time-lib
+        spells.block-io)
   (files ((pure scheme48) filesys) ((pure all) filesys)))
 
 (define-structure spells.sysutils spells.sysutils-interface
   ;; note: it should be POSIX-PLATFORM-NAMES instead of POSIX, but
   ;; for some reason s48 does not recognise the former structure name
-  (open scheme srfi-1 posix-process-data posix)
+  (open scheme srfi-1 srfi-13 srfi-14
+        posix-process-data posix
+        spells.pathname spells.filesys)
   (files ((pure all) sysutils) ((pure scheme48) sysutils)))
-
-(define-structure spells.file spells.file-interface
-  (for-syntax (open scheme destructuring))
-  (open scheme srfi-1 srfi-13 srfi-16
-        spells.error spells.pregexp spells.sysutils spells.misc
-        (modify spells.filesys (prefix fs:))
-        spells.namestring
-        spells.time-lib
-        srfi-14 sort posix threads byte-vectors i/o)
-  (files ((pure all) file) ((pure scheme48) file)))
-
-(define-structure spells.file-list spells.file-list-interface
-  (open scheme srfi-1
-        spells.error
-        spells.pregexp spells.misc spells.namestring spells.file)
-  (files file-list))
 
 (define-structure spells.process spells.process-interface
   (open scheme srfi-1 srfi-6 srfi-8 srfi-11 srfi-13

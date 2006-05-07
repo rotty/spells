@@ -10,22 +10,13 @@ o [rotty] Operating system interface
 
 This needs a restructuring; I have the following in mind:
 
+- spells.process
+
+   Proper documentation and more tests needed.
+
 - spells.filesys
 
-  Implement, based on Riastradh's filesys proposal.
-
-- spells.file
-
-   This should eventually go away. As a temporary measure, until
-   pathnames are ready (I want to wait for Riastradh's T stuff), move
-   the namestring-related parts to spells.namestring; then
-   spells.filesys + spells.namestring should be able to replace
-   spells.file, modulo some library-level procedures, which should be
-   added to spells.filesys.
-
-- spells.file-list
-
-   Remove; lift into conjure.
+   Documentation, tests missing.
 
 * Text-related
 

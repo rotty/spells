@@ -1,5 +1,5 @@
 ;; sysutils.scm -*- scheme48-package: spells.sysutils -*-
-;; Copyright (C) 2005 by Jose Antonio Ortega 
+;; Copyright (C) 2005-2006 by Jose Antonio Ortega 
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>  
 ;; Start date: Wed Dec 28, 2005 00:56 
@@ -22,6 +22,5 @@
 ;;; Code: 
 
 (define current-process-environment environment-alist)
-
 
 ;;; sysutils.scm ends here

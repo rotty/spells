@@ -1,5 +1,5 @@
 ;; sysutils.scm -*- scheme48-package: spells.sysutils -*-
-;; Copyright (C) 2005 by Jose Antonio Ortega 
+;; Copyright (C) 2005-2006 by Jose Antonio Ortega 
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>  
 ;; Start date: Wed Dec 28, 2005 01:34 
@@ -33,6 +33,9 @@
 ;; alist @1, replacing any variable already present in the current
 ;; environment.
 (define (extend-process-environment env) (proc-to-be-defined))
+
+;;@ Find executable file name in @file{$PATH}.
+(define (find-exec-path f) (proc-to-be-defined))
 
 ;;@ These procedures return strings that are supposed to identify the
 ;; current OS and machine. The POSIX standard does not indicate the

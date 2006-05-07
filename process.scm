@@ -61,13 +61,10 @@
 
 ;;@stop
 
-(define (open-process-input env prog . args)
-  (proc-to-define))
-
-(define (open-process-output env prog . args)
-  (proc-to-define))
-
 (define (call-with-process-output env prog+args receiver)
+  (proc-to-define))
+
+(define (call-with-process-input env prog+args receiver)
   (proc-to-define))
 
 (define (run-process/lines env prog . args)
