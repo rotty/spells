@@ -98,9 +98,12 @@
   (open scheme srfi-1 srfi-6 srfi-8 srfi-11 srfi-13
         posix-processes
         posix-i/o
+        spells.port
+        spells.error
         spells.record-types
         spells.byte-vectors
-        spells.delimited-readers)
+        spells.delimited-readers
+        spells.pathname)
   (files ((pure scheme48) process)))
 
 (define-structure spells.ascii spells.ascii-interface

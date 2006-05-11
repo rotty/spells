@@ -35,6 +35,14 @@
   (errors process-errors))
 
 
+(define (x->strlist lst)
+  (map (lambda (s)
+         (cond ((string? s)   s)
+               ((pathname? s) (x->namestring s))
+               (else
+                (error "cannot coerce to string list" lst))))
+       lst))
+
 (define (env->strlist env)
   (and (list? env)
        (map (lambda (e) (string-append (car e) "=" (cdr e))) env)))
@@ -51,7 +59,7 @@
              (make-process id in-out out-in err-in))
             (else
              (remap-file-descriptors! in-in out-out err-out)
-             (exec-with-alias prog #t (env->strlist env) (cons prog args)))))))
+             (exec-with-alias prog #t (env->strlist env) (x->strlist (cons prog args))))))))
 
 (define (wait-for-process process)
   (wait-for-child-process (process-pid process))
@@ -76,7 +84,7 @@
            (exec-with-alias prog #t (env->strlist env) (cons prog args))))))
 
 (define (run-process/string env prog . args)
-  (let* ((process (apply spawn-process (cons env (cons prog args))))
+  (let* ((process (apply spawn-process (cons env (x->strlist (cons prog args)))))
          (output (process-output process))
          (result (string-unfold eof-object?
                                 values
@@ -95,8 +103,8 @@
              (make-process id in-out #f #f))
             (else
              (close-output-port in-out)
-             (remap-file-descriptors! in-in #f #f)
-             (exec-with-alias prog #t (env->strlist env) (cons prog args)))))))
+             (remap-file-descriptors! in-in (current-output-port) (current-error-port))
+             (exec-with-alias prog #t (env->strlist env) (x->strlist (cons prog args))))))))
 
 (define (open-process-output env prog . args)
   (receive (out-in out-out) (open-pipe)
@@ -106,8 +114,8 @@
              (make-process id #f out-in #f))
             (else
              (close-input-port out-in)
-             (remap-file-descriptors! #f out-out #f)
-             (exec-with-alias prog #t (env->strlist env) (cons prog args)))))))
+             (remap-file-descriptors! (current-input-port) out-out (current-error-port))
+             (exec-with-alias prog #t (env->strlist env) (x->strlist (cons prog args))))))))
 
 (define (call-with-process-input env prog+args receiver)
   (let* ((process (apply open-process-input env prog+args))

@@ -212,7 +212,7 @@
           file-executable?
           file-modification-time
           file-size-in-bytes
-          
+
           directory-fold*
           directory-fold
           directory-fold-tree
