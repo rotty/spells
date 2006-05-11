@@ -226,6 +226,63 @@
           
           call-with-input-file-and-directory))
 
+(define-interface spells.posix-filesys-interface
+  (export get-file-info
+          
+          file-info?
+          file-info-name
+          file-info-device
+          file-info-inode
+          file-info-link-count
+          file-info-size
+          file-info-owner
+          file-info-group
+          file-info-mode
+          file-info-last-access
+          file-info-last-modification
+
+          file-info-type
+          (file-type :syntax)
+          file-type?
+          file-type-name
+          
+          (file-mode :syntax)
+          file-mode?
+
+          file-mode+  
+          file-mode-
+          file-mode=? 
+          file-mode<=? 
+          file-mode>=?
+
+          file-mode->integer
+          integer->file-mode
+
+          user-id?
+          user-id=?
+          user-id->integer
+          integer->user-id
+          group-id?
+          group-id=?
+          group-id->integer
+          integer->group-id
+
+          user-id->user-info
+          name->user-info
+          group-id->group-info
+          name->group-info 
+
+          user-info?
+          user-info-name
+          user-info-id
+          user-info-group
+          user-info-home-directory
+          user-info-shell
+          group-info?
+          group-info-name
+          group-info-id
+          group-info-members))
+
 (define-interface spells.process-interface
   (export process?
           process-input

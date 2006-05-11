@@ -74,6 +74,18 @@
         spells.block-io)
   (files ((pure scheme48) filesys) ((pure all) filesys)))
 
+(define-structure spells.posix-filesys spells.posix-filesys-interface
+  (open scheme
+        (modify posix-files
+                (rename (get-file-info s48:get-file-info)
+                        (file-info-last-access s48:file-info-last-access)
+                        (file-info-last-modification s48:file-info-last-modification)))
+        (modify posix-time (prefix posix:))
+        posix-users
+        spells.pathname
+        spells.time-lib)
+  (files ((pure scheme48) posix-filesys)))
+
 (define-structure spells.sysutils spells.sysutils-interface
   ;; note: it should be POSIX-PLATFORM-NAMES instead of POSIX, but
   ;; for some reason s48 does not recognise the former structure name
