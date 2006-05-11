@@ -48,8 +48,7 @@
   (or (string=? "." f) (string=? ".." f)))
 
 (define (directory-fold* pathname combiner . seeds)
-  (let ((stream (open-directory-stream (x->f pathname)))
-        (namestring (x->namestring pathname)))
+  (let ((stream (open-directory-stream (x->f pathname))))
     (define (full-pathname entry)
       (pathname-with-file pathname entry))
     (dynamic-wind
@@ -71,10 +70,10 @@
   (lambda (form r compare)
    (destructure (((with-working-directory dir . body) form))
       `(,(r 'let) ((,(r 'wd) (,(r 'working-directory))))
-        (,(r 'display) ,dir) (,(r 'newline))
         (,(r 'dynamic-wind)
-         (,(r 'lambda) () (,(r 'set-working-directory!) (,(r 'directory-namestring)
-                                                         (,(r 'x->pathname) ,dir))))
+         (,(r 'lambda) () (,(r 'set-working-directory!)
+                           (,(r 'x->namestring) (,(r 'pathname-as-directory)
+                                                 (,(r 'x->pathname) ,dir)))))
          (,(r 'lambda) () ,@body)
          (,(r 'lambda) () (,(r 'set-working-directory!) ,(r 'wd))))))))
 

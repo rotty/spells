@@ -228,8 +228,9 @@
         (make-pathname (pathname-origin pathname)
                        (let ((directory (pathname-directory pathname)))
                          (if directory
-                             (append directory (list file))
-                             (list file))))
+                             (append directory (list (file-namestring pathname)))
+                             (list (file-namestring pathname))))
+                       #f)
         pathname)))
 
 ;;@ Return a pathname of the directory that contains PATHNAME.

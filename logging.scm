@@ -192,5 +192,5 @@
 (define/optional-args (configure-logger name (optional (config (*default-config*))))
   (let ((logger (get-logger name)))
     (set-logger-handlers! logger (config-ref config 'handlers '()))
-    (set-logger-threshold! logger (config-ref* config 'threshold #f))
+    (set-logger-threshold! logger (numeric-level (config-ref* config 'threshold #f)))
     (set-logger-propagate?! logger (config-ref* config 'propagate? #t))))
