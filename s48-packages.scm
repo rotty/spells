@@ -29,7 +29,7 @@
 
 (define-structure spells.condition spells.condition-interface
   (open scheme srfi-1 srfi-9 srfi-23 conditions srfi-34 srfi-36)
-  (files ((pure scheme48) condition)))
+  (files ((pure all) condition)))
 
 (define-structure spells.time-lib spells.time-lib-interface
   (open scheme

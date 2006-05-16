@@ -136,7 +136,8 @@
           &parser-error parser-error?
           parser-error-port
           &end-of-input end-of-input?
-          end-of-input-port))
+          end-of-input-port
+          &stacked stacked-condition? next-condition))
 
 (define-interface spells.condition-interface
   (compound-interface spells.srfi-34-interface
