@@ -28,8 +28,23 @@
             (let ((new-dir (merge-pathnames (make-pathname #f (list new) #f) path)))
               (or (file-exists? new-dir) (create-directory new-dir))
               new-dir))
-          (make-pathname #f '() #f)
+          (make-pathname (pathname-origin pathname) '() #f)
           (pathname-directory pathname))))
+
+;;@ Search @1, a list of directories for an occurance of a file as
+;; specified by pathname.
+(define (search-directory-list dir-list pathname)
+  (let ((pathname (x->pathname pathname)))
+    (cond ((pathname-origin pathname)
+           pathname)
+          (else
+           (let loop ((lst dir-list))
+             (if (null? lst)
+                 #f
+                 (let ((path (merge-pathnames pathname (car lst))))
+                   (if (file-exists? path)
+                       path
+                       (loop (cdr lst))))))))))
 
 ;;@ Vanilla file installation procedure that simply copies the
 ;; file, creating any needed directory.

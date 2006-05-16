@@ -224,8 +224,11 @@
 
           working-directory
           with-working-directory
-          
-          call-with-input-file-and-directory))
+
+          call-with-input-file-and-directory
+
+          search-directory-list
+          ))
 
 (define-interface spells.posix-filesys-interface
   (export get-file-info
