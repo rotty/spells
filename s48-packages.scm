@@ -120,16 +120,13 @@
 
 (define-structure spells.define-values (export ((define-values)
                                                 :syntax))
-  (for-syntax (open scheme srfi-1 destructuring))
-  (open scheme srfi-8 primitives)
-  (files ((pure scheme48) define-values)))
+  (open scheme lib42.define-values))
 
 (define-structure spells.match (export ((match match-lambda
                                           match-let match-let*
                                           match-define-values)
                                         :syntax))
-  (open scheme spells.define-values)
-  (files match))
+  (open scheme lib42.match))
 
 (define-structure spells.port spells.port-interface
   (open scheme i/o
