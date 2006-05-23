@@ -229,4 +229,11 @@
         spells.record-types)
   (files logging))
 
+(define-structure spells.streams spells.streams-interface
+  (open scheme srfi-1
+        spells.cells
+        spells.record-types
+        spells.error)
+  (files streams))
+
 ;; arch-tag: b134cf62-6fc4-47ed-8659-c36a7c613e71

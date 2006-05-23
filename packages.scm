@@ -140,6 +140,15 @@
   (open scheme spells.cut spells.byte-vectors spells.error spells.bitwise)
   (files blobs))
 
+;; @uref{http://srfi.schemers.org/srfi-40/srfi-40.html, SRFI 40} -
+;; A library of streams.
+(define-structure spells.streams spells.streams-interface
+  (open scheme srfi-1
+        spells.cells
+        spells.record-types
+        spells.error)
+  (files streams))
+
 ;;; @subsection Text-related
 
 ;;@ Common-Lisp-style @code{format}.

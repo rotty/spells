@@ -476,4 +476,19 @@
           
           configure-logger))
 
+(define-interface spells.streams-interface
+  (export stream-null
+          (stream-cons :syntax)
+          stream?
+          stream-null?
+          stream-pair?
+          stream-car
+          stream-cdr
+          (stream-delay :syntax)
+          stream
+          stream-unfoldn
+          stream-map
+          stream-for-each
+          stream-filter))
+
 ;; arch-tag: a4a455e7-5c3e-4157-b598-a531e44a9e78
