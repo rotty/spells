@@ -104,6 +104,12 @@
   (open scheme)
   (files alist))
 
+;;@ @uref{http://srfi.schemers.org/srfi-43/srfi-43.html, SRFI-43} -
+;; Vector Library.
+(define-structure spells.vector-lib spells.vector-lib-interface
+  (open scheme
+        spells.error)
+  (files vector-lib))
 
 ;;@ Mutable cells.
 (define-structure spells.cells spells.cells-interface

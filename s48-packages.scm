@@ -236,4 +236,9 @@
         spells.error)
   (files streams))
 
+(define-structure spells.vector-lib spells.vector-lib-interface
+  (open scheme
+        spells.error)
+  (files vector-lib))
+
 ;; arch-tag: b134cf62-6fc4-47ed-8659-c36a7c613e71
