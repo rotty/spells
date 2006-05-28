@@ -201,11 +201,11 @@
           make-pathname
           pathname?
           x->pathname
-          x->namelist
-          x->namestring
+          pathname=?
+          pathname<?
+          pathname>?
           
-          pathname-host
-          pathname-base
+          pathname-origin
           pathname-directory
           pathname-file
           pathname-with-origin
@@ -246,7 +246,7 @@
           file-executable?
           file-modification-time
           file-size-in-bytes
-          
+
           directory-fold*
           directory-fold
           directory-fold-tree
@@ -325,6 +325,7 @@
           process-input
           process-output
           process-errors
+
           spawn-process
           wait-for-process
           close-process-ports
