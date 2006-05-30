@@ -26,10 +26,14 @@
 (testeez
  "Path name handling"
 
- (test/equal "make-pathname" (x->namestring
-                              (make-pathname #f '("foo" "bar") "baz")) "foo/bar/baz")
- (test/equal "make-pathname" (x->namestring
-                              (make-pathname '/ '("foo") "bar")) "/foo/bar"))
-
+ (test/equal "make-pathname"
+   (x->namestring (make-pathname #f '("foo" "bar") "baz"))
+   "foo/bar/baz")
+ (test/equal "make-pathname"
+   (x->namestring (make-pathname '/ '("foo") "bar"))
+   "/foo/bar")
+ (test/equal "make-pathname"
+   (x->namestring (make-pathname #f '() #f))
+   "."))
 
 ;;; file.scm ends here

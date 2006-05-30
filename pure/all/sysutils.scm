@@ -37,7 +37,7 @@
         (let loop ((path
                     (remove string-null? (string-split (lookup-environment-variable "PATH") #\:))))
           (if (null? path) #f
-              (let ((fp (merge-pathnames f (car path))))
+              (let ((fp (merge-pathnames f (pathname-as-directory (car path)))))
                 (if (file-executable? fp) fp (loop (cdr path)))))))))
 
 ;;; sysutils.scm ends here

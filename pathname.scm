@@ -394,9 +394,14 @@
     ((fs-type/pathname->namestring self pathname)
      
      (string-append (fs-type/origin-namestring self pathname)
-                    (if (null? (pathname-directory pathname))
-                        ""
-                        (fs-type/directory-namestring self pathname))
+                    (cond ((and (null? (pathname-directory pathname))
+                                (not (pathname-file pathname)))
+                           
+                           ".")
+                          ((null? (pathname-directory pathname))
+                           "")
+                          (else
+                           (fs-type/directory-namestring self pathname)))
                     (fs-type/file-namestring self pathname)))
     
     ((fs-type/file-namestring self pathname)
