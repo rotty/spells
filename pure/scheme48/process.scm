@@ -84,7 +84,7 @@
            (if env
                (apply exec-with-environment
                       (cons prog (cons (env->strlist env) args)))
-               (exec prog args))))))
+               (apply exec (x->strlist (cons prog args))))))))
 
 (define (run-process/string env prog . args)
   (let* ((process (apply spawn-process (cons env (x->strlist (cons prog args)))))
