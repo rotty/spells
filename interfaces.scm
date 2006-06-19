@@ -185,6 +185,7 @@
 (define-interface spells.opt-args-interface
   (export ((define/named-args
              define/optional-args
+             let-optionals
              let-optionals*
              :optional
              opt-lambda)

@@ -13,8 +13,8 @@
   (open srfi-26))
 
 (define-structure spells.opt-args spells.opt-args-interface
-  (open scheme spells.error)
-  (files opt-args))
+  (open scheme lib42.opt-args)
+  (files ((pure all) opt-args)))
 
 (define-structure spells.table spells.table-interface
   (open scheme srfi-16 srfi-23 (modify tables (prefix s48:)))

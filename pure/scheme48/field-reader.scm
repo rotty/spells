@@ -67,12 +67,6 @@
 ;;; a pattern that *terminates* fields, or a pattern that *matches*
 ;;; fields.
 
-;; Ugly hack until we have a real let-optionals
-(define-syntax let-optionals
-  (syntax-rules ()
-    ((let-optionals args bindings body ...) (let-optionals* args bindings body ...))))
-
-
 (define (thing->delim-matcher x)
   (if (procedure? x) x					; matcher proc
       (let ((re (cond ((string? x) (pregexp x))
