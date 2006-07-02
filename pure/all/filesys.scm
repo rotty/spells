@@ -23,13 +23,13 @@
 
 ;;@ Create directories, with intermediary ones when needed.
 (define (create-directory* pathname)
-  (let ((pathname (x->pathname pathname)))
+  (let ((pathname (pathname-as-directory (x->pathname pathname))))
     (fold (lambda (new path)
             (let ((new-dir (merge-pathnames (make-pathname #f (list new) #f) path)))
               (or (file-exists? new-dir) (create-directory new-dir))
               new-dir))
           (make-pathname (pathname-origin pathname) '() #f)
-          (pathname-directory pathname))))
+          pathname)))
 
 ;;@ Search @1, a list of directories for an occurance of a file as
 ;; specified by pathname.
