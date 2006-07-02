@@ -29,7 +29,7 @@
               (or (file-exists? new-dir) (create-directory new-dir))
               new-dir))
           (make-pathname (pathname-origin pathname) '() #f)
-          pathname)))
+          (pathname-directory pathname))))
 
 ;;@ Search @1, a list of directories for an occurance of a file as
 ;; specified by pathname.
