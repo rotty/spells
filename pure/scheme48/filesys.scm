@@ -11,9 +11,9 @@
 
 (define (delete-file pathname)
   (if (file-exists? pathname)
-      (if (file-regular? pathname)
-          (unlink (x->f pathname))
-          (remove-directory (x->f pathname)))))
+      (if (file-directory? pathname)
+          (remove-directory (x->f pathname))
+          (unlink (x->f pathname)))))
 
 (define (rename-file source-pathname target-pathname)
   (rename (x->f source-pathname) (x->f target-pathname)))
@@ -25,6 +25,9 @@
 
 (define (file-regular? pathname)
   (file-type-check pathname 'regular))
+
+(define (file-symbolic-link? pathname)
+  (file-type-check pathname 'symbolic-link))
 
 (define (file-directory? pathname)
   (file-type-check pathname 'directory))

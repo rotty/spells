@@ -242,6 +242,7 @@
           
           file-regular?
           file-directory?
+          file-symbolic-link?
           file-readable?
           file-writable?
           file-executable?

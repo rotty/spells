@@ -77,6 +77,8 @@
 ;; program, whether the file really exists or not.
 (define (file-regular? pathname)
   (proc-to-be-defined))
+(define (file-symbolic-link? pathname)
+  (proc-to-be-defined))
 (define (file-directory? pathname)
   (proc-to-be-defined))
 (define (file-readable? pathname)
