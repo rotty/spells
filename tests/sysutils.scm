@@ -1,5 +1,5 @@
 ;; sysutils.scm -*- scheme48-package: nil -*-
-;; Copyright (C) 2005 by Jose Antonio Ortega 
+;; Copyright (C) 2005, 2006 by Jose Antonio Ortega 
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>  
 ;; sysutils.scm -- Unit tests for spells.sysutils
@@ -34,8 +34,8 @@
            (new-env (extend-process-environment
                      `(("FOO" . "BAR") ("HOME" . ,home)))))
       (and (equal? (assoc "FOO" new-env) '("FOO" . "BAR"))
+           (= (count (lambda (pr) (string=? (car pr) "HOME")) new-env) 1)
            (equal? (assoc "HOME" new-env) `("HOME" . ,home))
            (equal? (assoc "PATH" new-env) `("PATH" . ,path))))))
-
 
 ;;; sysutils.scm ends here

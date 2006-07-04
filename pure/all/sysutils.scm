@@ -22,8 +22,8 @@
 ;;; Code: 
 
 (define (extend-process-environment env)
-  (let ((current-env (remove! (lambda (x) (assoc x env))
-                              (current-process-environment))))
+  (let ((current-env (remove (lambda (x) (assoc (car x) env))
+                             (current-process-environment))))
     (append env current-env)))
 
 

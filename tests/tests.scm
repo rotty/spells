@@ -31,7 +31,7 @@
   ;;("file-traversal.scm" spells.file)
   ;;("file-write.scm" spells.file spells.namestring)
   ;;("file.scm" spells.file spells.namestring)
-  ("sysutils.scm" spells.sysutils)
+  ("sysutils.scm" spells.sysutils srfi-1)
   ("format.scm" spells.format)
   ("misc.scm" spells.misc)
   ("opt-args.scm" spells.opt-args)
