@@ -82,12 +82,11 @@
                    (process-id-terminating-signal id)))
           (else
            (if env
-               (apply exec-with-environment
-                      (cons prog (cons (env->strlist env) args)))
+               (apply exec-with-environment (x->namestring prog) (env->strlist env) (x->strlist args))
                (apply exec (x->strlist (cons prog args))))))))
 
 (define (run-process/string env prog . args)
-  (let* ((process (apply spawn-process (cons env (x->strlist (cons prog args)))))
+  (let* ((process (apply spawn-process env (x->strlist (cons prog args))))
          (output (process-output process))
          (result (string-unfold eof-object?
                                 values
@@ -107,7 +106,10 @@
             (else
              (close-output-port in-out)
              (remap-file-descriptors! in-in (current-output-port) (current-error-port))
-             (exec-with-alias prog #t (env->strlist env) (x->strlist (cons prog args))))))))
+             (exec-with-alias (x->namestring prog)
+                              #t
+                              (env->strlist env)
+                              (x->strlist (cons prog args))))))))
 
 (define (open-process-output env prog . args)
   (receive (out-in out-out) (open-pipe)
@@ -118,7 +120,10 @@
             (else
              (close-input-port out-in)
              (remap-file-descriptors! (current-input-port) out-out (current-error-port))
-             (exec-with-alias prog #t (env->strlist env) (x->strlist (cons prog args))))))))
+             (exec-with-alias (x->namestring prog)
+                              #t
+                              (env->strlist env)
+                              (x->strlist (cons prog args))))))))
 
 (define (call-with-process-input env prog+args receiver)
   (let* ((process (apply open-process-input env prog+args))
