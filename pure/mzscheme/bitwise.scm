@@ -1,6 +1,3 @@
-(scmxlate-ignore-define bitwise-ior bitwise-and bitwise-xor bitwise-not
-                        arithmetic-shift)
-
 (#%require (only mzscheme
                  bitwise-ior bitwise-and bitwise-xor bitwise-not
                  arithmetic-shift))

@@ -41,6 +41,11 @@
      (define/named-args (name? (arg? def?) ...)
        (lambda (arg? ...) form1? form2? rest? ...) "define/named-args"))))
 
+(define-syntax let-optionals
+  (syntax-rules ()
+    ((let-optionals arg ...)
+     (let-optionals* arg ...))))
+
 ;;@ macro that allows for simple definition of functions with
 ;; optional arguments.
 ;;

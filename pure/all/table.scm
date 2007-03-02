@@ -6,6 +6,13 @@
                   (set! alist (cons (cons key value) alist))))
     alist))
 
+(define (table-fold proc init table)
+  (let ((result init))
+    (table-walk (lambda (key value)
+                  (set! result (proc key value result)))
+                table)
+    result))
+
 (define (default-failure-thunk) #f)
 
 ;; arch-tag: ebb30766-d8c9-4468-8cb5-a3ceb5c4a592

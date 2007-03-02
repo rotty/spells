@@ -1,7 +1,5 @@
 (#%require (only mzscheme parameterize))
 
-(scmxlate-ignore-define current-error-port)
-
 (define (with-current-ports in out error thunk)
   (parameterize ((current-input-port in)
                  (current-output-port out)

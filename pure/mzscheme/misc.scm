@@ -1,7 +1,7 @@
 ;; util.misc.scm -- Misc utilites for MzScheme
 ;; arch-tag: b27f4a34-4209-44ab-8586-49fd8c1b8322
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Jun 12, 2005 22:16
@@ -25,7 +25,7 @@
 
 (#%require (only mzscheme
                  sleep procedure-arity-includes?
-                 eof getenv andmap ormap)
+                 eof getenv andmap ormap void exit)
            (only (lib "list.ss") quicksort))
 
 (define sort-list quicksort)
@@ -34,5 +34,8 @@
 (define and-map andmap)
 (define or-map ormap)
 (define (eof-object) eof)
+(define (identity x) x)
+(define (compose f g) (lambda args (f (apply g args))))
+(define (unspecific) (void))
 
-;;; util.misc.scm ends here
+;;; misc.scm ends here

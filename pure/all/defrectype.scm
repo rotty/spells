@@ -10,35 +10,33 @@
     (lambda (lose)
       (lambda ()
         (parameterize (($lose (lambda (message . irritants)
-                                 (lose
-                                  (lambda ()
-                                    ;; SYNTAX-ERROR is silly in Scheme48.
-                                    (apply syntax-error
-                                           "invalid DEFINE-RECORD-TYPE form"
-                                           form
-                                           message irritants)
-                                    form)))))
-          (lambda ()
-            (match form ((keyword type-name (conser-name . conser-args)
-                                  other-fields)
-                          form)
-              (receive (needs-conser-layer? arg-tags vars inits)
-                  (compute-vars+inits conser-args other-fields)
-                (let ((real-conser
-                       (if needs-conser-layer?
-                           (rename (symbol-append '% conser-name))
-                           conser-name)))
-                  `(,(rename 'BEGIN)
-                    (,(rename 'DEFINE-RECORD-TYPE) ,type-name
-                     (,real-conser ,@arg-tags)
-                     ,(symbol-append type-name '?)
-                     ,@(generate-field-specs conser-args
-                                             other-fields
-                                             type-name))
-                    ,@(if needs-conser-layer?
-                          `((,(rename 'DEFINE) (,conser-name ,@vars)
-                             (,real-conser ,@inits)))
-                          '()))))))))))))
+                                (lose
+                                 (lambda ()
+                                   ;; SYNTAX-ERROR is silly in Scheme48.
+                                   (apply syntax-error
+                                          "invalid DEFINE-RECORD-TYPE form"
+                                          form
+                                          message irritants)
+                                   form)))))
+          (match form
+            ((list keyword type-name (list-rest conser-name conser-args) other-fields)
+             (receive (needs-conser-layer? arg-tags vars inits)
+                 (compute-vars+inits conser-args other-fields)
+               (let ((real-conser
+                      (if needs-conser-layer?
+                          (rename (symbol-append '% conser-name))
+                          conser-name)))
+                 `(,(rename 'BEGIN)
+                   (,(rename 'DEFINE-RECORD-TYPE) ,type-name
+                    (,real-conser ,@arg-tags)
+                    ,(symbol-append type-name '?)
+                    ,@(generate-field-specs conser-args
+                                            other-fields
+                                            type-name))
+                   ,@(if needs-conser-layer?
+                         `((,(rename 'DEFINE) (,conser-name ,@vars)
+                            (,real-conser ,@inits)))
+                         '()))))))))))))
 
 (define $lose (make-parameter #f))
 (define (lose msg . irritants) (apply ($lose) msg irritants))
@@ -130,26 +128,27 @@
                               symbols))))
 
 (define (expand-define-functional-fields form r compare)
-  (destructure (( (keyword type-name . fields) form))
-    (let ((obj (r 'OBJ))
-          (value (r 'VALUE))
-          (modifier (r 'MODIFIER))
-          (unconser (symbol-append type-name "-components"))
-          (conser (symbol-append "make-" type-name)))
-      `(,(r 'BEGIN)
-        (,(r 'DEFINE) (,unconser ,obj)
-         (,(r 'VALUES) ,@(map (lambda (f)
-                                `(,(make-field-accessor type-name f) ,obj))
-                              fields)))
-        ,@(append-map
-           (lambda (field)
-             `((,(r 'DEFINE) (,(make-field-replacer type-name field) ,obj ,value)
-                (,(r 'RECEIVE) ,fields (,unconser ,obj)
-                 (,conser ,@(map (lambda (f) (if (eq? f field) value f)) fields))))
-               (,(r 'DEFINE) (,(make-field-modifier type-name field) ,obj ,modifier)
-                (,(make-field-replacer type-name field)
-                 ,obj (,modifier (,(make-field-accessor type-name field) ,obj))))
-               (,(r 'DEFINE) (,(make-field-default type-name field) ,obj ,value)
-                (,(make-field-modifier type-name field) ,obj (,(r 'LAMBDA) (v)
-                                                              (,(r 'OR) v ,value))))))
-           fields)))))
+  (match form
+    ((list-rest keyword type-name fields)
+     (let ((obj (r 'OBJ))
+           (value (r 'VALUE))
+           (modifier (r 'MODIFIER))
+           (unconser (symbol-append type-name "-components"))
+           (conser (symbol-append "make-" type-name)))
+       `(,(r 'BEGIN)
+         (,(r 'DEFINE) (,unconser ,obj)
+          (,(r 'VALUES) ,@(map (lambda (f)
+                                 `(,(make-field-accessor type-name f) ,obj))
+                               fields)))
+         ,@(append-map
+            (lambda (field)
+              `((,(r 'DEFINE) (,(make-field-replacer type-name field) ,obj ,value)
+                 (,(r 'RECEIVE) ,fields (,unconser ,obj)
+                  (,conser ,@(map (lambda (f) (if (eq? f field) value f)) fields))))
+                (,(r 'DEFINE) (,(make-field-modifier type-name field) ,obj ,modifier)
+                 (,(make-field-replacer type-name field)
+                  ,obj (,modifier (,(make-field-accessor type-name field) ,obj))))
+                (,(r 'DEFINE) (,(make-field-default type-name field) ,obj ,value)
+                 (,(make-field-modifier type-name field) ,obj (,(r 'LAMBDA) (v)
+                                                               (,(r 'OR) v ,value))))))
+            fields))))))

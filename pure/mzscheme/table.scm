@@ -1,7 +1,7 @@
 ;; util.table.scm -- MzScheme hash tables
 ;; arch-tag: 432F12DC-EE68-4BF2-B5DE-3236147A33C5
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>
 ;; Start date: Sun May 29, 2005 23:41
@@ -25,7 +25,8 @@
 
 (#%require (only mzscheme
                  make-hash-table hash-table?
-                 hash-table-get hash-table-put!))
+                 hash-table-get hash-table-put! hash-table-remove!
+                 hash-table-for-each))
 
 (define make-table
   (case-lambda

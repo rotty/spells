@@ -63,7 +63,6 @@
   (files pathname))
 
 (define-structure spells.filesys spells.filesys-interface
-  (for-syntax (open scheme destructuring))
   (open scheme srfi-1 srfi-8
         posix-files
         (modify posix-time (prefix posix:))
@@ -144,7 +143,7 @@
 (define-structure spells.cells spells.cells-interface
   (open cells))
 
-(define-structure spells.error (export error call-error)
+(define-structure spells.error (export error call-error syntax-error)
   (open signals))
 
 (define-structure spells.weak spells.weak-interface
@@ -158,7 +157,8 @@
 
 (define-structure spells.byte-vectors spells.byte-vectors-interface
   (open scheme byte-vectors)
-  (files ((pure scheme48) byte-vectors) (dialects srfi-66-ops)))
+  (files ((pure scheme48) byte-vectors)
+         ((pure all) srfi-66-ops)))
 
 (define-structure spells.blobs spells.blobs-interface
   (open scheme srfi-26 spells.byte-vectors spells.error spells.bitwise)
@@ -202,8 +202,9 @@
 
 (define-structure spells.define-record-type*-expander (export expand-define-record-type*
                                                               expand-define-functional-fields)
-  (open scheme srfi-1 destructuring fluids signals receiving)
-  (files ((pure scheme48) defrectype*)))
+  (open scheme srfi-1 srfi-8
+        spells.match spells.parameter spells.error)
+  (files ((pure all) defrectype)))
 
 (define-structure spells.record-types spells.record-types-interface
   (open scheme srfi-8 srfi-9

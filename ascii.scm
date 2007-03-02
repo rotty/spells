@@ -1,7 +1,7 @@
 ;; ascii.scm -- ASCII encoding
 ;; arch-tag: 75433a58-dc9a-469c-b127-8d1b4edc7124
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Fri Jul 31, 2005 16:25
@@ -31,11 +31,5 @@
 
 ;;@ Converts the character @1 into the corresponding ASCII code.
 (define (char->ascii c) (proc-to-be-defined))
-
-;;@ Upper bound of the integer range accepted by ascii->char.
-(define ascii-limit 128)
-
-;;@ List of integers that are considered white-space.
-(define ascii-whitespaces '(32 10 9 12 13)) ;space linefeed tab page return
 
 ;;; ascii.scm ends here

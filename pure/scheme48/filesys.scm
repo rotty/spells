@@ -70,15 +70,14 @@
         (lambda () (close-directory-stream stream)))))
 
 (define-syntax with-working-directory
-  (lambda (form r compare)
-   (destructure (((with-working-directory dir . body) form))
-      `(,(r 'let) ((,(r 'wd) (,(r 'working-directory))))
-        (,(r 'dynamic-wind)
-         (,(r 'lambda) () (,(r 'set-working-directory!)
-                           (,(r 'x->namestring) (,(r 'pathname-as-directory)
-                                                 (,(r 'x->pathname) ,dir)))))
-         (,(r 'lambda) () ,@body)
-         (,(r 'lambda) () (,(r 'set-working-directory!) ,(r 'wd))))))))
+  (syntax-rules ()
+    ((with-working-directory dir body ...)
+     (let ((wd (working-directory)))
+       (dynamic-wind
+           (lambda () (set-working-directory!
+                       (x->f (pathname-as-directory (x->pathname dir)))))
+           (lambda () body ...)
+           (lambda () (set-working-directory! wd)))))))
 
 (define (copy-file old-file new-file) 
    (let* ((old-file (x->f old-file))

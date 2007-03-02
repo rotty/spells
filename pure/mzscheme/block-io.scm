@@ -1,4 +1,4 @@
-(#%require (only mzscheme read-bytes write-bytes)
+(#%require (only mzscheme read-bytes write-bytes read-string! read-bytes!)
            (rename mzscheme mz:write-string write-string))
 
 (define (read-block block start count port)

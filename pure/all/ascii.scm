@@ -1,3 +1,8 @@
+(define ascii-limit 128)
+
+;;@ List of integers that are considered white-space.
+(define ascii-whitespaces '(32 10 9 12 13)) ;space linefeed tab page return
+
 (define ascii-lowercase-a (char->ascii #\a))
 (define ascii-uppercase-a (char->ascii #\A))
 

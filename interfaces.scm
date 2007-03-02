@@ -173,7 +173,6 @@
           vector-fill!
           vector-reverse!
           vector-copy!                    vector-reverse-copy!
-          vector-reverse!
 
           vector->list                    reverse-vector->list
           list->vector                    reverse-list->vector))
