@@ -103,7 +103,8 @@
         spells.byte-vectors
         spells.delimited-readers
         spells.pathname)
-  (files ((pure scheme48) process)))
+  (files ((pure scheme48) process)
+         ((pure all) process)))
 
 (define-structure spells.ascii spells.ascii-interface
   (open scheme ascii)
@@ -126,6 +127,12 @@
                                           match-define-values)
                                         :syntax))
   (open scheme lib42.match))
+
+(define-structure spells.pacman spells.pacman-interface
+  (open scheme lib42.pacman)
+  (begin
+    (define load/package load)
+    (define (load-system . args) #f)))
 
 (define-structure spells.port spells.port-interface
   (open scheme i/o
@@ -164,17 +171,6 @@
   (open scheme srfi-26 spells.byte-vectors spells.error spells.bitwise)
   (files blobs))
 
-(define-interface spells.field-reader-interface
-  (export field-splitter infix-splitter suffix-splitter sloppy-suffix-splitter
-	  record-reader
-	  field-reader))
-
-(define-interface spells.delimited-readers-interface
-  (export read-line
-	  read-paragraph
-	  read-delimited
-	  skip-char-set))
-
 (define-structure spells.field-reader spells.field-reader-interface
   (open scheme srfi-8
 	(subset srfi-13 (string-join))
@@ -198,7 +194,8 @@
         spells.error
 	spells.ascii
         spells.opt-args)
-  (files ((pure scheme48) delimited-readers)))
+  (files ((pure scheme48) delimited-readers)
+         ((pure scheme48) skip-char-set)))
 
 (define-structure spells.define-record-type*-expander (export expand-define-record-type*
                                                               expand-define-functional-fields)

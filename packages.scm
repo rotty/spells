@@ -98,6 +98,10 @@
   (open scheme spells.define-values)
   (files match))
 
+(define-structure spells.pacman spells.pacman-interface
+  (dialect (scheme48 (open lib42.pacman))
+           (mzscheme (files ((pure mzscheme) pacman)))))
+
 ;;; @subsection Data structures
 
 ;;@ Simple hash tables.
@@ -241,6 +245,28 @@
   (dialect (scheme48 (open i/o))
            (mzscheme (files ((pure mzscheme) block-io)))))
 
+(define-structure spells.delimited-readers spells.delimited-readers-interface
+  (open scheme
+        srfi-8
+        srfi-13
+        srfi-14
+	spells.byte-vectors
+        spells.error
+	spells.ascii
+        spells.opt-args)
+  (dialect (mzscheme (files ((pure mzscheme) delimited-readers)
+                            ((pure all) skip-char-set)))
+           (scheme48 (files ((pure scheme48) delimited-readers))))
+  (files ((pure all) delimited-readers)))
+
+(define-structure spells.field-reader spells.field-reader-interface
+  (open scheme srfi-8 srfi-13 srfi-14
+        spells.error
+        spells.opt-args
+	spells.delimited-readers
+        spells.pregexp)
+  (dialect (mzscheme (files ((pure mzscheme) field-reader))))
+  (files ((pure all) field-reader)))
 
 ;;; @subsection Operating system interface
 
@@ -276,13 +302,22 @@
 
 ;;@ Process interface.
 (define-structure spells.process spells.process-interface
-  (all-dialects-except mzscheme)
-  (open scheme)
+  (open scheme srfi-1 srfi-13 spells.pathname spells.delimited-readers)
   (dialect (scheme48 (open posix-processes))
-           (guile (re-export exit)))
-  (files process))
+           (guile (re-export exit))
+           (mzscheme (open spells.record-types srfi-8 spells.error)
+                     (files ((pure mzscheme) process))))
+  (files ((pure all) process)))
 
 ;;; @subsection Unclassified
+
+(define-structure spells.logging spells.logging-interface
+  (open scheme srfi-1
+        spells.time-lib
+        spells.error
+        spells.opt-args
+        spells.record-types)
+  (files logging))
 
 ;;@ Assert the truth of an expression.
 (define-structure spells.assert (export ((assert) :syntax) cerr cout)

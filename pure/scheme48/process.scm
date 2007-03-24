@@ -1,5 +1,5 @@
 ;; process.scm -*- scheme48-package: spells.process -*-
-;; Copyright (C) 2005-2006 by Free Software Foundation, Inc.
+;; Copyright (C) 2005-2007 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Wed Nov 09, 2005 02:33
@@ -51,15 +51,18 @@
   (let-values (((in-in in-out) (open-pipe))
                ((out-in out-out) (open-pipe))
                ((err-in err-out) (open-pipe)))
-    (let ((id (fork)))
+    (let* ((env (env->strlist env))
+           (prog+args (x->strlist (cons prog args)))
+           (id (fork)))
       (cond (id
              (close-input-port in-in)
              (close-output-port out-out)
              (close-output-port err-out)
              (make-process id in-out out-in err-in))
             (else
+             (for-each display `(RUNNING ,env ,prog+args #\newline))
              (remap-file-descriptors! in-in out-out err-out)
-             (exec-with-alias prog #t (env->strlist env) (x->strlist (cons prog args))))))))
+             (exec-with-alias (car prog+args) #t env prog+args))))))
 
 (define (wait-for-process process)
   (wait-for-child-process (process-pid process))
@@ -84,18 +87,6 @@
            (if env
                (apply exec-with-environment (x->namestring prog) (env->strlist env) (x->strlist args))
                (apply exec (x->strlist (cons prog args))))))))
-
-(define (run-process/string env prog . args)
-  (let* ((process (apply spawn-process env (x->strlist (cons prog args))))
-         (output (process-output process))
-         (result (string-unfold eof-object?
-                                values
-                                (lambda (seed)
-                                  (read-char output))
-                                (read-char output))))
-    (close-process-ports process)
-    (receive (status signal) (wait-for-process process)
-      (values status signal result))))
 
 (define (open-process-input env prog . args)
   (receive (in-in in-out) (open-pipe)
@@ -140,18 +131,5 @@
       (receive status+signal (wait-for-process process)
         (apply values (append status+signal results))))))
 
-(define (port->lines port)
-  (unfold eof-object? values (lambda (seed) (read-line port)) (read-line port)))
-
-(define (port->sexps port)
-  (unfold eof-object? values (lambda (seed) (read port)) (read port)))
-
-(define (run-process/lines env prog . args)
-  (call-with-process-output env (cons prog args)
-    port->lines))
-
-(define (run-process/sexps env prog . args)
-  (call-with-process-output env (cons prog args)
-    port->sexps))
 
 ;;; process.scm ends here

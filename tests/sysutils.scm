@@ -1,5 +1,5 @@
 ;; sysutils.scm -*- scheme48-package: nil -*-
-;; Copyright (C) 2005, 2006 by Jose Antonio Ortega 
+;; Copyright (C) 2005, 2006-2007 by Jose Antonio Ortega 
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>  
 ;; sysutils.scm -- Unit tests for spells.sysutils
@@ -23,6 +23,7 @@
 ;; 02110-1301, USA.
 
 ;;; Code: 
+(all-dialects-except mzscheme)
 
 (testeez "environment"
   (test-false "lookup"

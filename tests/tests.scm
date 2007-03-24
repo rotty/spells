@@ -1,7 +1,7 @@
 ;; tests.scm -- list of test files
 ;; arch-tag: 81738281-305b-11d9-8bf0-00404513c0a4
 
-;; Copyright (C) 2004-2006 by Free Software Foundation, Inc.
+;; Copyright (C) 2004-2007 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Nov 07, 2004 02:22
@@ -31,18 +31,18 @@
   ;;("file-traversal.scm" spells.file)
   ;;("file-write.scm" spells.file spells.namestring)
   ;;("file.scm" spells.file spells.namestring)
-  ("sysutils.scm" spells.sysutils srfi-1)
   ("format.scm" spells.format)
   ("misc.scm" spells.misc)
   ("opt-args.scm" spells.opt-args)
   ("parameter.scm" spells.parameter)
   ("byte-vectors.scm" spells.byte-vectors)
-  ("process.scm" srfi-13 spells.process)
   ("table.scm" spells.table)
   ("blobs.scm" spells.blobs)
   ("delimited-readers.scm" spells.delimited-readers spells.misc srfi-6 srfi-13)
   ("operations.scm" spells.operations)
   ("logging.scm" spells.logging)
-  ("streams.scm" spells.streams)))
+  ("streams.scm" spells.streams)
+  ("process.scm" srfi-13 spells.process)
+  ("sysutils.scm" spells.sysutils srfi-1)))
 
 ;;; tests.scm ends here

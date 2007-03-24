@@ -37,5 +37,6 @@
 (define (identity x) x)
 (define (compose f g) (lambda args (f (apply g args))))
 (define (unspecific) (void))
+(define (scheme-dialect) 'mzscheme)
 
 ;;; misc.scm ends here

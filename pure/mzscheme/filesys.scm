@@ -71,7 +71,7 @@
         (apply values seeds)
         (let ((entry (mz:path->string (car entries))))
           (cond ((dot-or-dotdot? entry)
-                 (loop (cdr entries)) seeds)
+                 (loop (cdr entries) seeds))
                 (else
                  (receive (continue? . new-seeds)
                      (apply combiner (full-pathname entry) seeds)
@@ -80,7 +80,7 @@
                        (apply values new-seeds)))))))))
 
 (define (working-directory)
-  (mz:current-directory))
+  (x->pathname (mz:current-directory)))
 
 (define-syntax with-working-directory
   (syntax-rules ()

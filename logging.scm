@@ -1,6 +1,6 @@
 ;; -*- mode: scheme; scheme48-package: spells.logging; -*-
 ;;
-;; Copyright (C) 2006 by Free Software Foundation, Inc.
+;; Copyright (C) 2006-2007 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Tue Jan 17 13:50:56 CET 2006
@@ -72,7 +72,7 @@
                entry)
       ((log-handler-proc handler) entry)))
 
-(define (log logger entry)
+(define (do-log logger entry)
   (define (do-handle)
     (for-each (lambda (handler) (handle handler entry))
               (logger-handlers logger)))
@@ -85,7 +85,7 @@
               (else
                (do-handle)
                (if (logger-propagate? logger)
-                   (log parent entry)))))))
+                   (do-log parent entry)))))))
 
 ;; The nodes in the logger tree
 (define node-name car)
@@ -181,7 +181,7 @@
   (let ((level (numeric-level level))
         (logger (get-logger name)))
     (lambda (obj)
-      (log logger (make-log-entry logger level (current-time) obj)))))
+      (do-log logger (make-log-entry logger level (current-time) obj)))))
 
 
 ;; <config> --> (<config-clause>*)

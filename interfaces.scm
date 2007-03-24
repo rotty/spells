@@ -190,6 +190,17 @@
              opt-lambda)
            :syntax)))
 
+(define-interface spells.field-reader-interface
+  (export field-splitter infix-splitter suffix-splitter sloppy-suffix-splitter
+	  record-reader
+	  field-reader))
+
+(define-interface spells.delimited-readers-interface
+  (export read-line
+	  read-paragraph
+	  read-delimited
+	  skip-char-set))
+
 (define-interface spells.pathname-interface
   (export make-file
           file?
@@ -349,7 +360,8 @@
           sort-list
           and-map
           or-map
-          exit))
+          exit
+          scheme-dialect))
 
 (define-interface spells.sysutils-interface
   (export lookup-environment-variable
@@ -524,5 +536,8 @@
           stream-map
           stream-for-each
           stream-filter))
+
+(define-interface spells.pacman-interface
+  (export system-loader make-package load/package))
 
 ;; arch-tag: a4a455e7-5c3e-4157-b598-a531e44a9e78

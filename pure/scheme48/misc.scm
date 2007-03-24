@@ -1,7 +1,7 @@
 ;; util.misc.scm -- Misc utilites for s48
 ;; arch-tag: 1e0b6c72-492f-406a-8758-7473ff7bc946
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Jun 12, 2005 22:19
@@ -56,5 +56,7 @@
        (let ((arity (procedure-arity p)))
          (or (equal? arity 0)
              (and (pair? arity) (= (cadr arity) 0))))))
+
+(define (scheme-dialect) 'scheme48)
 
 ;;; util.misc.scm ends here
