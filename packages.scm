@@ -296,9 +296,9 @@
 ;;@ Miscellaneous procedures providing access to various bits of
 ;; information regarding the host running the scheme implementation.
 (define-structure spells.sysutils spells.sysutils-interface
-  (all-dialects-except mzscheme)
-  (open scheme srfi-1)
-  (dialect (scheme48 (open posix-process-data posix-platform-names))))
+  (open scheme spells.error)
+  (dialect (scheme48 (open posix-process-data posix-platform-names))
+           (mzscheme (files ((pure mzscheme) sysutils)))))
 
 ;;@ Process interface.
 (define-structure spells.process spells.process-interface

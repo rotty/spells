@@ -1,4 +1,4 @@
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Jun 12, 2005 22:09
@@ -18,6 +18,23 @@
 ;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 ;; 02110-1301, USA.
 
+(#%require (only mzscheme getenv system-type find-executable-path))
+
 (define lookup-environment-variable getenv)
+
+(define (extend-process-environment alist)
+  (error "EXTEND-PROCESS-ENVIRONMENT not implemented on mzscheme"))
+
+(define (current-process-environment)
+  (error "CURRENT-PROCESS-ENVIRONMENT not implemented on mzscheme"))
+
+(define (find-exec-path prog)
+  (find-executable-path prog #f))
+
+(define (os-name) (symbol->string (system-type 'os)))
+(define (os-node-name) "unknown")
+(define (os-release-name) "unknown")
+(define (os-version-name) "unknown")
+(define (machine-name) (system-type 'machine))
 
 ;;; sysutils.scm ends here
