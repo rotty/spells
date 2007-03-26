@@ -57,7 +57,7 @@
   (dialect (guile (open ice-9.syncase))
            (scheme48 (open conditions srfi-34 srfi-36))
            (mzscheme (open srfi-34)
-                     (files ((pure all) srfi-35)
+                     (files ((pure mzscheme) srfi-35)
                             ((pure all) srfi-36))))
   (files ((pure all) condition)))
 
