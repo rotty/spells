@@ -96,7 +96,7 @@
 
 ;;@ A simple object system.
 (define-structure spells.operations spells.operations-interface
-  (open scheme srfi-1 spells.error)
+  (open scheme srfi-1 spells.error spells.annotations)
   (files operations))
 
 (define-structure spells.match spells.match-interface

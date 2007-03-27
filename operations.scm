@@ -39,17 +39,8 @@
     ((object ?proc ?method-clause ...)
      (make-object ?proc (method-clauses->handler ?method-clause ...)))))
 
-(define %get-handler (list '%get-handler))
-
 (define (make-object proc handler)
-  (lambda args
-    (cond ((null? args)
-           (proc))
-          ((and (null? (cdr args))
-                (eq? (car args) %get-handler))
-           handler)
-          (else
-           (apply proc args)))))
+  (annotate-procedure (or proc (lambda args (error "object is not applicable"))) handler))
 
 (define-syntax operation
   (syntax-rules ()
@@ -59,7 +50,7 @@
 (define (make-operation default handler)
   (letrec ((op (make-object
                 (lambda (obj . args)
-                  (cond ((and (procedure? obj) ((obj %get-handler) op))
+                  (cond ((and (procedure? obj) ((procedure-annotation obj) op))
                          => (lambda (method)
                               (apply method obj args)))
                         (default
@@ -79,6 +70,7 @@
 (define (join object1 . objects)
   (make-object object1
                (lambda (op)
-                 (let ((method (any (lambda (o) ((o %get-handler) op)) (cons object1 objects))))
+                 (let ((method (any (lambda (o) ((procedure-annotation o) op))
+                                    (cons object1 objects))))
                    (or method
                        (error "operation not available" objects op))))))

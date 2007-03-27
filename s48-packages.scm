@@ -220,7 +220,7 @@
 
 (define-structure spells.operations spells.operations-interface
   (open scheme srfi-1
-        spells.error)
+        spells.annotations spells.error)
   (files operations))
 
 (define-structure spells.logging spells.logging-interface
