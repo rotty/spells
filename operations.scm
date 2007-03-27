@@ -1,6 +1,6 @@
 ;; -*- Mode: Scheme; scheme48-package: spells.operations; -*-
 ;;
-;; Copyright (C) 2006 by Free Software Foundation, Inc.
+;; Copyright (C) 2006-2007 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Sat Jan  7 16:17:26 CET 2006
@@ -75,3 +75,10 @@
      (define ?name (operation #f)))
     ((define-operation (?name ?arg ...) ?body1 ?body ...)
      (define ?name (operation (lambda (?arg ...) ?body1 ?body ...))))))
+
+(define (join object1 . objects)
+  (make-object object1
+               (lambda (op)
+                 (let ((method (any (lambda (o) ((o %get-handler) op)) (cons object1 objects))))
+                   (or method
+                       (error "operation not available" objects op))))))

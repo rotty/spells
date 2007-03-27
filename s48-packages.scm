@@ -215,7 +215,7 @@
            (BEGIN DEFINE RECEIVE))))
 
 (define-structure spells.operations spells.operations-interface
-  (open scheme
+  (open scheme srfi-1
         spells.error)
   (files operations))
 

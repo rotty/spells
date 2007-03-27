@@ -506,7 +506,8 @@
 (define-interface spells.operations-interface
   (export ((object
             operation
-            define-operation) :syntax)))
+            define-operation) :syntax)
+          join))
 
 (define-interface spells.logging-interface
   (export make-log
