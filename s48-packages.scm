@@ -60,7 +60,7 @@
         spells.opt-args
         spells.record-types
         spells.operations)
-  (files pathname))
+  (files ((pure scheme48) pathname) pathname))
 
 (define-structure spells.filesys spells.filesys-interface
   (open scheme srfi-1 srfi-8

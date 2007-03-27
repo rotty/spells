@@ -83,9 +83,10 @@
 ;; any other case, signal an error.
 (define/optional-args (x->pathname object (optional
                                            (fs-type (local-file-system-type))))
-  (cond ((symbol?   object) (make-pathname #f '() object))
-        ((string?   object) (parse-namestring object fs-type))
-        ((pathname? object) object)
+  (cond ((symbol?    object) (make-pathname #f '() object))
+        ((string?    object) (parse-namestring object fs-type))
+        ((os-string? object) (parse-namestring (os-string->string object)))
+        ((pathname?  object) object)
         ((pair? object)
          (if (pair? (car object))
              (make-pathname #f (car object)

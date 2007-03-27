@@ -282,6 +282,7 @@
         spells.opt-args
         spells.record-types
         spells.operations)
+  (dialect (mzscheme (files ((pure mzscheme) pathname))))
   (files pathname))
 
 ;;@ File system interface.
