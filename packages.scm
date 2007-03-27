@@ -89,6 +89,11 @@
            (else (open srfi-26)))
   (files cut))
 
+;;@ Procedure annotations.
+(define-structure spells.annotations (export annotate-procedure procedure-annotation)
+  (dialect (mzscheme (open scheme)
+                     (files ((pure mzscheme) annotations)))))
+
 ;;@ A simple object system.
 (define-structure spells.operations spells.operations-interface
   (open scheme srfi-1 spells.error)

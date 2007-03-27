@@ -27,6 +27,10 @@
         enumerated)
   (files ((pure scheme48) hash)))
 
+(define-structure spells.annotations (export annotate-procedure procedure-annotation)
+  (open scheme assembler)
+  (files ((pure scheme48) annotations)))
+
 (define-structure spells.condition spells.condition-interface
   (open scheme srfi-1 srfi-9 srfi-23 conditions srfi-34 srfi-36)
   (files ((pure all) condition)))
