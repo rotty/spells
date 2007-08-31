@@ -1,7 +1,7 @@
 ;; named-args.scm -- Defining procedures with named arguments
 ; arch-tag: 2e478444-23b6-49bc-aeb0-da0c81628803
 
-;; Copyright (C) 2004, 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005, 2007 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sat Oct 23, 2004 00:27
@@ -69,7 +69,7 @@
      (if (null? arg) (begin body ...)
 	 (error "Too many arguments in let-opt" arg)))))
 
-;;; (:optional rest-arg default-exp [test-pred])
+;;; (*optional rest-arg default-exp [test-pred])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; This form is for evaluating optional arguments and their defaults
 ;;; in simple procedures that take a *single* optional argument. It is
@@ -84,16 +84,16 @@
 ;;; If there is an TEST-PRED form, it is a predicate that is used to test
 ;;; a non-default value. If the predicate returns false, an error is raised.
 
-(define-syntax :optional
+(define-syntax *optional
   (syntax-rules ()
-    ((:optional rest default-exp)
+    ((*optional rest default-exp)
      (let ((maybe-arg rest))
        (if (pair? maybe-arg)
 	   (if (null? (cdr maybe-arg)) (car maybe-arg)
 	       (error "too many optional arguments" maybe-arg))
 	   default-exp)))
 
-    ((:optional rest default-exp arg-test)
+    ((*optional rest default-exp arg-test)
      (let ((maybe-arg rest))
        (if (pair? maybe-arg)
 	   (if (null? (cdr maybe-arg))

@@ -119,7 +119,7 @@
 
 	  ;; This is the parser.
 	  (lambda (s . maybe-start)
-	    (reverse (loop-proc s (:optional maybe-start 0)
+	    (reverse (loop-proc s (*optional maybe-start 0)
 				match-delim cons-field
 				num-fields nfields-exact?))))))))
 
@@ -144,7 +144,7 @@
 
 	;; This is the parser procedure.
 	(lambda (s . maybe-start)
-	  (reverse (fieldspec-field-loop s (:optional maybe-start 0)
+	  (reverse (fieldspec-field-loop s (*optional maybe-start 0)
 					 match-field num-fields nfields-exact?)))))))
 
 
@@ -320,7 +320,7 @@
 	((concat)		; CONCAT-delimiter reader.
 	 (let ((not-delims (char-set-complement delims)))
 	   (lambda maybe-port
-	     (let* ((p (:optional maybe-port (current-input-port)))
+	     (let* ((p (*optional maybe-port (current-input-port)))
 		    (s (read-delimited delims p 'concat)))
 	       (if (or (not elide?) (eof-object? s)) s
 		   (let ((extra-delims (read-delimited not-delims p 'peek)))
@@ -330,7 +330,7 @@
 	((split)		; SPLIT-delimiter reader.
 	 (let ((not-delims (char-set-complement delims)))
 	   (lambda maybe-port
-	     (let ((p (:optional maybe-port (current-input-port))))
+	     (let ((p (*optional maybe-port (current-input-port))))
 	       (receive (s delim) (read-delimited delims p 'split)
 		 (if (eof-object? s) (values s s)
 		     (values s

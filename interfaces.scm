@@ -186,7 +186,7 @@
              define/optional-args
              let-optionals
              let-optionals*
-             :optional
+             *optional
              opt-lambda)
            :syntax)))
 
