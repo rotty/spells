@@ -7,11 +7,11 @@
           (set-current-input-port in)
           (set-current-output-port out)
           (set-current-error-port err))
+        thunk
         (lambda ()
           (set-current-input-port orig-in)
           (set-current-output-port orig-out)
-          (set-current-error-port orig-err))
-        thunk)))
+          (set-current-error-port orig-err)))))
 
 (define-syntax file-options
   (syntax-rules ()

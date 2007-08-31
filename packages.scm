@@ -53,7 +53,7 @@
 ;; @uref{http://srfi.schemers.org/srfi-36/srfi-36.html, SRFI 36}
 ;; for documentation.
 (define-structure spells.condition spells.condition-interface
-  (dialect (guile (open ice-9.syncase srfi-1 srfi-9)
+  (dialect (guile (open srfi-1 srfi-9)
                   (replace raise)
                   (files ((pure all) srfi-35)
                          ((pure all) srfi-36)))
@@ -79,8 +79,7 @@
 (define-structure spells.opt-args spells.opt-args-interface
   (dialect (mzscheme (open (lib "defmacro.ss") spells.error)
                      (files opt-args ((pure all) opt-args)))
-           (guile (open ice-9.syncase)
-                  (export-syntax %let-optionals*)
+           (guile (export-syntax %let-optionals*)
                   (files opt-args ((pure all) opt-args)))))
 
 ;;@ @uref{http://srfi.schemers.org/srfi-26/srfi-26.html, SRFI 26} -
@@ -98,22 +97,21 @@
 ;;@ A simple object system.
 (define-structure spells.operations spells.operations-interface
   (open scheme srfi-1 spells.error spells.annotations)
-  (dialect (guile (open ice-9.syncase)
-                  (export make-operation make-object)
+  (dialect (guile (export make-operation make-object)
                   (export-syntax %method-clauses->handler)))
   (files operations))
 
 (define-structure spells.match spells.match-interface
   (open scheme spells.define-values)
-  (dialect (guile (open ice-9.syncase)
-                  (export-syntax literal-match guarded-match logical-match
+  (dialect (guile (export-syntax literal-match guarded-match logical-match
                                  compound-match simple-match symbol??)
                   (export literal?)))
   (files match))
 
 (define-structure spells.pacman spells.pacman-interface
   (dialect (scheme48 (open lib42.pacman))
-           (mzscheme (files ((pure mzscheme) pacman)))))
+           (mzscheme (files ((pure mzscheme) pacman)))
+           (guile (files ((pure guile) pacman)))))
 
 ;;; @subsection Data structures
 
@@ -134,8 +132,7 @@
 ;;@ @uref{http://srfi.schemers.org/srfi-43/srfi-43.html, SRFI-43} -
 ;; Vector Library.
 (define-structure spells.vector-lib spells.vector-lib-interface
-  (dialect (guile (open ice-9.syncase)
-                  (re-export make-vector vector vector? vector-fill!
+  (dialect (guile (re-export make-vector vector vector? vector-fill!
                              vector-ref vector-length vector-set!
                              list->vector vector->list)))
   (dialect (mzscheme (files ((pure mzscheme) vector-lib))
@@ -210,7 +207,6 @@
 ;; Octet-Addressed Binary Blocks.
 (define-structure spells.blobs spells.blobs-interface
   (open scheme spells.cut spells.byte-vectors spells.error spells.bitwise)
-  (dialect (guile (open ice-9.syncase)))
   (files blobs))
 
 
@@ -221,7 +217,6 @@
         spells.cells
         spells.record-types
         spells.error)
-  (dialect (guile (open ice-9.syncase)))
   (files streams))
 
 ;;; @subsection Text-related
@@ -266,8 +261,7 @@
                    (subset posix-files (file-options file-options-on? file-mode open-file))))
    (mzscheme (files ((pure mzscheme) port)
                     ((pure all) port)))
-   (guile (open ice-9.syncase)
-          (re-export current-error-port
+   (guile (re-export current-error-port
                      with-output-to-port
                      with-input-from-port
                      force-output)
@@ -403,7 +397,8 @@
         spells.opt-args
         spells.record-types
         spells.operations)
-  (dialect (mzscheme (files ((pure mzscheme) pathname))))
+  (dialect (mzscheme (files ((pure mzscheme) pathname)))
+           (guile (files ((pure guile) pathname))))
   (files pathname))
 
 ;;@ File system interface.
@@ -413,7 +408,10 @@
         spells.pathname
         spells.time-lib)
   (dialect (mzscheme (files ((pure mzscheme) filesys)
-                            ((pure all) filesys)))))
+                            ((pure all) filesys)))
+           (guile (re-export delete-file rename-file)
+                  (files ((pure guile) filesys)
+                         ((pure all) filesys)))))
 
 ;;@ Miscellaneous procedures providing access to various bits of
 ;; information regarding the host running the scheme implementation.
@@ -446,7 +444,6 @@
   (open scheme
         spells.error
         spells.port)
-  (dialect (guile (open ice-9.syncase)))
   (files assert))
 
 ;;@ Hash functions.
@@ -460,7 +457,8 @@
 ;;@ Stuff that doesn't fit somewhere else.
 (define-structure spells.misc spells.misc-interface
   (open scheme)
-  (dialect (guile (re-export thunk? and-map or-map sort-list))
+  (dialect (guile (re-export identity thunk? and-map or-map sort-list)
+                  (files ((pure guile) misc)))
            (mzscheme (open (lib "list.ss"))
                      (files ((pure mzscheme) misc)))
            (scheme48 (open srfi-23

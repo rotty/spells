@@ -40,58 +40,43 @@
   (accessible? (x->f pathname) (access-mode execute)))
 
 (define (file-modification-time pathname)
-  (posix-timestamp->time-utc
-   (posix:time-seconds (file-info-last-modification (get-file-info (x->f pathname))))))
+  (posix-timestamp->time-utc (stat:mtime (stat (x->f pathname)))))
 
 (define (file-size-in-bytes pathname)
-  (file-info-size (get-file-info (x->f pathname))))
+  (stat:size (stat (x->f pathname))))
 
 ;; Test wheter a filename is . or ..
 (define (dot-or-dotdot? f)
   (or (string=? "." f) (string=? ".." f)))
 
 (define (directory-fold* pathname combiner . seeds)
-  (let ((stream (open-directory-stream (x->f pathname))))
+  (let ((stream (opendir (x->f pathname))))
     (define (full-pathname entry)
       (pathname-with-file pathname entry))
     (dynamic-wind
         (lambda () #t)
         (lambda ()
-          (let loop ((entry (read-directory-stream stream)) (seeds seeds))
+          (let loop ((entry (readdir stream)) (seeds seeds))
             (cond ((eqv? entry #f) (apply values seeds))
                   ((dot-or-dotdot? entry)
-                   (loop (read-directory-stream stream)) seeds)
+                   (loop (readdir stream)) seeds)
                   (else
                    (receive (continue? . new-seeds)
                        (apply combiner (full-pathname entry) seeds)
                      (if continue?
-                         (loop (read-directory-stream stream) new-seeds)
+                         (loop (readdir stream) new-seeds)
                          (apply values new-seeds)))))))
-        (lambda () (close-directory-stream stream)))))
+        (lambda () (closedir stream)))))
 
 (define-syntax with-working-directory
   (syntax-rules ()
     ((with-working-directory dir body ...)
      (let ((wd (working-directory)))
        (dynamic-wind
-           (lambda () (set-working-directory!
-                       (x->f (pathname-as-directory (x->pathname dir)))))
+           (lambda () (chdir (x->f (pathname-as-directory (x->pathname dir)))))
            (lambda () body ...)
-           (lambda () (set-working-directory! wd)))))))
+           (lambda () (chdir wd)))))))
 
+(define guile:copy-file copy-file)
 (define (copy-file old-file new-file) 
-   (let* ((old-file (x->f old-file))
-          (new-file (x->f new-file))
-          (old-info (get-file-info old-file)) 
-          (old-port (open-file old-file (file-options read-only))) 
-          (new-port (open-file new-file (file-options write-only create truncate) 
-                               (file-info-mode old-info))) 
-          (buf-size 4000) 
-          (buffer (make-byte-vector buf-size 0))) 
-     (let loop () 
-       (let ((n (read-block buffer 0 buf-size old-port))) 
-         (cond ((not (eof-object? n)) 
-                (write-block buffer 0 n new-port) 
-                (loop))))) 
-     (close-input-port old-port) 
-     (close-output-port new-port)))
+   (guile:copy-file (x->f old-file) (x->f new-file)))
