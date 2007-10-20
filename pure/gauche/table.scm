@@ -1,7 +1,7 @@
-;; util.table.scm -- Hashtables in Gauche
+;; table.scm -- Hashtables in Gauche
 ;; arch-tag: 0AC484C0-D248-4EAB-8C4B-EFEA1F5B3337
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>
 ;; Start date: Sat Jun 04, 2005 11:18
@@ -23,14 +23,12 @@
 
 ;;; Code:
 
-(define make-table
-  (case-lambda
-    (() (make-hash-table))
-    ((type) (make-hash-table (case type
-                               ((eq) 'eq?)
-                               ((eqv) 'eqv?)
-                               ((equal) 'equal?)
-                               (else (error "unsupported hash type")))))))
+(define (make-table . maybe-type)
+  (make-hash-table (case (*optional maybe-type 'eq)
+                     ((eq) 'eq?)
+                     ((eqv) 'eqv?)
+                     ((equal) 'equal?)
+                     (else (error "unsupported hash type")))))
 
 (define table? hash-table?)
 (define table-ref
@@ -44,4 +42,4 @@
 (define table-walk hash-table-for-each)
 
 
-;;; util.table.scm ends here
+;;; table.scm ends here

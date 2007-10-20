@@ -33,7 +33,8 @@
 (define-structure spells.parameter spells.srfi-39-interface
   (open scheme)
   (dialect (scheme48 (open srfi-39))
-           (guile (open srfi-39)))
+           (guile (open srfi-39))
+           (gauche (open gauche.parameter)))
   (dialect (guile (re-export make-parameter with-parameters*)
                   (re-export-syntax parameterize))
            (mzscheme (files ((pure mzscheme) parameter)))))
@@ -117,12 +118,13 @@
 
 ;;@ Simple hash tables.
 (define-structure spells.table spells.table-interface
-  (open scheme srfi-16)
-  (dialect (scheme48 (open srfi-23
+  (dialect (scheme48 (open scheme srfi-23
                            (modify tables (prefix s48:))))
-           (mzscheme (open spells.error)
+           (mzscheme (open spells.error srfi-16)
                      (files ((pure mzscheme) table)
-                            ((pure all) table)))))
+                            ((pure all) table)))
+           (gauche (files ((pure gauche) table)
+                          ((pure all) table)))))
 
 ;;@ Association list utilities.
 (define-structure spells.alist (export acons assq-ref assv-ref assoc-ref)
