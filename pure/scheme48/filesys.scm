@@ -68,14 +68,21 @@
                          (apply values new-seeds)))))))
         (lambda () (closedir stream)))))
 
+(define (working-directory)
+  (pathname-as-directory (x->pathname (s48:working-directory))))
+
 (define-syntax with-working-directory
-  (syntax-rules ()
-    ((with-working-directory dir body ...)
-     (let ((wd (working-directory)))
-       (dynamic-wind
-           (lambda () (chdir (x->f (pathname-as-directory (x->pathname dir)))))
-           (lambda () body ...)
-           (lambda () (chdir wd)))))))
+  (lambda (form r compare)
+   (destructure (((with-working-directory dir . body) form))
+      `(,(r 'let) ((,(r 'wd) (,(r 'working-directory))))
+        (,(r 'dynamic-wind)
+         (,(r 'lambda) () (,(r 'set-working-directory!)
+                           (,(r 'x->namestring) (,(r 'pathname-as-directory)
+                                                 (,(r 'x->pathname) ,dir)))))
+         (,(r 'lambda) () ,@body)
+         (,(r 'lambda) () (,(r 'set-working-directory!) (,(r 'x->namestring) ,(r 'wd))))))))
+  (LET WORKING-DIRECTORY DYNAMIC-WIND LAMBDA SET-WORKING-DIRECTORY! X->NAMESTRING
+       PATHNAME-AS-DIRECTORY X->PATHNAME))
 
 (define guile:copy-file copy-file)
 (define (copy-file old-file new-file) 

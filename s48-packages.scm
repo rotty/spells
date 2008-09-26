@@ -13,7 +13,7 @@
   (open srfi-26))
 
 (define-structure spells.opt-args spells.opt-args-interface
-  (open scheme lib42.opt-args)
+  (open scheme spells.error lib42.opt-args)
   (files ((pure all) opt-args)))
 
 (define-structure spells.table spells.table-interface
@@ -68,7 +68,8 @@
 
 (define-structure spells.filesys spells.filesys-interface
   (open scheme srfi-1 srfi-8
-        posix-files
+        (modify posix-files
+                (rename (working-directory s48:working-directory)))
         (modify posix-time (prefix posix:))
         spells.byte-vectors
         spells.condition

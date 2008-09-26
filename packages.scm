@@ -1,7 +1,7 @@
 ;; packages.scm -- Utility packages
 ;; arch-tag: C324DB01-215B-4644-8C05-902E3404AAEA
 
-;; Copyright (C) 2005-2007 by Free Software Foundation, Inc.
+;; Copyright (C) 2005-2008 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>
 ;; Start date: Fri May 27, 2005 23:40
@@ -64,6 +64,13 @@
                             ((pure all) srfi-36))))
   (files ((pure all) condition)))
 
+;;@ @uref{http://srfi.schemers.org/srfi-26/srfi-26.html, SRFI 26} -
+;; Notation for Specializing Parameters without Currying.
+(define-structure spells.cut (export ((cut cute) :syntax))
+  (dialect (guile (open scheme))
+           (else (open srfi-26)))
+  (files cut))
+
 ;;@ A slightly extended version of
 ;; @uref{http://srfi.schemers.org/srfi-23/srfi-23.html, SRFI 23}. This
 ;; implementation of the @ref{spells.error error,error} procedure will
@@ -82,12 +89,6 @@
                      (files opt-args ((pure all) opt-args)))
            (guile (export-syntax %let-optionals*)
                   (files opt-args ((pure all) opt-args)))))
-
-;;@ @uref{http://srfi.schemers.org/srfi-26/srfi-26.html, SRFI 26} -
-;; Notation for Specializing Parameters without Currying.
-(define-structure spells.cut (export ((cut cute) :syntax))
-  (open srfi-26)
-  (dialect (guile (re-export-syntax cut cute))))
 
 ;;@ Procedure annotations.
 (define-structure spells.annotations (export annotate-procedure procedure-annotation)

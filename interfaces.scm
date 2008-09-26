@@ -268,7 +268,7 @@
           file-unreachable-error-operator
 
           working-directory
-          with-working-directory
+          (with-working-directory :syntax)
 
           call-with-input-file-and-directory
 
