@@ -1,6 +1,6 @@
 (library (spells receive)
   (export receive)
-  (import (rnrs))
+  (import (rnrs base))
 
   (define-syntax receive
     (syntax-rules ()

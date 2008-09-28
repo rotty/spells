@@ -32,10 +32,31 @@
    string-null?
    string-join
    string-tokenize
-   string-replace)
-  (import (rnrs base)
+   string-replace
+    ; R5RS extended:
+   string->list string-copy string-fill!
+   )
+  (import (except (rnrs base) string-copy string-for-each string->list)
+          (except (rnrs mutable-strings) string-fill!)
+          (rnrs control)
+          (rnrs syntax-case)
+          (except (rnrs unicode) string-upcase string-downcase string-titlecase)
+          (rnrs r5rs)
+          (rnrs arithmetic bitwise)
           (spells receive)
           (spells opt-args)
+          (spells char-set)
           (for (spells include) run expand))
 
-  (include (srfi string)))
+  (define-syntax check-arg
+    (lambda (stx)
+      (syntax-case stx ()
+        [(_ pred val caller)
+         (identifier? #'val)
+         #'(unless (pred val)
+             (error "check-arg failed" val))])))
+
+  (define (char-cased? c)
+    (char-upper-case? (char-upcase c)))
+
+  (include ((scheme spells) srfi-13)))

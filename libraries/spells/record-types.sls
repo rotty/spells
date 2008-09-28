@@ -1,15 +1,36 @@
 #!r6rs
 
 (library (spells record-types)
-  (export define-record-type)
+  (export define-record-type
+          define-record-type*
+          define-record-discloser)
   (import (for (rnrs base) run expand)
           (for (rnrs syntax-case) run expand)
+          (for (rnrs lists) expand)
           (rnrs records procedural)
           (rnrs io simple)
           (spells define-values)
+          (for (spells defrectype-expander) expand)
+          (spells include))
 
-          (for (rnrs lists) expand))
+  (include ((scheme spells) defmacro))
   
+  (define-macro (define-record-type* . forms)
+    (expand-define-record-type* (cons 'define-record-type* forms)
+                                (lambda (x) x)
+                                eq?))
+
+  (define-macro (define-functional-fields . forms)
+    (expand-define-functional-fields (cons 'define-record-type* forms)
+                                     (lambda (x) x)
+                                     eq?))
+
+  ;; How to implement this?
+  (define-syntax define-record-discloser
+    (syntax-rules ()
+      ((define-record-discloser type proc)
+       #t)))
+
   (define-syntax define-record-type
     (lambda (form)
       (define (iota n)
@@ -47,7 +68,7 @@
       (syntax-case form ()
         ((k <type-name>
             (<constructor-name> <field-tag> ...)
-            <predictate-name>
+            <predicate-name>
             <field-spec> ...)
          (let ((field-specs (syntax->datum #'(<field-spec> ...))))
            (let ((field-accessor-names (extract-field-accessor-names field-specs #'k))

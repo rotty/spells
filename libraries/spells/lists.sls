@@ -43,16 +43,21 @@
     lset-xor			lset-xor!
     lset-diff+intersection	        lset-diff+intersection!)
   
-  (import (except (rnrs base) map)
+  (import (except (rnrs base) map string-copy)
           (rnrs control)
           (only (rnrs lists) memq memv assq assv)
           (rnrs mutable-pairs)
+          (rnrs syntax-case)
           (spells receive)
           (spells include)
           (spells opt-args))
 
-  (define (check-arg pred val caller)
-    (let lp ((val val))
-      (if (pred val) val (lp (error "Bad argument" val pred caller)))))
+  (define-syntax check-arg
+    (lambda (stx)
+      (syntax-case stx ()
+        [(_ pred val caller)
+         (identifier? #'val)
+         #'(unless (pred val)
+             (error "check-arg failed" val))])))
   
-  (include ((scheme spells) lists)))
+  (include ((scheme spells) srfi-1)))

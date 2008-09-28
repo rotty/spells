@@ -14,7 +14,7 @@
                                  (lambda ()
                                    ;; SYNTAX-ERROR is silly in Scheme48.
                                    (apply syntax-error
-                                          "invalid DEFINE-RECORD-TYPE form"
+                                          "invalid define-record-type form"
                                           form
                                           message irritants))))))
           (let ((type-name (cadr form))
@@ -27,15 +27,15 @@
                      (if needs-conser-layer?
                          (rename (symbol-append '% conser-name))
                          conser-name)))
-                `(,(rename 'BEGIN)
-                  (,(rename 'DEFINE-RECORD-TYPE) ,type-name
+                `(,(rename 'begin)
+                  (,(rename 'define-record-type) ,type-name
                    (,real-conser ,@arg-tags)
                    ,(symbol-append type-name '?)
                    ,@(generate-field-specs conser-args
                                            other-fields
                                            type-name))
                   ,@(if needs-conser-layer?
-                        `((,(rename 'DEFINE) (,conser-name ,@vars)
+                        `((,(rename 'define) (,conser-name ,@vars)
                            (,real-conser ,@inits)))
                         '())))))))))))
 
@@ -131,25 +131,25 @@
 (define (expand-define-functional-fields form r compare)
   (let ((type-name (cadr form))
         (fields (cddr form)))
-    (let ((obj (r 'OBJ))
-          (value (r 'VALUE))
-          (modifier (r 'MODIFIER))
+    (let ((obj (r 'obj))
+          (value (r 'value))
+          (modifier (r 'modifier))
           (unconser (symbol-append type-name "-components"))
           (conser (symbol-append "make-" type-name)))
-      `(,(r 'BEGIN)
-        (,(r 'DEFINE) (,unconser ,obj)
-         (,(r 'VALUES) ,@(map (lambda (f)
+      `(,(r 'begin)
+        (,(r 'define) (,unconser ,obj)
+         (,(r 'values) ,@(map (lambda (f)
                                 `(,(make-field-accessor type-name f) ,obj))
                               fields)))
         ,@(append-map
            (lambda (field)
-             `((,(r 'DEFINE) (,(make-field-replacer type-name field) ,obj ,value)
-                (,(r 'RECEIVE) ,fields (,unconser ,obj)
+             `((,(r 'define) (,(make-field-replacer type-name field) ,obj ,value)
+                (,(r 'receive) ,fields (,unconser ,obj)
                  (,conser ,@(map (lambda (f) (if (eq? f field) value f)) fields))))
-               (,(r 'DEFINE) (,(make-field-modifier type-name field) ,obj ,modifier)
+               (,(r 'define) (,(make-field-modifier type-name field) ,obj ,modifier)
                 (,(make-field-replacer type-name field)
                  ,obj (,modifier (,(make-field-accessor type-name field) ,obj))))
-               (,(r 'DEFINE) (,(make-field-default type-name field) ,obj ,value)
-                (,(make-field-modifier type-name field) ,obj (,(r 'LAMBDA) (v)
-                                                              (,(r 'OR) v ,value))))))
+               (,(r 'define) (,(make-field-default type-name field) ,obj ,value)
+                (,(make-field-modifier type-name field) ,obj (,(r 'lambda) (v)
+                                                              (,(r 'or) v ,value))))))
            fields)))))

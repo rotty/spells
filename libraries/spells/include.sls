@@ -5,8 +5,10 @@
   (import (for (rnrs base) run expand)
           (for (rnrs syntax-case) run expand)
           (for (rnrs io simple) expand)
-          (for (rnrs io ports) expand))
-  
+          (for (rnrs io ports) expand)
+          (for (rnrs exceptions) expand)
+          (for (rnrs conditions) expand))
+
   (define-syntax include
     (lambda (x)
       (define (string-join lst sep)
@@ -27,15 +29,24 @@
                              (symbol->string (cadr name))
                              ".scm"))
               (else name)))
-      (define read-file
-        (lambda (fn k)
-          (call-with-input-file fn
-            (lambda (p)
-              (let f ((x (get-datum p)))
-                (if (eof-object? x)
-                    '()
-                    (cons (datum->syntax k x)
-                          (f (get-datum p)))))))))
+      (define (read-file fn k)
+        (with-exception-handler
+            (lambda (ex)
+              (raise
+               (condition
+                (make-error)
+                (make-who-condition 'include)
+                (make-message-condition "error while trying to include")
+                (make-irritants-condition (list fn))
+                (if (condition? ex) ex (make-irritants-condition (list ex))))))
+          (lambda ()
+            (call-with-input-file fn
+              (lambda (p)
+                (let f ((x (get-datum p)))
+                  (if (eof-object? x)
+                      '()
+                      (cons (datum->syntax k x)
+                            (f (get-datum p))))))))))
       (syntax-case x ()
         ((k filespec ...)
          (let ((forms

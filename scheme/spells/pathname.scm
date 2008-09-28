@@ -55,13 +55,6 @@
   (really-make-pathname origin directory file)
   ())
 
-(define-record-discloser pathname
-  (lambda (pathname)
-    (list 'pathname
-          (pathname-origin pathname)
-          (pathname-directory pathname)
-          (pathname-file pathname))))
-
 (define (make-pathname origin directory file)
   (really-make-pathname origin
                         directory
@@ -105,10 +98,6 @@
   (name file-name)
   (type file-types)
   (version file-version))
-
-(define-record-discloser file
-  (lambda (file)
-    (list 'file (file-name file) (file-types file) (file-version file))))
 
 ;;@ Make a pathname file with the given components.  is the file's
 ;; name, a string or a symbol.  @var{type} is the file's type or
@@ -443,3 +432,16 @@
 
 (define (local-file-system-type)
   unix-file-system-type)
+
+;; these go last, since it may expand to an expression, not a definition
+(define-record-discloser pathname
+  (lambda (pathname)
+    (list 'pathname
+          (pathname-origin pathname)
+          (pathname-directory pathname)
+          (pathname-file pathname))))
+
+(define-record-discloser file
+  (lambda (file)
+    (list 'file (file-name file) (file-types file) (file-version file))))
+

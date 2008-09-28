@@ -130,7 +130,7 @@
 ;;; Not exported; for internal use.
 (define-syntax let-string-start+end2
   (syntax-rules ()
-    ((l-s-s+e2 (start1 end1 start2 end2) proc s1 s2 args body ...)
+    ((let-string-start+end2 (start1 end1 start2 end2) proc s1 s2 args body ...)
      (let ((procv proc)) ; Make sure PROC is only evaluated once.
        (let-string-start+end (start1 end1 rest) procv s1 args
          (let-string-start+end (start2 end2) procv s2 rest
