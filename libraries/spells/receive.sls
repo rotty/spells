@@ -1,3 +1,4 @@
+#!r6rs
 (library (spells receive)
   (export receive)
   (import (rnrs base))

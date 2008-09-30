@@ -1,7 +1,7 @@
 ;; misc.scm -- Utilities that don't fit elsewhere
 ;; arch-tag: 6c79478b-4740-4db7-a6bf-acd915bf8fc4
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Jun 12, 2005 18:50
@@ -29,20 +29,35 @@
 
 ;;@ Efficiently sort the list @1 using the comparison function
 ;; @2. Stability is not required.
-(define (sort-list lst cmpf) (proc-to-be-defined))
-
-;;@ Sleep @1 seconds.
-(define (sleep-seconds t) (proc-to-be-defined))
-
-;;@ Test whether @1 is a procedured that can be called without
-;; arguments.
-(define (thunk? p) (proc-to-be-defined))
+(define (sort-list lst cmpf)
+  (list-sort cmpf lst))
 
 ;;@ Returns the `unspecific' value, as normally returned by e.g. code
 ;; @code{(if #f #f)}.
-(define (unspecific) (proc-to-be-defined))
+(define (unspecific)
+  (if #f #f))
 
-;;@ Returns the end-of-file object.
-(define eof-object (proc-to-be-defined))
+;;@ Apply @1 to @2 (like map) and apply @code{and} to the
+;; resulting list.
+(define (and-map proc lst)
+  (let loop ((lst lst) (res #t))
+    (cond ((null? lst) res)
+          (res (loop (cdr lst) (and res (proc (car lst)))))
+          (else #f))))
+
+;;@ Apply @1 to @2 (like map) and apply @code{or} to the
+;; resulting list.
+(define (or-map proc lst)
+  (let loop ((lst lst) (res #f))
+    (cond ((null? lst) res)
+          (res res)
+          (else (loop (cdr lst) (or res (proc (car lst))))))))
+
+;;@ The identity function, returning @1.
+(define (identity x) x)
+
+;;@ Compose two procedures, yielding a procedure of the same arity
+;;  as @2.
+(define (compose f g) (lambda args (f (apply g args))))
 
 ;;; misc.scm ends here

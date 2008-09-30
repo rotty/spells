@@ -1,6 +1,6 @@
 ;; -*- mode: scheme; scheme48-package: spells.logging; -*-
 ;;
-;; Copyright (C) 2006-2007 by Free Software Foundation, Inc.
+;; Copyright (C) 2006-2008 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Tue Jan 17 13:50:56 CET 2006
@@ -28,10 +28,6 @@
    (propagate? #t)
    (filters '())
    (handlers '())))
-
-(define-record-discloser logger
-  (lambda (l)
-    (list 'logger (logger-name l))))
 
 (define-record-type* log-handler
   (%make-log-handler proc threshold filters)
@@ -194,3 +190,10 @@
     (set-logger-handlers! logger (config-ref config 'handlers '()))
     (set-logger-threshold! logger (numeric-level (config-ref* config 'threshold #f)))
     (set-logger-propagate?! logger (config-ref* config 'propagate? #t))))
+
+
+;; Must go last, since it may expand into an expression
+(define-record-discloser logger
+  (lambda (l)
+    (list 'logger (logger-name l))))
+

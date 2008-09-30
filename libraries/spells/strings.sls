@@ -1,3 +1,4 @@
+#!r6rs
 (library (spells strings)
   (export
    string-map string-map!
@@ -33,13 +34,14 @@
    string-join
    string-tokenize
    string-replace
-    ; R5RS extended:
+                                        ; R5RS extended:
    string->list string-copy string-fill!
    )
-  (import (except (rnrs base) string-copy string-for-each string->list)
+  (import (for (except (rnrs base) string-copy string-for-each string->list)
+               run expand)
+          (for (rnrs syntax-case) run expand)
           (except (rnrs mutable-strings) string-fill!)
           (rnrs control)
-          (rnrs syntax-case)
           (except (rnrs unicode) string-upcase string-downcase string-titlecase)
           (rnrs r5rs)
           (rnrs arithmetic bitwise)
@@ -59,4 +61,4 @@
   (define (char-cased? c)
     (char-upper-case? (char-upcase c)))
 
-  (include ((scheme spells) srfi-13)))
+  (include (spells srfi-13)))

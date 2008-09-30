@@ -13,7 +13,7 @@
           (for (spells defrectype-expander) expand)
           (spells include))
 
-  (include ((scheme spells) defmacro))
+  (include (spells defmacro))
   
   (define-macro (define-record-type* . forms)
     (expand-define-record-type* (cons 'define-record-type* forms)

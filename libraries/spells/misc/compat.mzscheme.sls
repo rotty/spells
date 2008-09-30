@@ -1,7 +1,7 @@
 ;; util.misc.scm -- Misc utilites for MzScheme
 ;; arch-tag: b27f4a34-4209-44ab-8586-49fd8c1b8322
 
-;; Copyright (C) 2005, 2007 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007, 2008 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Jun 12, 2005 22:16
@@ -20,23 +20,18 @@
 ;; along with this program; if not, write to the Free Software
 ;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 ;; 02110-1301, USA.
+#!r6rs
 
 ;;; Code:
 
-(#%require (only mzscheme
-                 sleep procedure-arity-includes?
-                 eof getenv andmap ormap void exit)
-           (only (lib "list.ss") quicksort))
+(library (spells misc compat)
+  (export sleep-seconds thunk? exit scheme-dialect)
+  (import (rnrs base)
+          (only (mzscheme)
+                sleep procedure-arity-includes? exit))
 
-(define sort-list quicksort)
-(define sleep-seconds sleep)
-(define (thunk? p) (and (procedure? p) (procedure-arity-includes? p 0)))
-(define and-map andmap)
-(define or-map ormap)
-(define (eof-object) eof)
-(define (identity x) x)
-(define (compose f g) (lambda args (f (apply g args))))
-(define (unspecific) (void))
-(define (scheme-dialect) 'mzscheme)
+  (define sleep-seconds sleep)
+  (define (thunk? p) (and (procedure? p) (procedure-arity-includes? p 0)))
+  (define (scheme-dialect) 'mzscheme))
 
 ;;; misc.scm ends here

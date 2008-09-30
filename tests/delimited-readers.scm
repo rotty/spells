@@ -1,7 +1,7 @@
 ;; delimited-readers.scm -- unit tests for delimited-readers.scm
 ;; arch-tag: 9eded783-24d0-4fac-8044-b1bd464815de
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann
 ;; Start date: Fri Nov 06, 2005 14:32
@@ -24,16 +24,16 @@
 ;;; Code:
 
 (define (make-lines-port)
-  (open-input-string (string-join '("A line"
-                                    "Another line")
-                                  (string #\newline))))
+  (open-string-input-port (string-join '("A line"
+                                         "Another line")
+                                       (string #\newline))))
 
 (define (make-paragraph-port)
-  (open-input-string (string-join '("A line"
-                                    "on the first paragraph"
-                                    "  "
-                                    "Another paragraph")
-                                  (string #\newline))))
+  (open-string-input-port (string-join '("A line"
+                                         "on the first paragraph"
+                                         "  "
+                                         "Another paragraph")
+                                       (string #\newline))))
 
 (define (s . args)
   (apply string-append

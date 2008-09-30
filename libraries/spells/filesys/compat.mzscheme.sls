@@ -1,17 +1,48 @@
-(#%require (rename mzscheme mz:delete-directory delete-directory)
-           (rename mzscheme mz:file-exists? file-exists?)
-           (rename mzscheme mz:directory-exists? directory-exists?)
-           (rename mzscheme mz:link-exists? link-exists?)
-           (rename mzscheme mz:make-directory make-directory)
-           (rename mzscheme mz:delete-file delete-file)
-           (rename mzscheme mz:rename-file-or-directory rename-file-or-directory)
-           (rename mzscheme mz:file-or-directory-permissions file-or-directory-permissions)
-           (rename mzscheme mz:file-or-directory-modify-seconds file-or-directory-modify-seconds)
-           (rename mzscheme mz:file-size file-size)
-           (rename mzscheme mz:directory-list directory-list)
-           (rename mzscheme mz:path->string path->string)
-           (rename mzscheme mz:copy-file copy-file)
-           (rename mzscheme mz:current-directory current-directory))
+#!r6rs
+(library (spells filesys compat)
+  (export file-exists?
+          create-directory
+          delete-file
+          rename-file
+          
+          file-regular?
+          file-directory?
+          file-symbolic-link?
+          file-readable?
+          file-writable?
+          file-executable?
+          file-modification-time
+          file-size-in-bytes
+
+          directory-fold*
+
+          working-directory
+          with-working-directory
+
+          copy-file)
+  (import (rnrs base)
+          (rnrs lists)
+          (rnrs conditions)
+          (spells receive)
+          (spells pathname)
+          (spells time-lib)
+    
+          (prefix (only (mzscheme)
+                        delete-directory
+                        file-exists?
+                        directory-exists?
+                        link-exists?
+                        make-directory
+                        delete-file
+                        rename-file-or-directory
+                        file-or-directory-permissions
+                        file-or-directory-modify-seconds
+                        file-size
+                        directory-list
+                        path->string
+                        copy-file
+                        current-directory)
+                  mz:))
 
 (define x->f x->namestring)
 
@@ -93,4 +124,4 @@
            (lambda () (mz:current-directory wd)))))))
 
 (define (copy-file old-file new-file)
-  (mz:copy-file (x->f old-file) (x->f new-file)))
+  (mz:copy-file (x->f old-file) (x->f new-file))))

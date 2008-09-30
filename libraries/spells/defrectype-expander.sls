@@ -1,3 +1,4 @@
+#!r6rs
 (library (spells defrectype-expander)
   (export expand-define-record-type*
           expand-define-functional-fields)
@@ -9,4 +10,4 @@
 
   (define syntax-error error)
   
-  (include ((scheme spells) defrectype-expander)))
+  (include (spells defrectype-expander)))

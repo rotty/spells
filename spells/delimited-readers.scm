@@ -23,10 +23,14 @@
 ;;;   Return it as a second return value.
 ;;;
 
+
 (define (read-delimited delims . args)
   (let-optionals* args ((port         (current-input-port))
                         (delim-action 'trim))
-    (let* ((delims (x->char-set delims))
+    (%read-delimited delims port delim-action)))
+
+(define (%read-delimited delims port delim-action)
+  (let* ((delims (->char-set delims))
            (eof? #f)
            (split #f)
            (result
@@ -35,21 +39,21 @@
                (or (eof-object? c) (char-set-contains? delims c)))
              values
              (lambda (seed)
-               (read-char port)
-               (peek-char port))
-             (peek-char port)
+               (get-char port)
+               (lookahead-char port))
+             (lookahead-char port)
              ""
              (lambda (c)
                (if (eof-object? c)
                    (set! eof? #t))
                (case delim-action
                  ((peek)   "")
-                 ((concat) (read-char port) (if eof? "" (string c)))
-                 ((split)  (read-char port) (set! split c) "")
-                 (else     (read-char port) ""))))))
+                 ((concat) (get-char port) (if eof? "" (string c)))
+                 ((split)  (get-char port) (set! split c) "")
+                 (else     (get-char port) ""))))))
       (if (and eof? (zero? (string-length result)))
           (set! result (eof-object)))
-      (if split (values result split) result))))
+      (if split (values result split) result)))
 
 ;;; (read-line [port delim-action])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -58,7 +62,12 @@
 
 (define charset:newline (char-set #\newline))
 
-(define (read-line . rest) (apply read-delimited charset:newline rest))
+(define (read-line . args)
+  (let-optionals* args ((port (current-input-port))
+                        (delim-action 'trim))
+    (if (eq? delim-action 'trim)
+        (get-line port)
+        (%read-delimited charset:newline port delim-action))))
 
 
 ;;; (read-paragraph [port handle-delim])

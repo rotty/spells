@@ -1,3 +1,4 @@
+#!r6rs
 (library (spells operations)
   (export object
           operation
@@ -8,4 +9,4 @@
           (spells procedure-annotations)
           (spells include))
   
-  (include ((scheme spells) operations)))
+  (include (spells operations)))

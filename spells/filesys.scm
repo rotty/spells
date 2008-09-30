@@ -58,6 +58,6 @@
       (call-with-input-file (file-namestring pathname) proc))))
 
 (define-condition-type &file-unreachable-error &error
-  file-unreachable-error?
+  file-unreachable-error? make-file-unreachable-error
   (pathname file-unreachable-error-pathname)
   (operator file-unreachable-error-operator))

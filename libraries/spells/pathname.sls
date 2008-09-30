@@ -1,3 +1,4 @@
+#!r6rs
 (library (spells pathname)
   (export make-file
           file?
@@ -43,4 +44,4 @@
   (define (os-string->string os-string)
     os-string)
   
-  (include ((scheme spells) pathname)))
+  (include (spells pathname)))

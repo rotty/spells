@@ -33,12 +33,13 @@
     char-set:hex-digit   char-set:blank       char-set:ascii
     char-set:empty       char-set:full
     )
-  (import  (rnrs base)
+  (import  (for (except (rnrs base) error) run expand)
+           (for (rnrs syntax-case) run expand)
            (rnrs mutable-strings)
-           (rnrs syntax-case)
            (rnrs arithmetic bitwise)
            (rnrs control)
            (rnrs r5rs)
+           (spells error)
            (spells record-types)
            (spells parameter)
            (spells opt-args)
@@ -58,4 +59,4 @@
          #'(if (not (pred val))
              (error "check-arg failed" val))])))
   
-  (include ((scheme spells) srfi-14)))
+  (include (spells srfi-14)))
