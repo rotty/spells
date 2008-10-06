@@ -1,7 +1,7 @@
 ;; assert.scm -- Unit tests for spells.util.misc
 ;; arch-tag: c1d3c895-8707-4e2a-8b0d-5b4a5d1bf3ab
 
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Fri Jul 30, 2005 16:39
@@ -47,7 +47,7 @@
      (cond
       ((and expr ...) => (lambda (x) x))
       (else
-       (error "assertion failure: ~a" (list '(and expr ...) r-exp ...)))))
+       (error 'assert "assertion failure" (list '(and expr ...) r-exp ...)))))
     ((assert "collect" (expr ...))
      (assert "doit" (expr ...) ()))
     ((assert "collect" (expr ...) report: r-exp ...)

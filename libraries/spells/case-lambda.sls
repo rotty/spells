@@ -1,3 +1,5 @@
+#!r6rs
+
 (library (spells case-lambda)
   (export case-lambda)
   (import (rnrs base))

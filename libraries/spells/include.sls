@@ -20,7 +20,8 @@
                   (loop (cons (car lst) (cons sep result))
                         (cdr lst))))))
       (define (filespec->path name)
-        (cond ((symbol? name) (string-append (symbol->string name) ".scm"))
+        (cond ((string? name) name)
+              ((symbol? name) (string-append (symbol->string name) ".scm"))
               ((pair? name) (string-append
                              (if (pair? (car name))
                                  (string-join (map symbol->string (car name)) "/")
