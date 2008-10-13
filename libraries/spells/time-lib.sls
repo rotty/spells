@@ -36,22 +36,8 @@
     time-utc->posix-timestamp
     )
   (import
-    (rnrs)
-    (rnrs r5rs)
-    (rnrs mutable-strings)
-    (spells time-lib compat)
+    (rnrs base)
+    (xitomatl srfi time)
     (spells include))
 
-  (define open-input-string open-string-input-port)
-  (define read-line
-    (case-lambda
-      [()
-       (get-line (current-input-port))]
-      [(port)
-       (get-line port)]))
-  
-  (define eof (eof-object))
-  
-  (include (spells srfi-19)
-           (spells time-lib)))
-
+  (include (spells time-lib)))
