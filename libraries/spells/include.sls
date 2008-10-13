@@ -1,13 +1,14 @@
 #!r6rs
 
 (library (spells include)
-  (export include)
+  (export include include/resolve)
   (import (for (rnrs base) run expand)
           (for (rnrs syntax-case) run expand)
           (for (rnrs io simple) expand)
           (for (rnrs io ports) expand)
           (for (rnrs exceptions) expand)
-          (for (rnrs conditions) expand))
+          (for (rnrs conditions) expand)
+          (only (xitomatl include) include/resolve))
 
   (define-syntax include
     (lambda (x)
