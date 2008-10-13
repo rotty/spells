@@ -24,8 +24,10 @@
           (spells receive)
           (spells pathname)
           (spells time-lib)
+          (primitives parameterize)
           (prefix (primitives file-exists?
-                              current-directory)
+                              current-directory
+                              delete-file)
                   la:))
 
 (define x->f x->namestring)
@@ -34,59 +36,40 @@
   (la:file-exists? (x->f pathname)))
 
 (define (create-directory pathname)
-  (la:make-directory (x->f pathname)))
+  (error 'directory-fold* "please implement me for larceny"))
 
 (define (delete-file pathname)
+  ;; FIXME: doesn't work for directories
   (if (file-exists? pathname)
-      (if (file-directory? pathname)
-          (la:delete-directory (x->f pathname))
-          (la:delete-file (x->f pathname)))))
+      (la:delete-file (x->f pathname))))
 
 (define (rename-file source-pathname target-pathname)
-  (la:rename-file (x->f source-pathname) (x->f target-pathname)))
+  (error 'rename-file "please implement me for larceny"))
 
 (define (file-regular? pathname)
-  (la:file-regular? (x->f pathname)))
+  (error 'file-regular? "please implement me for larceny"))
 
 (define (file-symbolic-link? pathname)
-  (la:file-symbolic-link? (x->f pathname)))
+  (error 'file-symbolic-link? "please implement me for larceny"))
 
 (define (file-directory? pathname)
-  (la:file-directory? (x->f pathname)))
+  (error 'file-directory? "please implement me for larceny"))
 
 (define (file-readable? pathname)
-  (la:file-readable? (x->f pathname)))
+  (error 'file-readable? "please implement me for larceny"))
 (define (file-writable? pathname)
-  (la:file-writable? (x->f pathname)))
+  (error 'file-writable? "please implement me for larceny"))
 (define (file-executable? pathname)
-  (la:file-executable? (x->f pathname)))
+  (error 'file-executable? "please implement me for larceny"))
 
 (define (file-modification-time pathname)
-  (posix-timestamp->time-utc
-   (la:file-mtime (x->f pathname))))
+  (error 'file-modification-time "please implement me for larceny"))
 
 (define (file-size-in-bytes pathname)
-  (la:file-size (x->f pathname)))
-
-;; Test wheter a filename is . or ..
-(define (dot-or-dotdot? f)
-  (or (string=? "." f) (string=? ".." f)))
+  (error 'file-size-in-bytes "please implement me for larceny"))
 
 (define (directory-fold* pathname combiner . seeds)
-  (define (full-pathname entry)
-    (pathname-with-file pathname entry))
-  (let loop ((entries (la:directory-list (x->f pathname))) (seeds seeds))
-    (if (null? entries)
-        (apply values seeds)
-        (let ((entry (car entries)))
-          (cond ((dot-or-dotdot? entry)
-                 (loop (cdr entries) seeds))
-                (else
-                 (receive (continue? . new-seeds)
-                     (apply combiner (full-pathname entry) seeds)
-                   (if continue?
-                       (loop (cdr entries) new-seeds)
-                       (apply values new-seeds)))))))))
+  (error 'directory-fold* "please implement me for larceny"))
 
 (define (working-directory)
   (x->pathname (la:current-directory)))
@@ -94,14 +77,10 @@
 (define-syntax with-working-directory
   (syntax-rules ()
     ((with-working-directory dir body ...)
-     (let ((wd (la:current-directory)))
-       (dynamic-wind
-           (lambda () (la:current-directory
-                       (x->f (pathname-as-directory (x->pathname dir)))))
-           (lambda () body ...)
-           (lambda () (la:current-directory wd)))))))
+     (parameterize ((la:current-directory (x->f (pathname-as-directory (x->pathname dir)))))
+       body ...))))
 
 (define (copy-file old-file new-file)
-  (error "please implement COPY-FILE for ikarus"))
+  (error 'copy-file "please implement me for larceny"))
 
 )
