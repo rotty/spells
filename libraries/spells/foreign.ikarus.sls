@@ -5,22 +5,24 @@
           c-type-sizeof c-type-alignof)
   (import (rnrs base)
           (rnrs control)
+          (rnrs lists)
           (rnrs bytevectors)
           (spells alist)
+          (spells foreign config)
           (ikarus foreign))
 
   (define type-aliases
     (map (lambda (ctype)
            (let ((signed? (memq ctype '(char short int long llong))))
              (cons
-              (case (ctype-sizeof ctype)
+              (case (c-type-sizeof ctype)
                 ((1)  (if signed? 'int8 'uint8))
                 ((2)  (if signed? 'int16 'uint16))
                 ((4)  (if signed? 'int32 'uint32))
                 ((8)  (if signed? 'int64 'uint64))
                 (else
                  (assertion-violation 'type-aliases
-                                      "unexpected return value from ctype-sizeof"
+                                      "unexpected return value from c-type-sizeof"
                                       ctype)))
               ctype)))
          '(char uchar short ushort int uint long ulong llong ullong)))
@@ -38,8 +40,9 @@
       ((float)  pointer-ref-float)
       ((double) pointer-ref-double)
       (else
-       (or (assq-ref type-aliases sym)
-           (error 'make-pointer-ref "invalid type" sym)))))
+       (let ((alias (assq-ref type-aliases sym)))
+         (or (and alias (make-pointer-ref alias)) 
+             (error 'make-pointer-ref "invalid type" sym))))))
 
   (define memcpy
     (lambda (p1 p2 n)

@@ -1,0 +1,5 @@
+configure
+^Makefile$
+^Makefile\.in$
+^autom4te\.cache$
+^libraries/spells/foreign/config\.sls$

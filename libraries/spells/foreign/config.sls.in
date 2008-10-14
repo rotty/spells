@@ -1,0 +1,33 @@
+#!r6rs
+
+(library (spells foreign config)
+  (export c-type-sizeof c-type-alignof)
+  (import (rnrs base))
+
+  (define (c-type-sizeof sym)
+    (let ((size
+           (case sym
+             ((char uchar)    1)
+             ((short ushort)  @SIZEOF_SHORT@)
+             ((int uint)      @SIZEOF_INT@)
+             ((long ulong)    @SIZEOF_LONG@)
+             ((llong ullong)  @SIZEOF_LONG_LONG@)
+             ((pointer)       @SIZEOF_POINTER@)
+             ((size_t)        @SIZEOF_SIZE_T@)
+             (else #f))))
+      (or size
+          (error 'c-type-sizeof "size of type unknown" sym))))
+
+  (define c-type-alignof
+    (let ((target '(@TARGET_CPU@ @TARGET_OS@)))
+      (cond
+       ((equal? target '(x86_64 linux-gnu))
+        (lambda (sym)
+          (case sym
+            ((int8 uint8)   1)
+            ((int16 uint16) 2)
+            ((int32 uint32) 4)
+            ((int64 uint64) 8)
+            (else           (c-type-sizeof sym)))))
+       (else
+        (error 'c-type-alignment "unknown target" target))))))
