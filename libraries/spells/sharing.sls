@@ -1,7 +1,7 @@
 ;;; NOTE: This pre-R6RS code does not support full R6RS lexical syntax.
 ;;;       This library is a last resort fall-back because the R6RS
 ;;;       implementation should supply this functionality.
-#!r6s
+#!r6rs
 (library (spells sharing)
   (export
     write-with-shared-structure
