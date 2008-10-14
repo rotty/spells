@@ -2,9 +2,11 @@
   (export make-pointer-ref
           pointer->integer integer->pointer
           malloc free memcpy
-          c-type-sizeof c-type-alignof)
+          c-type-sizeof c-type-alignof c-type-align
+          c-compound-element-fetcher)
   (import (rnrs base)
           (rnrs control)
+          (rnrs arithmetic bitwise)
           (rnrs lists)
           (rnrs bytevectors)
           (spells alist)
@@ -26,7 +28,26 @@
                                       ctype)))
               ctype)))
          '(char uchar short ushort int uint long ulong llong ullong)))
+
+  (define (c-type-align ctype n)
+    (let ((alignment (c-type-alignof ctype)))
+      (+ n (mod (- alignment (mod n alignment)) alignment))))
   
+  (define (c-compound-element-fetcher type offset bits bit-offset)
+    (case type
+      ((record union)
+         (lambda (pointer)
+           (integer->pointer (+ (pointer->integer pointer) offset))))
+      (else
+       (let ((ptr-ref (make-pointer-ref type)))
+         (cond ((and bits bit-offset)
+                (let ((end-offset (+ bit-offset bits)))
+                  (lambda (pointer)
+                    (let ((val (ptr-ref pointer offset)))
+                      (bitwise-bit-field val bit-offset end-offset)))))
+               (else
+                (lambda (pointer) (ptr-ref pointer offset))))))))
+
   (define (make-pointer-ref sym)
     (case sym
       ((char)   pointer-ref-signed-char)
