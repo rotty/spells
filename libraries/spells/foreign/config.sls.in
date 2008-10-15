@@ -13,6 +13,8 @@
              ((long ulong)    @SIZEOF_LONG@)
              ((llong ullong)  @SIZEOF_LONG_LONG@)
              ((pointer)       @SIZEOF_POINTER@)
+             ((float)         @SIZEOF_FLOAT@)
+             ((double)        @SIZEOF_DOUBLE@)
              ((size_t)        @SIZEOF_SIZE_T@)
              (else #f))))
       (or size

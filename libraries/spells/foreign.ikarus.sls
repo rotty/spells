@@ -1,7 +1,11 @@
 (library (spells foreign)
   (export make-pointer-ref
+          pointer-ref-pointer pointer-set-pointer
+          pointer-set-char pointer-ref-unsigned-char
           pointer->integer integer->pointer
+          make-callout
           malloc free memcpy
+          dlopen dlsym dlclose
           c-type-sizeof c-type-alignof c-type-align
           c-compound-element-fetcher)
   (import (rnrs base)
@@ -33,9 +37,9 @@
     (let ((alignment (c-type-alignof ctype)))
       (+ n (mod (- alignment (mod n alignment)) alignment))))
   
-  (define (c-compound-element-fetcher type offset bits bit-offset)
+  (define (c-compound-element-fetcher type offset bit-offset bits)
     (case type
-      ((record union)
+      ((record union array)
          (lambda (pointer)
            (integer->pointer (+ (pointer->integer pointer) offset))))
       (else
@@ -49,21 +53,24 @@
                 (lambda (pointer) (ptr-ref pointer offset))))))))
 
   (define (make-pointer-ref sym)
-    (case sym
-      ((char)   pointer-ref-signed-char)
-      ((uchar)  pointer-ref-unsigned-char)
-      ((short)  pointer-ref-signed-short)
-      ((ushort) pointer-ref-unsigned-short)
-      ((int)    pointer-ref-signed-int)
-      ((uint)   pointer-ref-unsigned-int)
-      ((long)   pointer-ref-signed-long)
-      ((ulong)  pointer-ref-unsigned-long)
-      ((float)  pointer-ref-float)
-      ((double) pointer-ref-double)
-      (else
-       (let ((alias (assq-ref type-aliases sym)))
-         (or (and alias (make-pointer-ref alias)) 
-             (error 'make-pointer-ref "invalid type" sym))))))
+    (define (primitive-ref sym)
+      (case sym
+        ((char)   pointer-ref-signed-char)
+        ((uchar)  pointer-ref-unsigned-char)
+        ((short)  pointer-ref-signed-short)
+        ((ushort) pointer-ref-unsigned-short)
+        ((int)    pointer-ref-signed-int)
+        ((uint)   pointer-ref-unsigned-int)
+        ((long)   pointer-ref-signed-long)
+        ((ulong)  pointer-ref-unsigned-long)
+        ((float)  pointer-ref-float)
+        ((double) pointer-ref-double)
+        ((pointer) pointer-ref-pointer)
+        (else #f)))
+    (or (primitive-ref sym)
+         (let ((alias (assq-ref type-aliases sym)))
+           (or (and alias (primitive-ref alias))
+               (error 'make-pointer-ref "invalid type" sym)))))
 
   (define memcpy
     (lambda (p1 p2 n)

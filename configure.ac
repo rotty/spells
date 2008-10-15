@@ -27,6 +27,11 @@ AC_SUBST(SIZEOF_LONG_LONG, $ac_cv_sizeof_long_long)
 AC_CHECK_SIZEOF(void *)
 AC_SUBST(SIZEOF_POINTER, $ac_cv_sizeof_void_p)
 
+AC_CHECK_SIZEOF(float)
+AC_SUBST(SIZEOF_FLOAT, $ac_cv_sizeof_float)
+AC_CHECK_SIZEOF(double)
+AC_SUBST(SIZEOF_DOUBLE, $ac_cv_sizeof_double)
+
 AC_CHECK_TYPE(size_t, [AC_CHECK_SIZEOF(size_t)
                        AC_SUBST(SIZEOF_SIZE_T, $ac_cv_sizeof_size_t)],
 		      [AC_SUBST(SIZEOF_SIZE_T, [\#f])],)
