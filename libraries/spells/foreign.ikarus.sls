@@ -1,9 +1,9 @@
 (library (spells foreign)
   (export make-pointer-ref
-          pointer-ref-pointer pointer-set-pointer
-          pointer-set-char pointer-ref-unsigned-char
+          pointer-ref-c-pointer pointer-set-c-pointer!
+          pointer-set-c-char! pointer-ref-c-unsigned-char
           pointer->integer integer->pointer
-          make-callout
+          make-c-callout
           malloc free memcpy
           dlopen dlsym dlclose
           c-type-sizeof c-type-alignof c-type-align
@@ -55,17 +55,17 @@
   (define (make-pointer-ref sym)
     (define (primitive-ref sym)
       (case sym
-        ((char)   pointer-ref-signed-char)
-        ((uchar)  pointer-ref-unsigned-char)
-        ((short)  pointer-ref-signed-short)
-        ((ushort) pointer-ref-unsigned-short)
-        ((int)    pointer-ref-signed-int)
-        ((uint)   pointer-ref-unsigned-int)
-        ((long)   pointer-ref-signed-long)
-        ((ulong)  pointer-ref-unsigned-long)
-        ((float)  pointer-ref-float)
-        ((double) pointer-ref-double)
-        ((pointer) pointer-ref-pointer)
+        ((char)   pointer-ref-c-signed-char)
+        ((uchar)  pointer-ref-c-unsigned-char)
+        ((short)  pointer-ref-c-signed-short)
+        ((ushort) pointer-ref-c-unsigned-short)
+        ((int)    pointer-ref-c-signed-int)
+        ((uint)   pointer-ref-c-unsigned-int)
+        ((long)   pointer-ref-c-signed-long)
+        ((ulong)  pointer-ref-c-unsigned-long)
+        ((float)  pointer-ref-c-float)
+        ((double) pointer-ref-c-double)
+        ((pointer) pointer-ref-c-pointer)
         (else #f)))
     (or (primitive-ref sym)
          (let ((alias (assq-ref type-aliases sym)))
@@ -77,11 +77,11 @@
       (cond ((and (pointer? p1) (bytevector? p2))
              (do ((i 0 (+ i 1)))
                  ((>= i n))
-               (pointer-set-char p1 i (bytevector-u8-ref p2 i))))
+               (pointer-set-c-char! p1 i (bytevector-u8-ref p2 i))))
             ((and (bytevector? p1) (pointer? p2))
              (do ((i 0 (+ i 1)))
                  ((>= i n))
-               (bytevector-u8-set! p1 i (pointer-ref-unsigned-char p2 i))))
+               (bytevector-u8-set! p1 i (pointer-ref-c-unsigned-char p2 i))))
             (else
              (error 'memcpy "need pointer and bytevector" p1 p2)))
       p1)))
