@@ -5,7 +5,7 @@
           pointer->integer integer->pointer
           make-c-callout
           malloc free memcpy
-          dlopen dlsym dlclose
+          dlopen dlsym dlclose dlerror
           c-type-sizeof c-type-alignof c-type-align
           c-compound-element-fetcher)
   (import (rnrs base)
