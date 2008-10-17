@@ -33,30 +33,5 @@
     char-set:hex-digit   char-set:blank       char-set:ascii
     char-set:empty       char-set:full
     )
-  (import  (for (except (rnrs base) error) run expand)
-           (for (rnrs syntax-case) run expand)
-           (rnrs mutable-strings)
-           (rnrs arithmetic bitwise)
-           (rnrs control)
-           (rnrs r5rs)
-           (spells error)
-           (spells record-types)
-           (spells parameter)
-           (spells opt-args)
-           (spells include))
-  
-  (define (%latin1->char i)
-    (integer->char i))
-  
-  (define (%char->latin1 c)
-    (char->integer c))
-  
-  (define-syntax check-arg
-    (lambda (stx)
-      (syntax-case stx ()
-        [(_ pred val caller)
-         (identifier? #'val)
-         #'(if (not (pred val))
-             (error "check-arg failed" val))])))
-  
-  (include (spells srfi-14)))
+  (import  (rnrs base)
+           (xitomatl srfi char-set)))

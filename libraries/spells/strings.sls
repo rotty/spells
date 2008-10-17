@@ -38,28 +38,5 @@
                                         ; R5RS extended:
    string->list string-copy string-fill!
    )
-  (import (for (except (rnrs base) string-copy string-for-each string->list)
-               run expand)
-          (for (rnrs syntax-case) run expand)
-          (except (rnrs mutable-strings) string-fill!)
-          (rnrs control)
-          (except (rnrs unicode) string-upcase string-downcase string-titlecase)
-          (rnrs r5rs)
-          (rnrs arithmetic bitwise)
-          (spells receive)
-          (spells opt-args)
-          (spells char-set)
-          (for (spells include) run expand))
-
-  (define-syntax check-arg
-    (lambda (stx)
-      (syntax-case stx ()
-        [(_ pred val caller)
-         (identifier? #'val)
-         #'(unless (pred val)
-             (error "check-arg failed" val))])))
-
-  (define (char-cased? c)
-    (char-upper-case? (char-upcase c)))
-
-  (include (spells srfi-13)))
+  (import (except (rnrs base) string-copy string-for-each string->list)
+          (xitomatl srfi strings)))
