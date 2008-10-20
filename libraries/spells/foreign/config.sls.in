@@ -2,7 +2,8 @@
 
 (library (spells foreign config)
   (export c-type-sizeof c-type-alignof)
-  (import (rnrs base))
+  (import (rnrs base)
+          (rnrs lists))
 
   (define (c-type-sizeof sym)
     (let ((size
@@ -23,7 +24,7 @@
   (define c-type-alignof
     (let ((target '(@TARGET_CPU@ @TARGET_OS@)))
       (cond
-       ((equal? target '(x86_64 linux-gnu))
+       ((member target '((x86_64 linux-gnu) (i686 linux-gnu)))
         (lambda (sym)
           (case sym
             ((int8 uint8)   1)
