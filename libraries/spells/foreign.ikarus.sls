@@ -1,5 +1,5 @@
 (library (spells foreign)
-  (export make-pointer-ref
+  (export make-pointer-c-getter make-pointer-c-setter
           pointer-ref-c-pointer pointer-set-c-pointer!
           pointer-set-c-char! pointer-ref-c-unsigned-char
           pointer->integer integer->pointer
@@ -43,7 +43,7 @@
          (lambda (pointer)
            (integer->pointer (+ (pointer->integer pointer) offset))))
       (else
-       (let ((ptr-ref (make-pointer-ref type)))
+       (let ((ptr-ref (make-pointer-c-getter type)))
          (cond ((and bits bit-offset)
                 (let ((end-offset (+ bit-offset bits)))
                   (lambda (pointer)
@@ -52,7 +52,7 @@
                (else
                 (lambda (pointer) (ptr-ref pointer offset))))))))
 
-  (define (make-pointer-ref sym)
+  (define (make-pointer-c-getter sym)
     (define (primitive-ref sym)
       (case sym
         ((char)   pointer-ref-c-signed-char)
@@ -70,7 +70,27 @@
     (or (primitive-ref sym)
          (let ((alias (assq-ref type-aliases sym)))
            (or (and alias (primitive-ref alias))
-               (error 'make-pointer-ref "invalid type" sym)))))
+               (error 'make-pointer-c-getter "invalid type" sym)))))
+
+  (define (make-pointer-c-setter sym)
+    (define (primitive-set sym)
+      (case sym
+        ((char)   pointer-set-c-char!)
+        ((uchar)  pointer-set-c-char!)
+        ((short)  pointer-set-c-short!)
+        ((ushort) pointer-set-c-short!)
+        ((int)    pointer-set-c-int!)
+        ((uint)   pointer-set-c-int!)
+        ((long)   pointer-set-c-long!)
+        ((ulong)  pointer-set-c-long!)
+        ((float)  pointer-set-c-float!)
+        ((double) pointer-set-c-double!)
+        ((pointer) pointer-set-c-pointer!)
+        (else #f)))
+    (or (primitive-set sym)
+         (let ((alias (assq-ref type-aliases sym)))
+           (or (and alias (primitive-set alias))
+               (error 'make-pointer-c-setter "invalid type" sym)))))
 
   (define memcpy
     (lambda (p1 p2 n)
