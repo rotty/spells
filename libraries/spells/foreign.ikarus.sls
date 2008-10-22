@@ -2,6 +2,7 @@
   (export make-pointer-c-getter make-pointer-c-setter
           pointer-ref-c-pointer pointer-set-c-pointer!
           pointer-set-c-char! pointer-ref-c-unsigned-char
+          pointer?
           pointer->integer integer->pointer
           make-c-callout
           malloc free memcpy
