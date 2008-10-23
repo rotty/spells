@@ -4,7 +4,7 @@
           pointer-set-c-char! pointer-ref-c-unsigned-char
           pointer?
           pointer->integer integer->pointer
-          make-c-callout
+          (rename (spells:make-c-callout make-c-callout))
           malloc free memcpy
           dlopen dlsym dlclose dlerror
           c-type-sizeof c-type-alignof c-type-align
@@ -73,6 +73,21 @@
            (or (and alias (primitive-ref alias))
                (error 'make-pointer-c-getter "invalid type" sym)))))
 
+  (define (spells:make-c-callout ret-type arg-types)
+    (make-c-callout (type->ikarus-type ret-type)
+                    (map type->ikarus-type arg-types)))
+
+  (define (type->ikarus-type type)
+    (case type
+      ((uchar) 'unsigned-char)
+      ((short) 'signed-short)
+      ((ushort) 'unsigned-short)
+      ((int) 'signed-int)
+      ((uint) 'unsigned-int)
+      ((long) 'signed-long)
+      ((ulong) 'unsigned-long)
+      (else type)))
+  
   (define (make-pointer-c-setter sym)
     (define (primitive-set sym)
       (case sym
