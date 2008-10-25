@@ -9,4 +9,4 @@
           (spells procedure-annotations)
           (spells include))
   
-  (include (spells operations)))
+  (include-file (spells operations)))

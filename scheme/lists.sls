@@ -61,4 +61,4 @@
          #'(unless (pred val)
              (error "check-arg failed" val))])))
   
-  (include (spells srfi-1)))
+  (include-file (spells srfi-1)))

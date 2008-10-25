@@ -9,4 +9,4 @@
           (rnrs mutable-pairs)
           (spells include))
 
-  (include (spells parameter)))
+  (include-file (spells parameter)))

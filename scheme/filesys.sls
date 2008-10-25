@@ -41,4 +41,4 @@
           (spells filesys compat)
           (spells include))
 
-  (include (spells filesys)))
+  (include-file (spells filesys)))

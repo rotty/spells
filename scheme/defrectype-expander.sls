@@ -10,4 +10,4 @@
 
   (define syntax-error error)
   
-  (include (spells defrectype-expander)))
+  (include-file (spells defrectype-expander)))

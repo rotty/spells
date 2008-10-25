@@ -16,4 +16,4 @@
   (define char->ascii char->integer)
   (define ascii->char integer->char)
   
-  (include (spells srfi-48)))
+  (include-file (spells srfi-48)))

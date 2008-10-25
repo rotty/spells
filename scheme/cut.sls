@@ -5,4 +5,4 @@
   (import (rnrs base)
           (spells include))
   
-  (include (spells cut)))
+  (include-file (spells cut)))

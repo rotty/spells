@@ -9,5 +9,5 @@
   (import (rnrs base)
           (spells include))
 
-  (include (spells opt-args)
-           (spells opt-args-vanilla)))
+  (include-file (spells opt-args))
+  (include-file (spells opt-args-vanilla)))

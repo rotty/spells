@@ -44,4 +44,4 @@
   (define (os-string->string os-string)
     os-string)
   
-  (include (spells pathname)))
+  (include-file (spells pathname)))

@@ -40,4 +40,4 @@
     (xitomatl srfi time)
     (spells include))
 
-  (include (spells time-lib)))
+  (include-file (spells time-lib)))
