@@ -60,7 +60,7 @@
                         directory
                         (cond ((list? file)
                                (case (length file)
-                                 ((0) (error "empty list not allowed for file part"))
+                                 ((0) (error 'make-pathname "empty list not allowed for file part"))
                                  ((1) (make-file (first file) #f))
                                  (else (make-file (first file) (cdr file)))))
                               ((string? file)
@@ -87,7 +87,7 @@
                                 #f
                                 (make-file (cadr object) #f)))
              (make-pathname #f (drop-right object 1) (make-file (last object) #f))))
-        (else (error "cannot coerce to a pathname" object))))
+        (else (error 'x->pathname "cannot coerce to a pathname" object))))
 
 
 ;;;; Files
@@ -112,7 +112,7 @@
   (cond ((not type) '())
         ((string-or-symbol? type) (list type))
         ((and (list? type) (every string-or-symbol? type)) type)
-        (else (error "Invalid file type specifier: %S" type))))
+        (else (error 'make-file "Invalid file type specifier: %S" type))))
 
 ;;@ Return the type of @1.
 ;; Return the last type if there is more than one.
@@ -195,7 +195,7 @@
 ;;@ Return a pathname whose merging with RELATIVE produces PATHNAME.
 ;; This is currently unimplemented and will simply return PATHNAME."
 (define (enough-pathname pathname relative)
-  (error "Unimplemented: %S"
+  (error 'enough-pathname "Unimplemented: %S"
          `(enough-pathname ',pathname ',relative)))
 
 ;;;; Directory Pathnames
@@ -237,9 +237,31 @@
             (else
              (let ((expansion (expand-pathname pathname)))
                (if (equal? expansion pathname)
-                   (error "Unable to find pathname's container: %S"
+                   (error 'pathname-container
+                          "Unable to find pathname's container: %S"
                           pathname)
                    (loop expansion))))))))
+
+;;@ Return a pathname by interpreting @2 as a series of directories
+;; relative to the origin and directory of @1, with the last element
+;; of @2 specifying the file component of the result.
+(define (pathname-join base . steps)
+  (let ((base (x->pathname base)))
+    (if (null? steps)
+        base
+        (let loop ((steps steps) (dirs (list (pathname-directory base))) (file #f))
+          (if (null? steps)
+              (make-pathname (pathname-origin base)
+                             (concatenate (reverse dirs))
+                             file)
+              (let ((step (x->pathname (car steps))))
+                (if (null? (cdr steps))
+                    (loop (cdr steps)
+                          (cons (pathname-directory step) dirs)
+                          (pathname-file step))
+                    (loop (cdr steps)
+                          (cons (pathname-directory (pathname-as-directory step)))
+                          file))))))))
 
 
 ;;;; Pathname Expansion
@@ -247,7 +269,7 @@
 ;;@ Return a pathname like PATHNAME but with the origin expanded.
 ;; This is currently unimplemented and will simply return PATHNAME."
 (define (expand-pathname pathname)
-  (error "Unimplemented: %S" `(expand-pathname ',pathname)))
+  (error 'expand-pathname "Unimplemented: %S" `(expand-pathname ',pathname)))
 
 ;;@ Compare the pathnames @1 and @2 and return @code{#t} if they refer
 ;; to the same filesystem entity.
@@ -267,7 +289,7 @@
 (define (%->string obj)
   (cond ((string? obj) obj)
         ((symbol? obj) (symbol->string obj))
-        (else (error "cannot coerce to string" obj))))
+        (else (error 'pathname-compare "cannot coerce to string" obj))))
 
 (define (make-pathname-file-comp pred)
   (lambda (x y)
@@ -309,7 +331,9 @@
          (fs-type/canonicalize-namestring fs-type object))
         ((pathname? object)
          (pathname->namestring object fs-type))
-        (else (error "Unable to coerce to a namestring: %S" object))))
+        ((pair? object)
+         (pathname->namestring (x->pathname object) fs-type))
+        (else (error 'x->namestring "Unable to coerce to a namestring: %S" object))))
 
 (define (pathname->namestring pathname fs-type)
   (fs-type/pathname->namestring fs-type pathname))
@@ -373,13 +397,13 @@
        (cond ((eqv? origin #f) "")
              ((or (eq? origin '/) (equal? origin "/")) "/")
              (else
-              (error "invalid origin for unix file system" origin)))))
+              (error 'unix/origin-namestring "invalid origin for unix file system" origin)))))
     
     ((fs-type/directory-namestring self pathname)
      (let ((dir (pathname-directory pathname)))
        (if (null? dir)
            "."
-           (string-append (string-join dir "/") "/"))))
+           (string-append (string-join (map %->string dir) "/") "/"))))
 
     ((fs-type/pathname->namestring self pathname)
      

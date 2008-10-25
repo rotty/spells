@@ -25,6 +25,7 @@
           directory-pathname?
           pathname-as-directory
           pathname-container
+          pathname-join
           
           directory-namestring
           file-namestring
