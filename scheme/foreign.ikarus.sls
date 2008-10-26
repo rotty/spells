@@ -4,7 +4,8 @@
           pointer-set-c-char! pointer-ref-c-unsigned-char
           pointer?
           pointer->integer integer->pointer
-          (rename (spells:make-c-callout make-c-callout))
+          (rename (spells:make-c-callout make-c-callout)
+                  (spells:make-c-callback make-c-callback))
           malloc free memcpy
           dlopen dlsym dlclose dlerror
           c-type-sizeof c-type-alignof c-type-align
@@ -76,6 +77,10 @@
   (define (spells:make-c-callout ret-type arg-types)
     (make-c-callout (type->ikarus-type ret-type)
                     (map type->ikarus-type arg-types)))
+
+  (define (spells:make-c-callback ret-type arg-types)
+    (make-c-callback (type->ikarus-type ret-type)
+                     (map type->ikarus-type arg-types)))
 
   (define (type->ikarus-type type)
     (case type
