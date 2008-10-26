@@ -36,5 +36,5 @@ AC_CHECK_TYPE(size_t, [AC_CHECK_SIZEOF(size_t)
                        AC_SUBST(SIZEOF_SIZE_T, $ac_cv_sizeof_size_t)],
 		      [AC_SUBST(SIZEOF_SIZE_T, [\#f])],)
 
-AC_CONFIG_FILES(Makefile libraries/spells/foreign/config.sls)
+AC_CONFIG_FILES(Makefile scheme/foreign/config.sls)
 AC_OUTPUT
