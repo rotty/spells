@@ -72,7 +72,7 @@
 
 (define (directory-fold* pathname combiner . seeds)
   (define (full-pathname entry)
-    (pathname-with-file pathname entry))
+    (pathname-with-file pathname (pathname-file (x->pathname entry))))
   (let loop ((entries (ik:directory-list (x->f pathname))) (seeds seeds))
     (if (null? entries)
         (apply values seeds)
