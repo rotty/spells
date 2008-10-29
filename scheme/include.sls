@@ -32,8 +32,8 @@
               (else name)))
 
       (syntax-case stx ()
-        ((k (<pathcomp> ...))
-         (let ((relpath (filespec->path (map syntax->datum #'(<pathcomp> ...)))))
+        ((k <path>)
+         (let ((relpath (filespec->path (syntax->datum #'<path>))))
            (let loop ((search (search-paths)))
              (if (null? search)
                (error 'include-files "cannot find file in search paths"
