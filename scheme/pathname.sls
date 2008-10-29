@@ -30,7 +30,9 @@
           directory-namestring
           file-namestring
           origin-namestring
-          x->namestring)
+          x->namestring
+
+          parse-unix-file-types)
   (import (except (rnrs base) string-copy string-for-each string->list)
           (spells receive)
           (spells lists)
@@ -38,6 +40,7 @@
           (spells char-set)
           (spells record-types)
           (spells opt-args)
+          (spells parameter)
           (spells operations)
           (spells include))
 

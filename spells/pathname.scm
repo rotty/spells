@@ -81,7 +81,7 @@
         ((os-string? object) (parse-namestring (os-string->string object)))
         ((pathname?  object) object)
         ((pair? object)
-         (if (pair? (car object))
+         (if (or (null? (car object)) (pair? (car object)))
              (make-pathname #f (car object)
                             (if (null? (cdr object))
                                 #f
@@ -93,13 +93,13 @@
 ;;;; Files
 
 (define-record-type file
-  (really-make-file name type version)
+  (really-make-file name types version)
   file?
   (name file-name)
-  (type file-types)
+  (types file-types)
   (version file-version))
 
-;;@ Make a pathname file with the given components.  is the file's
+;;@ Make a pathname file with the given components. @1 is the file's
 ;; name, a string or a symbol.  @var{type} is the file's type or
 ;; types; it may be a string, a symbol, or a list of strings and
 ;; symbols. @var{version} is a non-negative integer representing the
@@ -438,21 +438,25 @@
         (if directory?
             #f
             (let ((file-part (last parts)))
-              (fs-type/parse-file-namestring self file-part))))))))
+              (fs-type/parse-file-namestring self file-part))))))
 
-(define (parse-file-part/types file-part)
-  (receive (prefix file-parts)
-      (cond ((string-every #\. file-part)
-             (values "" (list file-part)))
-            ((string-skip file-part #\.)
-             => (lambda (idx)
-                  (values (substring/shared file-part 0 idx)
-                          (string-split file-part #\. idx))))
-            (else (values "" (string-split file-part #\. 0))))
-    (if (and (null? file-parts) (string-null? prefix))
-        #f
-        (make-file (string-append prefix (first file-parts))
-                          (cdr file-parts)))))
+    ((fs-type/parse-file-namestring self namestring)
+     (if (parse-unix-file-types)
+         (receive (prefix file-parts)
+                  (cond ((string-every #\. namestring)
+                         (values "" (list namestring)))
+                        ((string-skip namestring #\.)
+                         => (lambda (idx)
+                              (values (substring/shared namestring 0 idx)
+                                      (string-split namestring #\. idx))))
+                        (else (values "" (string-split namestring #\. 0))))
+           (if (and (null? file-parts) (string-null? prefix))
+               #f
+               (make-file (string-append prefix (first file-parts))
+                          (cdr file-parts))))
+         (make-file namestring '())))))
+
+(define parse-unix-file-types (make-parameter #t))
 
 (define (local-file-system-type)
   unix-file-system-type)

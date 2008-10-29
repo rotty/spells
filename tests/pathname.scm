@@ -1,7 +1,7 @@
-;; file.scm -- unit tests for file.scm
+;; pathname.scm -- unit tests for (spells pathname)
 ;; arch-tag: aaeb0020-2f1a-11d9-a288-00404513c0a4
 
-;; Copyright (C) 2004, 2005-2006 by Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005-2006, 2008 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 ;; Start date: Fri Nov 05, 2004 12:05
@@ -22,18 +22,48 @@
 
 ;;; Code:
 
-;; This presumes unix namestrings
-(testeez
- "Path name handling"
+(testeez "pathname comparison"
+  (test-true "empty" (pathname=? (make-pathname #f '() #f) (make-pathname #f '() #f)))
+  (test-false "one empty" (pathname=? (make-pathname #f '() #f) (make-pathname #f '() "foo"))))
 
- (test/equal "make-pathname"
+(testeez "pathname s-expr parsing"
+  (test/equiv "string"
+    (x->pathname "foo")
+    (make-pathname #f '() "foo")
+    (pathname=?))
+  (test/equiv "dirlist, no filename"
+    (x->pathname '(("foo" "bar")))
+    (make-pathname #f '("foo" "bar") #f)
+    (pathname=?))
+  (test/equiv "dirlist, nonempty"
+    (x->pathname '(("foo" "bar") "baz"))
+    (make-pathname #f '("foo" "bar") "baz")
+    (pathname=?))
+  (test/equiv "dirlist, empty"
+    (x->pathname '(() "baz"))
+    (make-pathname #f '() "baz")
+    (pathname=?)))
+
+;; The rest of the tests presume unix namestrings
+(testeez "namestring conversion"
+
+ (test/equal "relative"
    (x->namestring (make-pathname #f '("foo" "bar") "baz"))
    "foo/bar/baz")
- (test/equal "make-pathname"
+ (test/equal "absolute"
    (x->namestring (make-pathname '/ '("foo") "bar"))
    "/foo/bar")
- (test/equal "make-pathname"
+ (test/equal "empty"
    (x->namestring (make-pathname #f '() #f))
-   "."))
+   ".")
+ (test/equal "dir, but no file"
+   (x->namestring (make-pathname #f '("foo") #f))
+   "foo/"))
 
-;;; file.scm ends here
+(testeez "file type parsing"
+  (test/equiv "one type"
+    (x->pathname "foo.scm")
+    (make-pathname #f '() (make-file "foo" "scm"))
+    (pathname=?)))
+
+;;; pathname.scm ends here
