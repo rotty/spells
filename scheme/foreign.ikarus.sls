@@ -9,32 +9,49 @@
           malloc free memcpy
           dlopen dlsym dlclose dlerror
           c-type-sizeof c-type-alignof c-type-align
+          c-type-aliases
           c-compound-element-fetcher)
   (import (rnrs base)
           (rnrs control)
           (rnrs arithmetic bitwise)
           (rnrs lists)
           (rnrs bytevectors)
+          (xitomatl srfi and-let*)
           (spells alist)
+          (spells parameter)
           (spells foreign config)
           (ikarus foreign))
 
-  (define type-aliases
+  (define (sized-type ctype signed?)
+    (case (c-type-sizeof ctype)
+      ((1)  (if signed? 'int8 'uint8))
+      ((2)  (if signed? 'int16 'uint16))
+      ((4)  (if signed? 'int32 'uint32))
+      ((8)  (if signed? 'int64 'uint64))
+      (else
+       (assertion-violation 'c-type-aliases
+                            "unexpected return value from c-type-sizeof"
+                            ctype))))
+  
+  (define (sized-types-aliases)
     (map (lambda (ctype)
-           (let ((signed? (memq ctype '(char short int long llong))))
-             (cons
-              (case (c-type-sizeof ctype)
-                ((1)  (if signed? 'int8 'uint8))
-                ((2)  (if signed? 'int16 'uint16))
-                ((4)  (if signed? 'int32 'uint32))
-                ((8)  (if signed? 'int64 'uint64))
-                (else
-                 (assertion-violation 'type-aliases
-                                      "unexpected return value from c-type-sizeof"
-                                      ctype)))
-              ctype)))
-         '(char uchar short ushort int uint long ulong llong ullong)))
+            (let ((signed? (memq ctype '(char short int long llong))))
+              (cons (sized-type ctype signed?) ctype)))
+          '(char uchar short ushort int uint long ulong llong ullong)))
 
+  (define (other-types-aliases)
+    `((size_t . ,(sized-type 'size_t #f))))
+  
+  (define c-type-aliases (make-parameter (append (sized-types-aliases)
+                                                 (other-types-aliases))))
+
+  (define (resolve-alias ctype)
+    (cond ((assq-ref (c-type-aliases) ctype)
+           => (lambda (alias)
+                (or (resolve-alias alias)
+                    alias)))
+          (else #f)))
+  
   (define (c-type-align ctype n)
     (let ((alignment (c-type-alignof ctype)))
       (+ n (mod (- alignment (mod n alignment)) alignment))))
@@ -70,9 +87,9 @@
         ((pointer) pointer-ref-c-pointer)
         (else #f)))
     (or (primitive-ref sym)
-         (let ((alias (assq-ref type-aliases sym)))
-           (or (and alias (primitive-ref alias))
-               (error 'make-pointer-c-getter "invalid type" sym)))))
+        (let ((alias (resolve-alias sym)))
+          (or (and alias (primitive-ref alias))
+              (error 'make-pointer-c-getter "invalid type" sym)))))
 
   (define (spells:make-c-callout ret-type arg-types)
     (make-c-callout (type->ikarus-type ret-type)
@@ -83,15 +100,22 @@
                      (map type->ikarus-type arg-types)))
 
   (define (type->ikarus-type type)
-    (case type
-      ((uchar) 'unsigned-char)
-      ((short) 'signed-short)
-      ((ushort) 'unsigned-short)
-      ((int) 'signed-int)
-      ((uint) 'unsigned-int)
-      ((long) 'signed-long)
-      ((ulong) 'unsigned-long)
-      (else type)))
+    (define (prim->ikarus-type prim)
+      (case prim
+        ((uchar) 'unsigned-char)
+        ((short) 'signed-short)
+        ((ushort) 'unsigned-short)
+        ((int) 'signed-int)
+        ((uint) 'unsigned-int)
+        ((long) 'signed-long)
+        ((ulong) 'unsigned-long)
+        ((pointer) 'pointer)
+        ((void) 'void)
+        (else #f)))
+    (or (prim->ikarus-type type)
+        (and-let* ((alias (resolve-alias type)))
+          (prim->ikarus-type alias))
+        (error 'type->ikarus-type "invalid type" type)))
   
   (define (make-pointer-c-setter sym)
     (define (primitive-set sym)
@@ -109,10 +133,10 @@
         ((pointer) pointer-set-c-pointer!)
         (else #f)))
     (or (primitive-set sym)
-         (let ((alias (assq-ref type-aliases sym)))
-           (or (and alias (primitive-set alias))
-               (error 'make-pointer-c-setter "invalid type" sym)))))
-
+        (let ((alias (resolve-alias sym)))
+          (or (and alias (primitive-set alias))
+              (error 'make-pointer-c-setter "invalid type" sym)))))
+  
   (define memcpy
     (lambda (p1 p2 n)
       (cond ((and (pointer? p1) (bytevector? p2))
