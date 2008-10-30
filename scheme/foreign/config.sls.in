@@ -8,7 +8,10 @@
   (define (c-type-sizeof sym)
     (let ((size
            (case sym
-             ((char uchar)    1)
+             ((char uchar int8 uint8)    1)
+             ((int16 uint16)             2)
+             ((int32 uint32)             4)
+             ((int64 uint64)             8)
              ((short ushort)  @SIZEOF_SHORT@)
              ((int uint)      @SIZEOF_INT@)
              ((long ulong)    @SIZEOF_LONG@)
@@ -25,12 +28,6 @@
     (let ((target '(@TARGET_CPU@ @TARGET_OS@)))
       (cond
        ((member target '((x86_64 linux-gnu) (i686 linux-gnu)))
-        (lambda (sym)
-          (case sym
-            ((int8 uint8)   1)
-            ((int16 uint16) 2)
-            ((int32 uint32) 4)
-            ((int64 uint64) 8)
-            (else           (c-type-sizeof sym)))))
+        c-type-sizeof)
        (else
         (error 'c-type-alignment "unknown target" target))))))
