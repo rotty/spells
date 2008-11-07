@@ -1,3 +1,5 @@
+;; -*- Mode: scheme; -*-
+
 #!r6rs
 
 (library (spells foreign config)
@@ -27,7 +29,13 @@
   (define c-type-alignof
     (let ((target '(@TARGET_CPU@ @TARGET_OS@)))
       (cond
-       ((member target '((x86_64 linux-gnu) (i686 linux-gnu)))
+       ((member target '((x86_64 linux-gnu)))
         c-type-sizeof)
+       ((member target '((i686 linux-gnu)))
+        (lambda (type)
+          (let ((size (c-type-sizeof type)))
+            (if (= size 8)
+                4
+                size))))
        (else
         (error 'c-type-alignment "unknown target" target))))))
