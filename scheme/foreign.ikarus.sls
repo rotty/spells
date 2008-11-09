@@ -7,9 +7,9 @@
           (rename (spells:make-c-callout make-c-callout)
                   (spells:make-c-callback make-c-callback))
           malloc free memcpy
+          make-guardian
           dlopen dlsym dlclose dlerror
           c-type-sizeof c-type-alignof c-type-align
-          c-type-aliases
           c-compound-element-fetcher)
   (import (rnrs base)
           (rnrs control)
@@ -20,6 +20,7 @@
           (spells alist)
           (spells parameter)
           (spells foreign config)
+          (only (ikarus) make-guardian)
           (ikarus foreign))
 
   (define (sized-type ctype signed?)
@@ -42,11 +43,10 @@
   (define (other-types-aliases)
     `((size_t . ,(sized-type 'size_t #f))))
   
-  (define c-type-aliases (make-parameter (append (sized-types-aliases)
-                                                 (other-types-aliases))))
+  (define c-type-aliases (append (sized-types-aliases) (other-types-aliases)))
 
   (define (resolve-alias ctype)
-    (cond ((assq-ref (c-type-aliases) ctype)
+    (cond ((assq-ref c-type-aliases ctype)
            => (lambda (alias)
                 (or (resolve-alias alias)
                     alias)))
@@ -109,6 +109,7 @@
         ((uint) 'unsigned-int)
         ((long) 'signed-long)
         ((ulong) 'unsigned-long)
+        ((double) 'double)
         ((pointer) 'pointer)
         ((void) 'void)
         (else #f)))
