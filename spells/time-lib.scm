@@ -2,7 +2,7 @@
 
 ;; time-lib.scm - Implementation-independent part of spells.time-lib
 
-;; Copyright (C) 2004, 2005-2006 by Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005-2006, 2008 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann
 ;; Start date: Wed Jan  4 13:33:55 CET 2006
@@ -23,8 +23,8 @@
 
 (define *posix-epoch* (date->time-utc (make-date 0 0 0 0 1 1 1970 0)))
 
-(define (posix-timestamp->time-utc timestamp)
-  (add-duration *posix-epoch* (make-time time-duration 0 timestamp)))
+(define/optional-args (posix-timestamp->time-utc timestamp (optional (nanoseconds 0)))
+  (add-duration *posix-epoch* (make-time time-duration nanoseconds timestamp)))
 
 (define (time-utc->posix-timestamp time-utc)
   (time-second (time-difference time-utc *posix-epoch*)))

@@ -38,6 +38,7 @@
   (import
     (rnrs base)
     (xitomatl srfi time)
+    (spells opt-args)
     (spells include))
 
   (include-file (spells time-lib)))
