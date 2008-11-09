@@ -60,8 +60,8 @@
   (ik:file-executable? (x->f pathname)))
 
 (define (file-modification-time pathname)
-  (posix-timestamp->time-utc
-   (ik:file-mtime (x->f pathname))))
+  (let ((nsecs (ik:file-mtime (x->f pathname))))
+    (posix-timestamp->time-utc (div nsecs #e1e9) (mod nsecs #e1e9))))
 
 (define (file-size-in-bytes pathname)
   (ik:file-size (x->f pathname)))
