@@ -1,16 +1,20 @@
-(library (spells foreign)
+(library (spells foreign compat)
   (export make-pointer-c-getter make-pointer-c-setter
-          pointer-ref-c-pointer pointer-set-c-pointer!
-          pointer-set-c-char! pointer-ref-c-unsigned-char
+
           pointer?
           pointer->integer integer->pointer
+
+          pointer-ref-c-pointer pointer-set-c-pointer!
+          pointer-set-c-char! pointer-ref-c-unsigned-char
+
           (rename (spells:make-c-callout make-c-callout)
                   (spells:make-c-callback make-c-callback))
+
           malloc free memcpy
+
           make-guardian
-          dlopen dlsym dlclose dlerror
-          c-type-sizeof c-type-alignof c-type-align
-          c-compound-element-fetcher)
+
+          dlopen dlsym dlclose dlerror)
   (import (rnrs base)
           (rnrs control)
           (rnrs arithmetic bitwise)
@@ -33,7 +37,7 @@
        (assertion-violation 'c-type-aliases
                             "unexpected return value from c-type-sizeof"
                             ctype))))
-  
+
   (define (sized-types-aliases)
     (map (lambda (ctype)
             (let ((signed? (memq ctype '(char short int long llong))))
@@ -42,7 +46,7 @@
 
   (define (other-types-aliases)
     `((size_t . ,(sized-type 'size_t #f))))
-  
+
   (define c-type-aliases (append (sized-types-aliases) (other-types-aliases)))
 
   (define (resolve-alias ctype)
@@ -51,25 +55,6 @@
                 (or (resolve-alias alias)
                     alias)))
           (else #f)))
-  
-  (define (c-type-align ctype n)
-    (let ((alignment (c-type-alignof ctype)))
-      (+ n (mod (- alignment (mod n alignment)) alignment))))
-  
-  (define (c-compound-element-fetcher type offset bit-offset bits)
-    (case type
-      ((record union array)
-         (lambda (pointer)
-           (integer->pointer (+ (pointer->integer pointer) offset))))
-      (else
-       (let ((ptr-ref (make-pointer-c-getter type)))
-         (cond ((and bits bit-offset)
-                (let ((end-offset (+ bit-offset bits)))
-                  (lambda (pointer)
-                    (let ((val (ptr-ref pointer offset)))
-                      (bitwise-bit-field val bit-offset end-offset)))))
-               (else
-                (lambda (pointer) (ptr-ref pointer offset))))))))
 
   (define (make-pointer-c-getter sym)
     (define (primitive-ref sym)
@@ -117,7 +102,7 @@
         (and-let* ((alias (resolve-alias type)))
           (prim->ikarus-type alias))
         (error 'type->ikarus-type "invalid type" type)))
-  
+
   (define (make-pointer-c-setter sym)
     (define (primitive-set sym)
       (case sym
@@ -137,7 +122,7 @@
         (let ((alias (resolve-alias sym)))
           (or (and alias (primitive-set alias))
               (error 'make-pointer-c-setter "invalid type" sym)))))
-  
+
   (define memcpy
     (lambda (p1 p2 n)
       (cond ((and (pointer? p1) (bytevector? p2))
