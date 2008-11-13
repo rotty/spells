@@ -33,6 +33,7 @@
   ;;("file-traversal.scm" spells.file)
   ;;("file-write.scm" spells.file spells.namestring)
   ;;("file.scm" spells.file spells.namestring)
+  ("string-substitute.scm" spells.string-substitute)
   ("format.scm" spells.format)
   ("misc.scm" spells.misc)
   ;;("opt-args.scm" spells.opt-args) ;; temporarily disabled (can't eval definitions in R6RS)
