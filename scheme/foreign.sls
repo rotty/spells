@@ -12,7 +12,7 @@
           
           make-c-callout make-c-callback
           
-          malloc free memcpy
+          malloc free memcpy memset
           
           make-guardian
           

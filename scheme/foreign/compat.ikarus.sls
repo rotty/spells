@@ -10,7 +10,7 @@
           (rename (spells:make-c-callout make-c-callout)
                   (spells:make-c-callback make-c-callback))
 
-          malloc free memcpy
+          malloc free memcpy memset
 
           make-guardian
 
@@ -123,16 +123,21 @@
           (or (and alias (primitive-set alias))
               (error 'make-pointer-c-setter "invalid type" sym)))))
 
-  (define memcpy
-    (lambda (p1 p2 n)
-      (cond ((and (pointer? p1) (bytevector? p2))
-             (do ((i 0 (+ i 1)))
-                 ((>= i n))
-               (pointer-set-c-char! p1 i (bytevector-u8-ref p2 i))))
-            ((and (bytevector? p1) (pointer? p2))
-             (do ((i 0 (+ i 1)))
-                 ((>= i n))
-               (bytevector-u8-set! p1 i (pointer-ref-c-unsigned-char p2 i))))
-            (else
-             (error 'memcpy "need pointer and bytevector" p1 p2)))
-      p1)))
+  (define (memcpy p1 p2 n)
+    (cond ((and (pointer? p1) (bytevector? p2))
+           (do ((i 0 (+ i 1)))
+               ((>= i n))
+             (pointer-set-c-char! p1 i (bytevector-u8-ref p2 i))))
+          ((and (bytevector? p1) (pointer? p2))
+           (do ((i 0 (+ i 1)))
+               ((>= i n))
+             (bytevector-u8-set! p1 i (pointer-ref-c-unsigned-char p2 i))))
+          (else
+           (error 'memcpy "need pointer and bytevector" p1 p2)))
+    p1)
+
+  (define (memset p v n)
+    (do ((i 0 (+ i 1)))
+        ((>= i n))
+      (pointer-set-c-char! p i v))
+    p))
