@@ -31,52 +31,59 @@
   (export string-substitute)
   (import (except (rnrs base) string-copy string-for-each string->list)
           (rnrs control)
+          (rnrs io simple)
           (spells strings)
           (spells char-set))
 
-  (define (string-substitute template vals)
-    (define (lose msg . irritants)
-      (apply error 'string-substitute msg irritants))
-    (let loop ((i 0) (open-pos #f) (parts '()))
-      (define (handle-close-brace/escaped pos)
-        (unless (doubled-char? template pos)
-          (lose "unexpected close brace" template pos))
-        (loop (+ pos 2) open-pos (cons (substring/shared template i (+ pos 1))
-                                       parts)))
-      (define (handle-open-brace pos)
-        (cond ((doubled-char? template pos)
-               (loop (+ pos 2) #f (cons (substring/shared template i (+ pos 1)) parts)))
-              (else
-               (loop (+ pos 1)
-                     pos
-                     (cons (substring/shared template i pos) parts)))))
-      (if (not i)
-          (string-concatenate-reverse parts)
-          (cond (open-pos
-                 (let ((close-pos (string-index template #\} i)))
-                   (unless close-pos
-                     (lose "unmatched opening brace" template open-pos))
-                   (cond ((doubled-char? template close-pos)
-                          (loop (+ close-pos 2) open-pos parts))
-                         (else
-                          (loop (+ close-pos 1)
-                                #f
-                                (cons (subst-one template open-pos close-pos vals)
-                                      parts))))))
-                (else
-                 (let ((open-pos (string-index template #\{ i))
-                       (close-pos (string-index template #\} i)))
-                   (cond
-                    ((not (or open-pos close-pos))
-                     (loop #f #f (cons (substring/shared template i) parts)))
-                    ((not open-pos)
-                     (handle-close-brace/escaped close-pos))
-                    ((not close-pos)
-                     (handle-open-brace open-pos))
-                    ((< open-pos close-pos)
-                     (handle-open-brace open-pos))
+  (define string-substitute
+    (case-lambda
+      ((dst template vals)
+        (define (lose msg . irritants)
+          (apply error 'string-substitute msg irritants))
+        (let loop ((i 0) (open-pos #f) (parts '()))
+          (define (output str)
+            (cond ((eqv? dst #f)
+                   (cons str parts))
+                  ((eqv? dst #t) (display str) parts)
+                  (else (display str dst) parts)))
+          (define (handle-close-brace/escaped pos)
+            (unless (doubled-char? template pos)
+              (lose "unexpected close brace" template pos))
+            (loop (+ pos 2) open-pos (output (substring/shared template i (+ pos 1)))))
+          (define (handle-open-brace pos)
+            (cond ((doubled-char? template pos)
+                   (loop (+ pos 2) #f (output (substring/shared template i (+ pos 1)))))
+                  (else
+                   (loop (+ pos 1) pos (output (substring/shared template i pos))))))
+          (if (not i)
+              (if (eqv? dst #f)
+                  (string-concatenate-reverse parts))
+              (cond (open-pos
+                     (let ((close-pos (string-index template #\} i)))
+                       (unless close-pos
+                         (lose "unmatched opening brace" template open-pos))
+                       (cond ((doubled-char? template close-pos)
+                              (loop (+ close-pos 2) open-pos parts))
+                             (else
+                              (loop (+ close-pos 1)
+                                    #f
+                                    (output (subst-one template open-pos close-pos vals)))))))
                     (else
-                     (handle-close-brace/escaped close-pos)))))))))
+                     (let ((open-pos (string-index template #\{ i))
+                           (close-pos (string-index template #\} i)))
+                       (cond
+                        ((not (or open-pos close-pos))
+                         (loop #f #f (output (substring/shared template i))))
+                        ((not open-pos)
+                         (handle-close-brace/escaped close-pos))
+                        ((not close-pos)
+                         (handle-open-brace open-pos))
+                        ((< open-pos close-pos)
+                         (handle-open-brace open-pos))
+                        (else
+                         (handle-close-brace/escaped close-pos)))))))))
+      ((template vals)
+       (string-substitute #f template vals))))
 
   (define (doubled-char? s i)
     (let ((c (string-ref s i)))
