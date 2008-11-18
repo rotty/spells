@@ -3,6 +3,7 @@
 
           make-pointer-c-getter make-pointer-c-setter
           make-pointer-c-element-getter
+          make-pointer-c-element-setter
           
           pointer?
           pointer->integer integer->pointer
@@ -101,4 +102,27 @@
                     (let ((val (ptr-ref pointer offset)))
                       (bitwise-bit-field val bit-offset end-offset)))))
                (else
-                (lambda (pointer) (ptr-ref pointer offset)))))))))
+                (lambda (pointer) (ptr-ref pointer offset))))))))
+
+  (define (make-pointer-c-element-setter type offset bit-offset bits)
+    (define (lose msg . irritants)
+      (apply error 'make-pointer-c-element-setter msg irritants))
+    (case type
+      ((record union array)
+       (lose "cannot set compound element" type))
+      (else
+       (let ((ptr-set (make-pointer-c-setter type)))
+         (cond ((and bits bit-offset)
+                (let ((end-offset (+ bit-offset bits))
+                      (ptr-ref (make-pointer-c-getter type))
+                      (mask (bitwise-not (bitwise-arithmetic-shift-left -1 bit-offset))))
+                  (lambda (pointer val)
+                    (let ((val (ptr-ref pointer offset)))
+                      (ptr-set pointer offset
+                               (bitwise-copy-bit-field
+                                val bit-offset end-offset
+                                (bitwise-arithmetic-shift-left
+                                 (bitwise-and val mask)
+                                 bit-offset)))))))
+               (else
+                (lambda (pointer val) (ptr-set pointer offset val)))))))))
