@@ -9,7 +9,6 @@
           sort-list
           and-map
           or-map
-          exit
           scheme-dialect)
   (import (rnrs base)
           (rnrs io simple)
