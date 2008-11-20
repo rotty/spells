@@ -24,6 +24,7 @@
           (spells alist)
           (spells parameter)
           (spells foreign config)
+          (spells tracing)
           (only (ikarus) make-guardian)
           (ikarus foreign))
 
@@ -45,7 +46,8 @@
           '(char uchar short ushort int uint long ulong llong ullong)))
 
   (define (other-types-aliases)
-    `((size_t . ,(sized-type 'size_t #f))))
+    `((size_t . ,(sized-type 'size_t #f))
+      (ssize_t . ,(sized-type 'ssize_t #t))))
 
   (define c-type-aliases (append (sized-types-aliases) (other-types-aliases)))
 
@@ -87,6 +89,7 @@
   (define (type->ikarus-type type)
     (define (prim->ikarus-type prim)
       (case prim
+        ((char) 'signed-char)
         ((uchar) 'unsigned-char)
         ((short) 'signed-short)
         ((ushort) 'unsigned-short)
@@ -94,6 +97,7 @@
         ((uint) 'unsigned-int)
         ((long) 'signed-long)
         ((ulong) 'unsigned-long)
+        ((float) 'float)
         ((double) 'double)
         ((pointer) 'pointer)
         ((void) 'void)
