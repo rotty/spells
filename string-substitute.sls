@@ -92,4 +92,10 @@
 
   (define (subst-one template open-pos close-pos vals)
     (let ((placeholder (substring/shared template (+ open-pos 1) close-pos)))
-      (vector-ref vals (string->number placeholder)))))
+      (let ((i (string->number placeholder)))
+        (cond ((vector? vals)
+               (vector-ref vals i))
+              ((list? vals)
+               (list-ref vals i))
+              (else
+               (error 'string-substitute "Invalid type for replacements" vals)))))))
