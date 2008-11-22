@@ -47,7 +47,10 @@
 
   (define (other-types-aliases)
     `((size_t . ,(sized-type 'size_t #f))
-      (ssize_t . ,(sized-type 'ssize_t #t))))
+      (ssize_t . ,(sized-type 'ssize_t #t))
+      ;; we assume time_t to be a signed integer type; this true at
+      ;; least on glibc systems
+      (time_t . ,(sized-type 'time_t #t))))
 
   (define c-type-aliases (append (sized-types-aliases) (other-types-aliases)))
 

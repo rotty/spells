@@ -22,6 +22,7 @@
              ((float)          @SIZEOF_FLOAT@)
              ((double)         @SIZEOF_DOUBLE@)
              ((size_t ssize_t) @SIZEOF_SIZE_T@)
+             ((time_t)         @SIZEOF_TIME_T@)
              (else #f))))
       (or size
           (error 'c-type-sizeof "size of type unknown" sym))))
