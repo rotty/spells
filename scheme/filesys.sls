@@ -7,7 +7,7 @@
           rename-file
           copy-file
           install-file
-          
+
           file-regular?
           file-directory?
           file-symbolic-link?
@@ -19,6 +19,7 @@
 
           directory-fold*
           directory-fold
+          directory-fold-tree*
           directory-fold-tree
 
           file-unreachable-error?

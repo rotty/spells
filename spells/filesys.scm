@@ -9,16 +9,36 @@
    seeds))
 
 ;; Naive implementation in terms of DIRECTORY-FOLD
-(define (directory-fold-tree pathname file-combiner dir-combiner . seeds)
-  (apply directory-fold pathname
+(define (directory-fold-tree* pathname file-combiner dir-combiner . seeds)
+  (apply directory-fold* pathname
          (lambda (pathname . seeds)
            (if (file-directory? pathname)
-               (receive new-seeds
-                   (apply dir-combiner pathname seeds)
-                 (apply directory-fold-tree pathname
-                        file-combiner dir-combiner
-                        new-seeds))
+               (receive (new-fc new-dc proceed . new-seeds) (apply dir-combiner pathname seeds)
+                 (cond ((and new-fc new-dc)
+                        (receive newest-seeds
+                                 (apply directory-fold-tree*
+                                        (pathname-as-directory pathname)
+                                        (if (eqv? new-fc #t) file-combiner new-fc)
+                                        (if (eqv? new-dc #t) dir-combiner new-dc)
+                                        new-seeds)
+                          (if proceed
+                              (apply proceed newest-seeds)
+                              (apply values #t newest-seeds))))
+                       ((or new-fc new-dc)
+                        (apply values #t new-seeds))
+                       (else
+                        (apply values #f new-seeds))))
                (apply file-combiner pathname seeds)))
+         seeds))
+
+(define (directory-fold-tree pathname file-combiner dir-combiner . seeds)
+  (apply directory-fold-tree* pathname
+         (lambda (file-entry . seeds)
+           (receive new-seeds (apply file-combiner file-entry seeds)
+             (apply values #t new-seeds)))
+         (lambda (dir-entry . seeds)
+           (receive new-seeds (apply dir-combiner dir-entry seeds)
+             (apply values #t #t #f new-seeds)))
          seeds))
 
 ;;@ Create directories, with intermediary ones when needed.

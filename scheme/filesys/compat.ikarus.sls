@@ -100,6 +100,6 @@
            (lambda () (ik:current-directory wd)))))))
 
 (define (copy-file old-file new-file)
-  (error "please implement COPY-FILE for ikarus"))
+  (error 'copy-file "please implement COPY-FILE for ikarus"))
 
 )
