@@ -72,6 +72,8 @@
         ((uint)   pointer-ref-c-unsigned-int)
         ((long)   pointer-ref-c-signed-long)
         ((ulong)  pointer-ref-c-unsigned-long)
+        ((llong)  pointer-ref-c-signed-long-long)
+        ((ullong) pointer-ref-c-unsigned-long-long)
         ((float)  pointer-ref-c-float)
         ((double) pointer-ref-c-double)
         ((pointer) pointer-ref-c-pointer)
