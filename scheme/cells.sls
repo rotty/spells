@@ -1,6 +1,6 @@
-;; cells.scm -- Implementation of the cells datatype
+;; cells.sls -- Implementation of the cells datatype in terms of records
 
-;; Copyright (C) 2007 by Free Software Foundation, Inc.
+;; Copyright (C) 2007, 2008 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann
 ;; Start date: Wed Aug 29 15:35:22 CEST 2007
@@ -26,9 +26,14 @@
 
 ;;; Code:
 
-(define-record-type cell
-  (make-cell value)
-  cell?
-  (value cell-ref cell-set!))
+(library (spells cells)
+  (export make-cell cell? cell-ref cell-set!)
+  (import (rnrs base)
+          (spells record-types))
 
-;;; cells.scm ends here
+  (define-record-type cell
+    (make-cell value)
+    cell?
+    (value cell-ref cell-set!)))
+
+;;; cells.sls ends here
