@@ -1,16 +1,13 @@
-#!r6rs
-
 (library (spells tracing)
-  (export trace-lambda trace-define)
+  (export trace-define trace-lambda trace-procedure)
   (import (rnrs base)
-          (rnrs io simple))
+          (spells tracing compat))
 
-  (define-syntax trace-define
+  (define-syntax trace-procedure
     (syntax-rules ()
-      ((trace-define (name arg ...) body ...)
-       (define (name arg ...) body ...))))
+      ((trace-procedure <label> <proc-expr>)
+       (let ((proc <proc-expr>))
+         (trace-lambda <label> args
+           (apply proc args))))))
 
-  (define-syntax trace-lambda
-    (syntax-rules ()
-      ((trace-lambda name args body ...)
-       (lambda args body ...)))))
+  )
