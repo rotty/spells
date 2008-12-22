@@ -36,7 +36,7 @@
          (let ((relpath (filespec->path (syntax->datum #'<path>))))
            (let loop ((search (search-paths)))
              (if (null? search)
-               (error 'include-files "cannot find file in search paths"
+               (error 'include-file "cannot find file in search paths"
                       relpath
                       (search-paths))
                (let ((full (string-append (car search) "/" relpath)))

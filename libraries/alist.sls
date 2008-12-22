@@ -7,4 +7,4 @@
           (rnrs lists)
           (spells include))
   
-  (include-file (spells alist)))
+  (include-file ((spells scheme) alist)))

@@ -66,7 +66,7 @@
      (let ((rest arg)) body ...))
 
     ((%let-optionals* arg () body ...)
-     (if (null? arg) (begin body ...)
+     (if (null? arg) (let () body ...)
 	 (error "Too many arguments in let-opt" arg)))))
 
 ;;; (*optional rest-arg default-exp [test-pred])

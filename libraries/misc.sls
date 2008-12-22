@@ -16,4 +16,4 @@
           (spells include)
           (spells misc compat))
 
-  (include-file (spells misc)))
+  (include-file ((spells scheme) misc)))

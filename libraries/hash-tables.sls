@@ -17,4 +17,4 @@
 
   (define error (make-error-signaller "SRFI-69"))
   
-  (include-file (spells srfi-69)))
+  (include-file ((spells scheme) srfi-69)))

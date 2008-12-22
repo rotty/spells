@@ -14,5 +14,5 @@
           (spells opt-args)
           (spells include))
 
-  (include-file (spells delimited-readers))
-  (include-file (spells skip-char-set)))
+  (include-file ((spells scheme) delimited-readers))
+  (include-file ((spells scheme) skip-char-set)))

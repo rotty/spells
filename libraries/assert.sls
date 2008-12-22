@@ -8,4 +8,4 @@
           (rnrs io simple)
           (spells include))
 
-  (include-file (spells assert)))
+  (include-file ((spells scheme) assert)))

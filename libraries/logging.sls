@@ -24,4 +24,4 @@
           (spells record-types)
           (spells include))
   
-  (include-file (spells logging)))
+  (include-file ((spells scheme) logging)))

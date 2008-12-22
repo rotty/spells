@@ -42,4 +42,4 @@
           (spells filesys compat)
           (spells include))
 
-  (include-file (spells filesys)))
+  (include-file ((spells scheme) filesys)))

@@ -29,4 +29,4 @@
           (spells process compat)
           (spells include))
   
-  (include-file (spells process)))
+  (include-file ((spells scheme) process)))

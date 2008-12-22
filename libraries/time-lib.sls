@@ -41,4 +41,4 @@
     (spells opt-args)
     (spells include))
 
-  (include-file (spells time-lib)))
+  (include-file ((spells scheme) time-lib)))

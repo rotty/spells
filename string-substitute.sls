@@ -47,7 +47,7 @@
                    ((braces) (values #\{ #\}))
                    ((abrackets) (values #\< #\>))
                    (else
-                    (lose "invalid grammar" grammar)))
+                    (lose "invalid grammar" dst template vals grammar)))
           (let loop ((i 0) (open-pos #f) (parts '()))
             (define (output str)
               (cond ((eqv? dst #f)

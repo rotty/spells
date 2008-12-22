@@ -6,4 +6,4 @@
           (spells include))
   
   ;; Ikarus doesn't yet have hashtables, so we use SRFI 69 instead
-  (include-file (spells table-srfi-69-impl)))
+  (include-file ((spells scheme) table-srfi-69-impl)))
