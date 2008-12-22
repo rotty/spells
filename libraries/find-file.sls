@@ -1,3 +1,5 @@
+#!r6rs
+
 (library (spells find-file)
   (export find-file
           library-search-paths)

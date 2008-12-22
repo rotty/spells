@@ -1,3 +1,5 @@
+#!r6rs
+
 (library (spells tracing)
   (export trace-define trace-lambda trace-procedure)
   (import (rnrs base)

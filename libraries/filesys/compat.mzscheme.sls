@@ -41,7 +41,9 @@
                         directory-list
                         path->string
                         copy-file
-                        current-directory)
+                        current-directory
+                        
+                        car cdr)
                   mz:))
 
 (define x->f x->namestring)
@@ -96,18 +98,18 @@
 
 (define (directory-fold* pathname combiner . seeds)
   (define (full-pathname entry)
-    (pathname-with-file pathname entry))
+    (pathname-with-file pathname (pathname-file (x->pathname entry))))
   (let loop ((entries (mz:directory-list (x->f pathname))) (seeds seeds))
     (if (null? entries)
         (apply values seeds)
-        (let ((entry (mz:path->string (car entries))))
+        (let ((entry (mz:path->string (mz:car entries))))
           (cond ((dot-or-dotdot? entry)
-                 (loop (cdr entries) seeds))
+                 (loop (mz:cdr entries) seeds))
                 (else
                  (receive (continue? . new-seeds)
                      (apply combiner (full-pathname entry) seeds)
                    (if continue?
-                       (loop (cdr entries) new-seeds)
+                       (loop (mz:cdr entries) new-seeds)
                        (apply values new-seeds)))))))))
 
 (define (working-directory)

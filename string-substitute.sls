@@ -26,6 +26,7 @@
 ;; for example.
 
 ;;; Code:
+#!r6rs
 
 (library (spells string-substitute)
   (export string-substitute)

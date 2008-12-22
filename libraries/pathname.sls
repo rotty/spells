@@ -42,10 +42,7 @@
           (spells opt-args)
           (spells parameter)
           (spells operations)
+          (spells pathname os-string)
           (spells include))
 
-  (define os-string? string?)
-  (define (os-string->string os-string)
-    os-string)
-  
   (include-file ((spells scheme) pathname)))
