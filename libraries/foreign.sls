@@ -20,8 +20,6 @@
           
           malloc free memcpy memset
           
-          make-guardian
-          
           dlopen dlsym dlclose dlerror
 
           pointer-uint16-ref
