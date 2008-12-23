@@ -1,3 +1,5 @@
+#!r6rs
+
 (library (spells foreign)
   (export c-type-sizeof c-type-alignof c-type-align
 
@@ -6,7 +8,10 @@
           make-pointer-c-element-setter
           
           pointer?
-          pointer->integer integer->pointer
+          null-pointer
+          null-pointer?
+          pointer=?
+          pointer+
           
           pointer-ref-c-pointer pointer-set-c-pointer!
           pointer-set-c-char! pointer-ref-c-unsigned-char
@@ -18,8 +23,6 @@
           make-guardian
           
           dlopen dlsym dlclose dlerror
-
-          pointer+ pointer-null?
 
           pointer-uint16-ref
           pointer-uint16-set!
@@ -49,7 +52,7 @@
   (define (->utf8z-ptr/null who s)
     (cond ((string? s) (string->utf8z-ptr s))
           ((eqv? s #f)
-           (integer->pointer 0))
+           (null-pointer))
           (else
            (assertion-violation who "invalid argument" s))))
 
@@ -68,22 +71,16 @@
 
   (define (pointer-utf8z-ptr-ref ptr i)
     (let ((utf8z-ptr (pointer-ref-c-pointer ptr i)))
-      (if (= (pointer->integer utf8z-ptr) 0)
+      (if (null-pointer? utf8z-ptr)
           #f
           (utf8z-ptr->string utf8z-ptr))))
 
   (define pointer-uint16-ref  (make-pointer-c-getter 'uint16))
   (define pointer-uint16-set! (make-pointer-c-setter 'uint16))
   (define pointer-uint32-ref  (make-pointer-c-getter 'uint32))
-  (define pointer-uint32-set! (make-pointer-c-getter 'uint32))
+  (define pointer-uint32-set! (make-pointer-c-setter 'uint32))
   (define pointer-uint64-ref  (make-pointer-c-getter 'uint64))
-  (define pointer-uint64-set! (make-pointer-c-getter 'uint64))
-
-  (define (pointer+ p n)
-    (integer->pointer (+ (pointer->integer p) n)))
-
-  (define (pointer-null? p)
-    (= 0 (pointer->integer p)))
+  (define pointer-uint64-set! (make-pointer-c-setter 'uint64))
 
   (define (c-type-align ctype n)
     (let ((alignment (c-type-alignof ctype)))
@@ -93,7 +90,7 @@
     (case type
       ((record union array)
          (lambda (pointer)
-           (integer->pointer (+ (pointer->integer pointer) offset))))
+           (pointer+ pointer offset)))
       (else
        (let ((ptr-ref (make-pointer-c-getter type)))
          (cond ((and bits bit-offset)

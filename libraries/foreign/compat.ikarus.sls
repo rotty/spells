@@ -1,8 +1,9 @@
 (library (spells foreign compat)
   (export make-pointer-c-getter make-pointer-c-setter
 
-          pointer?
-          pointer->integer integer->pointer
+          pointer? null-pointer null-pointer?
+          pointer=?
+          pointer+
 
           pointer-ref-c-pointer pointer-set-c-pointer!
           pointer-set-c-char! pointer-ref-c-unsigned-char
@@ -38,6 +39,21 @@
        (assertion-violation 'c-type-aliases
                             "unexpected return value from c-type-sizeof"
                             ctype))))
+
+  (define null-pointer
+    (let ((null (integer->pointer 0)))
+      (lambda ()
+        null)))
+
+  (define (null-pointer? ptr)
+    (= (pointer->integer ptr) 0))
+
+  (define (pointer=? p1 p2)
+    (= (pointer->integer p1)
+       (pointer->integer p2)))
+
+  (define (pointer+ p n)
+    (integer->pointer (+ (pointer->integer p) n)))
 
   (define (sized-types-aliases)
     (map (lambda (ctype)
