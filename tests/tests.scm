@@ -46,6 +46,7 @@
   ("logging.scm" spells.logging)
   ("streams.scm" spells.streams)
   ("process.scm" spells.process spells.strings rnrs.io.ports)
-  ("sysutils.scm" spells.sysutils spells.lists)))
+  ("sysutils.scm" spells.sysutils spells.lists rnrs.lists)
+  ("foreign.scm" spells.foreign)))
 
 ;;; tests.scm ends here
