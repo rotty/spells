@@ -1,3 +1,4 @@
+;;;(library (spells foreign compat) (export) (import))
 #lang scheme
 
 (provide make-pointer-c-getter make-pointer-c-setter
