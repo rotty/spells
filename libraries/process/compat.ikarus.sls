@@ -15,8 +15,12 @@
           call-with-process-output)
   (import (rnrs base)
           (rnrs io ports)
-          (only (mzscheme)
-                subprocess subprocess-wait subprocess-status)
+          (prefix (only (ikarus)
+                        process
+                        waitpid
+                        wstatus-exit-status
+                        wstatus-received-signal)
+                  ik:)
           (spells receive)
           (spells record-types)
           (spells pathname))
@@ -38,13 +42,14 @@
          lst))
 
   (define (spawn-process env prog . args)
-    (receive (process stdout-port stdin-port stderr-port)
-        (apply subprocess #f #f #f (x->strlist (cons prog args)))
-      (make-process process stdin-port stdout-port stderr-port)))
+    (receive (pid stdin-port stdout-port stderr-port)
+        (apply ik:process (x->strlist (cons prog args)))
+      (make-process pid stdin-port stdout-port stderr-port)))
 
   (define (wait-for-process process)
-    (subprocess-wait (process-pid process))
-    (values (subprocess-status (process-pid process)) #f))
+    (let ((wstatus (ik:waitpid (process-pid process))))
+      (values (ik:wstatus-exit-status wstatus)
+              (ik:wstatus-received-signal wstatus))))
 
   (define (close-process-ports process)
     (let ((input (process-input process))
