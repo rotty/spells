@@ -4,5 +4,5 @@ configure
 ^aclocal\.m4$
 ^config\.(log|status)$
 ^autom4te\.cache$
-^scheme/foreign/config\.sls$
+^libraries/foreign/config\.sls$
 .*~$
