@@ -10,7 +10,10 @@
          make-c-callout
          make-c-callback
 
-         malloc free memcpy memset
+         (rename-out (spells:malloc malloc)
+                     (spells:memcpy memcpy)
+                     (spells:memset memset))
+         free
 
          dlopen dlsym dlclose dlerror)
 
@@ -25,7 +28,8 @@
          (lib "spells/foreign/config.sls")
          (lib "spells/tracing.sls")
          scheme/mpair
-         scheme/foreign)
+         scheme/foreign
+         (only-in '#%foreign ffi-callback))
 
 (unsafe!)
 
@@ -83,6 +87,9 @@
 (define (pointer+ p offset)
   (ptr-add p offset))
 
+(define (spells:malloc n-bytes)
+  (malloc n-bytes 'raw))
+
 (define (make-c-callout ret-type arg-types)
   (let ((ctype (_cprocedure (mlist->list (map type->mz-type arg-types))
                             (type->mz-type ret-type))))
@@ -90,7 +97,10 @@
       (function-ptr ptr ctype))))
 
 (define (make-c-callback ret-type arg-types)
-  (error 'make-c-callback "FIXME"))
+  (let ((mz-arg-types (mlist->list (map type->mz-type arg-types)))
+        (mz-ret-type (type->mz-type ret-type)))
+    (lambda (proc)
+      (ffi-callback proc mz-arg-types mz-ret-type))))
 
 (define (type->mz-type type)
   (define (prim->mz-type prim)
@@ -119,6 +129,14 @@
                        (ptr-set! (ptr-add ptr offset) mz-type val)))
         (error 'make-pointer-c-setter "invalid type" sym))))
 
+(define (spells:memcpy p1 p2 n)
+  (memcpy p1 p2 n)
+  p1)
+
+(define (spells:memset p v n)
+  (memset p v n)
+  p)
+
 (define *dlerror* #f)
 
 (define dlopen
@@ -131,7 +149,9 @@
          (set! *dlerror* #f)
          result)))
     ((lib-name)
-     (dlopen lib-name #f #f))))
+     (dlopen lib-name #f #f))
+    (()
+     (dlopen #f #f #f))))
 
 (define (dlsym lib-ptr str)
   (get-ffi-obj str lib-ptr _fpointer
