@@ -58,3 +58,32 @@
   (test/equal "call atoi"
     (((make-c-callout 'int '(pointer)) atoi-ptr) num-utf8z-ptr)
     424242))
+
+(testeez "callback"
+  (test-define "bsearch-ptr" bsearch-ptr (dlsym (dlopen *libc-path*) "bsearch"))
+  (test-define "bsearch" bsearch
+    ((make-c-callout 'pointer '(pointer pointer size_t size_t pointer)) bsearch-ptr))
+  (test-define "data" data (let ((mem (malloc (* 5 4))))
+                             (pointer-uint32-set! mem (* 0 4) 7)
+                             (pointer-uint32-set! mem (* 1 4) 11)
+                             (pointer-uint32-set! mem (* 2 4) 23)
+                             (pointer-uint32-set! mem (* 3 4) 31)
+                             (pointer-uint32-set! mem (* 4 4) 37)
+                             mem))
+  (test-define "comparator" cmp ((make-c-callback 'int '(pointer pointer))
+                                 (lambda (p1 p2)
+                                   (- (pointer-uint32-ref p1 0)
+                                      (pointer-uint32-ref p2 0)))))
+  (test-define "key cell" key (malloc 4))
+  (test/equiv "23 (hit)"
+    (begin
+      (pointer-uint32-set! key 0 23)
+      (bsearch key data 5 4 cmp))
+    (pointer+ data (* 2 4))
+    (pointer=?))
+  (test/equiv "10 (miss)"
+    (begin
+      (pointer-uint32-set! key 0 10)
+      (bsearch key data 5 4 cmp))
+    (null-pointer)
+    (pointer=?)))
