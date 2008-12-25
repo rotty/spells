@@ -22,34 +22,40 @@
 ;; 02110-1301, USA.
 
 ;;; Code:
+#!r6rs
 
-(#%require (only mzscheme
-                 make-hash-table hash-table?
-                 hash-table-get hash-table-put! hash-table-remove!
-                 hash-table-for-each))
+(library (spells table compat)
+  (export make-table table? table-ref table-set! table-walk)
+  (import (rnrs base)
+          (rnrs control)
+          (only (scheme base)
+                make-hash make-hasheq make-hasheqv
+                hash?
+                hash-ref hash-set! hash-remove!
+                hash-for-each))
 
 (define make-table
   (case-lambda
-    (() (make-table 'equal))
+    (() (make-hash))
     ((type)
      (case type
-       ((eq) (make-hash-table))
-       ((eqv equal) (make-hash-table 'equal))
+       ((eq) (make-hasheq))
+       ((eqv equal) (make-hasheqv))
        (else (error "invalid hash table type"))))))
 
-(define table? hash-table?)
+(define table? hash?)
 
 (define table-ref
   (case-lambda
     ((table key) (table-ref table key (lambda () #f)))
-    ((table key failure-thunk) (hash-table-get table key failure-thunk))))
+    ((table key failure-thunk) (hash-ref table key failure-thunk))))
 
 (define (table-set! table key value)
   (if value
-      (hash-table-put! table key value)
-      (hash-table-remove! table key)))
+      (hash-set! table key value)
+      (hash-set! table key)))
 
-(define table-walk hash-table-for-each)
+(define table-walk hash-for-each)
 
-
+)
 ;;; util.table.scm ends here

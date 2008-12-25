@@ -1,3 +1,5 @@
+#!r6rs
+
 ;;@ Simple hash tables.
 (library (spells table)
   (export make-table
