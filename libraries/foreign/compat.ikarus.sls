@@ -5,9 +5,6 @@
           pointer=?
           pointer+
 
-          pointer-ref-c-pointer pointer-set-c-pointer!
-          pointer-set-c-char! pointer-ref-c-unsigned-char
-
           (rename (spells:make-c-callout make-c-callout)
                   (spells:make-c-callback make-c-callback))
 
