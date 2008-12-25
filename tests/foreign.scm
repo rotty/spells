@@ -28,6 +28,27 @@
 ;; You will probably have to tweak this on a non-GNU/Linux system.
 (define *libc-path* "/lib/libc.so.6")
 
+(define N 1000)
+
+(testeez "pointers"
+  (test-true "null pointer is a pointer" (pointer? (null-pointer)))
+  (test/equiv "pointer+ sanity"
+    (pointer+ (null-pointer) 777)
+    (pointer+ (pointer+ (null-pointer) 666) 111)
+    (pointer=?)))
+
+(testeez "malloc/free, mem access"
+  (test/equal "stress"
+    (let loop ((i 0) (sum 0))
+      (if (>= i N)
+          sum
+          (let ((mem (malloc 4)))
+            (pointer-uint32-set! mem 0 (* i 7))
+            (let ((v (pointer-uint32-ref mem 0)))
+              (free mem)
+              (loop (+ i 1) (+ sum v))))))
+    (/ (* N (- N 1) 7) 2)))
+
 (testeez "callout"
   (test-define "libc" libc (dlopen *libc-path*))
   (test-false "check handle" (eqv? libc #f))
