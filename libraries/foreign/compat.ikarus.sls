@@ -59,7 +59,8 @@
           '(char uchar short ushort int uint long ulong llong ullong)))
 
   (define (other-types-aliases)
-    `((size_t . ,(sized-type 'size_t #f))
+    `((fpointer . pointer)
+      (size_t . ,(sized-type 'size_t #f))
       (ssize_t . ,(sized-type 'ssize_t #t))
       ;; we assume time_t to be a signed integer type; this true at
       ;; least on glibc systems

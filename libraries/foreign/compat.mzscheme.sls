@@ -116,6 +116,7 @@
       ((float) _float)
       ((double) _double)
       ((pointer) _pointer)
+      ((fpointer) _fpointer)
       ((void) _void)
       (else #f)))
   (or (prim->mz-type type)

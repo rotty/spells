@@ -62,7 +62,7 @@
 (testeez "callback"
   (test-define "bsearch-ptr" bsearch-ptr (dlsym (dlopen *libc-path*) "bsearch"))
   (test-define "bsearch" bsearch
-    ((make-c-callout 'pointer '(pointer pointer size_t size_t pointer)) bsearch-ptr))
+    ((make-c-callout 'pointer '(pointer pointer size_t size_t fpointer)) bsearch-ptr))
   (test-define "data" data (let ((mem (malloc (* 5 4))))
                              (pointer-uint32-set! mem (* 0 4) 7)
                              (pointer-uint32-set! mem (* 1 4) 11)
