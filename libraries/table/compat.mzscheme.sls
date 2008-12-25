@@ -40,7 +40,8 @@
     ((type)
      (case type
        ((eq) (make-hasheq))
-       ((eqv equal) (make-hasheqv))
+       ((eqv) (make-hasheqv))
+       ((equal) (make-hash))
        (else (error "invalid hash table type"))))))
 
 (define table? hash?)
