@@ -40,4 +40,15 @@
    (run-process/sexps #f "/bin/echo" "(hello world)")
    (values 0 #f '((hello world)))))
 
+(testeez "call-with-process-output"
+  (test/equal "echo (sexp)"
+    (call-with-process-output #f '("/bin/echo" "(hello world)")
+      (lambda (port)
+        (read port)))
+    (values 0 #f '(hello world)))
+  (test/equal "echo (with delay)"
+    (call-with-process-output #f '("/bin/sh" "-c" "sleep 1 && echo foo")
+      get-line)
+    (values 0 #f "foo")))
+
 ;;; process.scm ends here
