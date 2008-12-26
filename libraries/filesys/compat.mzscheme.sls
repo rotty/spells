@@ -43,7 +43,7 @@
                         copy-file
                         current-directory
                         
-                        car cdr)
+                        car cdr memq)
                   mz:))
 
 (define x->f x->namestring)
@@ -63,7 +63,7 @@
           (mz:delete-file (x->f pathname)))))
 
 (define (rename-file source-pathname target-pathname)
-  (mz:rename-file-or-directory (x->f source-pathname) (x->f target-pathname)))
+  (mz:rename-file-or-directory (x->f source-pathname) (x->f target-pathname) #t))
 
 (define (file-regular? pathname)
   (mz:file-exists? (x->f pathname)))
@@ -76,7 +76,7 @@
 
 (define (file-test-p f p)
   (and (file-exists? f)
-       (if (memq p (mz:file-or-directory-permissions f)) #t #f)))
+       (if (mz:memq p (mz:file-or-directory-permissions f)) #t #f)))
 
 (define (file-readable? pathname)
   (file-test-p (x->f pathname) 'read))

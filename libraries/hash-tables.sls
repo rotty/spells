@@ -1,3 +1,5 @@
+#!r6rs
+
 (library (spells hash-tables)
   (export
    hash-table? make-hash-table hash-table-ref hash-table-ref/default

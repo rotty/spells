@@ -7,7 +7,7 @@
 ;;; Commentary:
 
 ;;; Code:
-
+#!r6rs
 
 (library (spells queue)
   (export queue? empty-queue queue-empty? queue-insert queue-remove queue-first)

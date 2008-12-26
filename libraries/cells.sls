@@ -22,9 +22,10 @@
 
 ;;; Comentary:
 
-;; Heavyweight implementation of cells.
+;; Heavyweight (but portable) implementation of cells.
 
 ;;; Code:
+#!r6rs
 
 (library (spells cells)
   (export make-cell cell? cell-ref cell-set!)
