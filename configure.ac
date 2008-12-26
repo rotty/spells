@@ -40,5 +40,5 @@ AC_CHECK_TYPE(time_t, [AC_CHECK_SIZEOF(time_t)
                        AC_SUBST(SIZEOF_TIME_T, $ac_cv_sizeof_time_t)],
 		      [AC_SUBST(SIZEOF_TIME_T, [\#f])],)
 
-AC_CONFIG_FILES(Makefile scheme/foreign/config.sls)
+AC_CONFIG_FILES(Makefile libraries/foreign/config.sls)
 AC_OUTPUT
