@@ -10,8 +10,6 @@
 
           malloc free memcpy memset
 
-          make-guardian
-
           dlopen dlsym dlclose dlerror)
   (import (rnrs base)
           (rnrs control)
@@ -23,7 +21,6 @@
           (spells parameter)
           (spells foreign config)
           (spells tracing)
-          (only (ikarus) make-guardian)
           (ikarus foreign))
 
   (define (sized-type ctype signed?)
