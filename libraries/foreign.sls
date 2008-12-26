@@ -39,13 +39,24 @@
           ->utf8z-ptr/null
 
           pointer-utf8z-ptr-set!
-          pointer-utf8z-ptr-ref)
+          pointer-utf8z-ptr-ref
+
+          define-c-callouts)
   (import (rnrs base)
           (rnrs control)
           (rnrs arithmetic bitwise)
           (rnrs bytevectors)
           (spells foreign compat)
           (spells foreign config))
+
+  ;; TODO: callout compression (i.e. reusing callouts with the same
+  ;; signature)
+  (define-syntax define-c-callouts
+    (syntax-rules ()
+      ((define-callouts shlib (name ret-type c-name arg-types) ...)
+       (begin
+         (define name ((make-c-callout ret-type arg-types) (dlsym shlib c-name)))
+         ...))))
 
   (define (utf8z-ptr->string ptr)
     (let ((size (do ((i 0 (+ i 1)))
