@@ -26,6 +26,7 @@
           (spells receive)
           (spells pathname)
           (spells time-lib)
+          (spells filesys copy-file)
           (prefix (ikarus) ik:))
 
 (define x->f x->namestring)
@@ -106,8 +107,5 @@
                        (x->f (pathname-as-directory (x->pathname dir)))))
            (lambda () body ...)
            (lambda () (ik:current-directory wd)))))))
-
-(define (copy-file old-file new-file)
-  (error 'copy-file "please implement COPY-FILE for ikarus"))
 
 )
