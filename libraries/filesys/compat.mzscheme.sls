@@ -2,9 +2,11 @@
 (library (spells filesys compat)
   (export file-exists?
           create-directory
+          create-symbolic-link
+          create-hard-link
           delete-file
           rename-file
-          
+
           file-regular?
           file-directory?
           file-symbolic-link?
@@ -26,7 +28,7 @@
           (spells receive)
           (spells pathname)
           (spells time-lib)
-    
+
           (prefix (only (mzscheme)
                         delete-directory
                         file-exists?
@@ -42,7 +44,7 @@
                         path->string
                         copy-file
                         current-directory
-                        
+
                         car cdr memq)
                   mz:))
 
@@ -55,6 +57,12 @@
 
 (define (create-directory pathname)
   (mz:make-directory (x->f pathname)))
+
+(define (create-symbolic-link link-pathname linked-pathname)
+  (error 'create-symbolic-link "not implemented on mzscheme"))
+
+(define (create-hard-link link-pathname linked-pathname)
+  (error 'create-hard-link "not implemented on mzscheme"))
 
 (define (delete-file pathname)
   (if (file-exists? pathname)

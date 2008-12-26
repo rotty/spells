@@ -1,6 +1,8 @@
 (library (spells filesys compat)
   (export file-exists?
           create-directory
+          create-symbolic-link
+          create-hard-link
           delete-file
           rename-file
           
@@ -42,6 +44,12 @@
 
 (define (rename-file source-pathname target-pathname)
   (ik:rename-file (x->f source-pathname) (x->f target-pathname)))
+
+(define (create-hard-link old-pathname new-pathname)
+  (ik:make-hard-link (x->f old-pathname) (x->f new-pathname)))
+
+(define (create-symbolic-link old-pathname new-pathname)
+  (ik:make-symbolic-link (x->f old-pathname) (x->f new-pathname)))
 
 (define (file-regular? pathname)
   (ik:file-regular? (x->f pathname)))

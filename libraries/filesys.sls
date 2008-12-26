@@ -7,6 +7,8 @@
           rename-file
           copy-file
           install-file
+          create-symbolic-link
+          create-hard-link
 
           file-regular?
           file-directory?
