@@ -75,7 +75,6 @@
 (define (file-size-in-bytes pathname)
   (ik:file-size (x->f pathname)))
 
-;; Test wheter a filename is . or ..
 (define (dot-or-dotdot? f)
   (or (string=? "." f) (string=? ".." f)))
 
