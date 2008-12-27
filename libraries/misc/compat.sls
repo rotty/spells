@@ -1,5 +1,5 @@
 (library (spells misc compat)
-  (export sleep-seconds exit scheme-dialect)
+  (export sleep-seconds scheme-dialect)
   (import (rnrs base))
 
   ;;@ Sleep @1 seconds.
