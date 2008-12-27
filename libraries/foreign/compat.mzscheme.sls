@@ -130,9 +130,9 @@
                        (ptr-set! (ptr-add ptr offset) mz-type val)))
         (error 'make-pointer-c-setter "invalid type" sym))))
 
-(define (spells:memcpy p1 p2 n)
-  (memcpy p1 p2 n)
-  p1)
+(define (spells:memcpy p . args)
+  (apply memcpy p args)
+  p)
 
 (define (spells:memset p v n)
   (memset p v n)
