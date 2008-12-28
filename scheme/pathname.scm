@@ -375,9 +375,9 @@
 (define-operation (fs-type/canonicalize-namestring fs-type object)
   (pathname->namestring (x->pathname object) fs-type))
 
-(define-operation (fs-type/origin-namestring fs-type))
-(define-operation (fs-type/directory-namestring fs-type))
-(define-operation (fs-type/file-namestring fs-type))
+(define-operation (fs-type/origin-namestring fs-type pathname))
+(define-operation (fs-type/directory-namestring fs-type pathname))
+(define-operation (fs-type/file-namestring fs-type pathname))
 
 (define-operation (fs-type/pathname->namestring fs-type pathname)
   (string-append (origin-namestring pathname)
