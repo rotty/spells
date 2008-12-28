@@ -59,11 +59,11 @@
   (define (spawn-process env prog . args)
     (destructuring-bind (pid stdin stdout stderr) (apply yp:process prog args)
       (make-process pid stdin stdout stderr)))
-  
+
   (define (wait-for-process process)
     (values (yp:process-wait (process-pid process) #f)
             #f))
-  
+
   (define (close-process-ports process)
     (let ((input (process-input process))
           (output (process-output process))
@@ -91,5 +91,5 @@
         (close-process-ports process)
         (receive status+signal (wait-for-process process)
           (apply values (append status+signal results))))))
-  
+
 )
