@@ -23,7 +23,7 @@
 ;; 02110-1301, USA.
 
 ;;; Code: 
-(all-dialects-except mzscheme ikarus)
+(all-dialects-except mzscheme ikarus ypsilon)
 
 (testeez "environment"
   (test-false "lookup"
