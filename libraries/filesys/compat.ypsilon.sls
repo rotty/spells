@@ -64,30 +64,36 @@
 
   (define (file-exists? pathname)
     (rnrs:file-exists? (x->f pathname)))
-  
+
   (define (create-directory pathname)
     (yp:create-directory (x->f pathname)))
-  
+
   (define create-symbolic-link (todo-proc 'create-symbolic-link))
   (define create-hard-link (todo-proc 'create-hard-link))
 
   (define (delete-file pathname)
     (rnrs:delete-file (x->f pathname)))
-  
+
   (define rename-file (todo-proc 'rename-file))
-  
+
   (define (file-regular? pathname)
     (yp:file-regular? (x->f pathname)))
   (define (file-directory? pathname)
     (yp:file-directory? (x->f pathname)))
   (define (file-symbolic-link? pathname)
     (yp:file-symbolic-link? (x->f pathname)))
-  
-  (define file-readable? (todo-proc 'file-readable?))
-  (define file-writable? (todo-proc 'file-writable?))
-  (define file-executable? (todo-proc 'file-executable?))
+
+  (define (file-readable? pathname)
+    (yp:file-readable? (x->f pathname)))
+
+  (define (file-writable? pathname)
+    (yp:file-writable? (x->f pathname)))
+
+  (define (file-executable? pathname)
+    (yp:file-executable? (x->f pathname)))
+
   (define file-modification-time (todo-proc 'file-modification-time))
-  
+
   (define (file-size-in-bytes pathname)
     (yp:file-size-in-bytes (x->f pathname)))
 
@@ -111,17 +117,17 @@
                          (apply values new-seeds)))))))))
 
 
-  (define working-directory (todo-proc 'working-directory))
-  (define change-working-directory (todo-proc 'change-working-directory))
+  (define (working-directory)
+    (yp:current-directory))
 
   (define-syntax with-working-directory
     (syntax-rules ()
       ((with-working-directory dir body ...)
-       (let ((wd (working-directory)))
+       (let ((wd (yp:current-directory)))
          (dynamic-wind
-           (lambda () (change-working-directory
+           (lambda () (yp:current-directory
                        (x->f (pathname-as-directory (x->pathname dir)))))
            (lambda () body ...)
-           (lambda () (change-working-directory wd)))))))
-  
+           (lambda () (yp:current-directory wd)))))))
+
   )
