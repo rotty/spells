@@ -60,8 +60,11 @@
   (define (create-directory pathname)
     (yp:create-directory (x->f pathname)))
 
-  (define create-symbolic-link (todo-proc 'create-symbolic-link))
-  (define create-hard-link (todo-proc 'create-hard-link))
+  (define (create-symbolic-link old-pathname new-pathname)
+    (yp:create-symbolic-link (x->f old-pathname) (x->f new-pathname)))
+
+  (define (create-hard-link old-pathname new-pathname)
+    (yp:create-hard-link (x->f old-pathname) (x->f new-pathname)))
 
   (define (delete-file pathname)
     (rnrs:delete-file (x->f pathname)))
