@@ -40,7 +40,8 @@
      (make-object ?proc (%method-clauses->handler ?method-clause ...)))))
 
 (define (make-object proc handler)
-  (annotate-procedure (or proc (lambda args (error "object is not applicable"))) handler))
+  (annotate-procedure
+   (or proc (lambda args (error 'make-object "object is not applicable"))) handler))
 
 (define-syntax operation
   (syntax-rules ()
@@ -56,7 +57,7 @@
                         (default
                           (apply default obj args))
                         (else
-                         (error "operation is not available" obj op))))
+                         (error 'make-operation "operation is not available" obj op))))
                 handler)))
     op))
 
@@ -73,4 +74,4 @@
                  (let ((method (any (lambda (o) ((procedure-annotation o) op))
                                     (cons object1 objects))))
                    (or method
-                       (error "operation not available" objects op))))))
+                       (error 'join "operation not available" objects op))))))
