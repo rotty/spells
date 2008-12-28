@@ -25,8 +25,16 @@
 ;; Interface for system processes
 
 ;;; Code:
+#!r6rs
 
 (library (spells process compat)
+  (export spawn-process
+          wait-for-process
+          run-process
+          call-with-process-input
+          call-with-process-output)
+  (import (rnrs base))
+
   ;;@ Run @2 with the environment @1 and arguments @3
   ;; asynchronously. The return value is a process descriptor to be
   ;; passed to @ref{spells.process wait-for-process,wait-for-process},
