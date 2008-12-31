@@ -2,11 +2,19 @@
 
 (library (spells hash-tables)
   (export
-   hash-table? make-hash-table hash-table-ref hash-table-ref/default
-   hash-table-set! hash-table-update! hash-table-copy
-   hash-table-fold hash-table-walk hash-table-keys hash-table-values
-   hash-table->alist alist->hash-table hash-table-merge!
-   hash-table-delete!)
+   ;; Type constructors and predicate
+   make-hash-table hash-table? alist->hash-table 
+   ;; Reflective queries
+   hash-table-equivalence-function hash-table-hash-function 
+   ;; Dealing with single elements
+   hash-table-ref hash-table-ref/default hash-table-set!
+   hash-table-delete! hash-table-exists?
+   hash-table-update! hash-table-update!/default 
+   ;; Dealing with the whole contents
+   hash-table-size hash-table-keys hash-table-values hash-table-walk
+   hash-table-fold hash-table->alist hash-table-copy hash-table-merge! 
+   ;;Hashing
+   hash string-hash string-ci-hash hash-by-identity)
   (import (except (rnrs base) error)
           (rnrs control)
           (rnrs lists)
