@@ -1,7 +1,7 @@
 ;; condition.scm -- Conditions
 ; arch-tag: 068260f3-0c62-450f-8d2a-f5a42e9baa57
 
-;; Copyright (C) 2005-2006 by Free Software Foundation, Inc.
+;; Copyright (C) 2005-2006, 2008 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Fri May 21, 2005 03:18
@@ -28,20 +28,12 @@
 ;;; Code:
 
 
-(define-condition-type &irritants &condition
-  irritants?
-  (values condition-irritants))
-
 (define-condition-type &parser-error &error
-  parser-error?
+  make-parser-error parser-error?
   (port parser-error-port))
 
-(define-condition-type &end-of-input &condition
-  end-of-input?
-  (port end-of-input-port))
-
-(define-condition-type &stacked &message
-  stacked-condition?
+(define-condition-type &stacked &condition
+  make-stacked-condition stacked-condition?
   (next next-condition))
 
 
