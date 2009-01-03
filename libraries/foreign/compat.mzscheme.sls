@@ -28,8 +28,7 @@
          (lib "spells/foreign/config.sls")
          (lib "spells/tracing.sls")
          scheme/mpair
-         scheme/foreign
-         (only-in '#%foreign ffi-callback))
+         scheme/foreign)
 
 (unsafe!)
 
@@ -97,10 +96,10 @@
       (function-ptr ptr ctype))))
 
 (define (make-c-callback ret-type arg-types)
-  (let ((mz-arg-types (mlist->list (map type->mz-type arg-types)))
-        (mz-ret-type (type->mz-type ret-type)))
+  (let ((ctype (_cprocedure (mlist->list (map type->mz-type arg-types))
+                            (type->mz-type ret-type))))
     (lambda (proc)
-      (ffi-callback proc mz-arg-types mz-ret-type))))
+      (function-ptr proc ctype))))
 
 (define (type->mz-type type)
   (define (prim->mz-type prim)
