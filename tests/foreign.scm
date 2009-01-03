@@ -1,6 +1,6 @@
 ;;; foreign.scm --- Unit tests for spells.foreign
 
-;; Copyright (C) 2008 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -57,7 +57,12 @@
   (test-define "test str (num)" num-utf8z-ptr (string->utf8z-ptr "424242"))
   (test/equal "call atoi"
     (((make-c-callout 'int '(pointer)) atoi-ptr) num-utf8z-ptr)
-    424242))
+    424242)
+  (test-define "realloc" realloc ((make-c-callout 'pointer '(pointer size_t))
+                                  (dlsym libc "realloc")))
+  (test-define "call realloc" mem (realloc (null-pointer) 1024))
+  (test-true "pointer?" (pointer? mem))
+  (test-eval "free" (free mem)))
 
 (testeez "callback"
   (test-define "bsearch-ptr" bsearch-ptr (dlsym (dlopen *libc-path*) "bsearch"))
