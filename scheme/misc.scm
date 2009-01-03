@@ -1,7 +1,7 @@
 ;; misc.scm -- Utilities that don't fit elsewhere
 ;; arch-tag: 6c79478b-4740-4db7-a6bf-acd915bf8fc4
 
-;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2008, 2009 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Jun 12, 2005 18:50
@@ -59,5 +59,8 @@
 ;;@ Compose two procedures, yielding a procedure of the same arity
 ;;  as @2.
 (define (compose f g) (lambda args (f (apply g args))))
+
+(define (and=> e proc)
+  (and e (proc e)))
 
 ;;; misc.scm ends here

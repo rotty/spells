@@ -9,6 +9,7 @@
           sort-list
           and-map
           or-map
+          and=>
           scheme-dialect)
   (import (rnrs base)
           (rnrs io simple)

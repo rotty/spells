@@ -1,7 +1,7 @@
 ;; tests.scm -- list of test files
 ;; arch-tag: 81738281-305b-11d9-8bf0-00404513c0a4
 
-;; Copyright (C) 2004-2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2004-2009 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Nov 07, 2004 02:22
@@ -35,7 +35,7 @@
   ;;("file.scm" spells.file spells.namestring)
   ("string-substitute.scm" spells.string-substitute)
   ("format.scm" spells.format)
-  ("misc.scm" spells.misc)
+  ("misc.scm" spells.misc rnrs.lists)
   ;;("opt-args.scm" spells.opt-args) ;; temporarily disabled (can't eval definitions in R6RS)
   ("parameter.scm" spells.parameter)
   ;;("byte-vectors.scm" spells.byte-vectors) ;; superceded by R6RS

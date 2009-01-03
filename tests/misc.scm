@@ -1,7 +1,7 @@
 ;; misc.scm -- Unit tests for spells.misc
 ;; arch-tag: 4822bd68-4e16-4bbd-bca4-42277a933717
 
-;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2008, 2009 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Mon Jun 13, 2005 07:13
@@ -37,5 +37,11 @@
  (test-false "or-empty" (or-map (lambda (x) (not x)) '()))
  (test-true "or" (or-map (lambda (x) (not x)) '(#t #t #t #f #t)))
  (test/eqv "or" (or-map (lambda (x) (> x 5)) '(1 3 2 3 34 12)) #t))
+
+(let ((alist '((foo 42)
+               (cthulu 666))))
+  (testeez "and=>"
+    (test-false "miss" (and=> (assq 'qux alist) cadr))
+    (test/equal "hit" (and=> (assq 'foo alist) cadr) 42)))
 
 ;;; misc.scm ends here
