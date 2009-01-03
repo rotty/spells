@@ -69,7 +69,7 @@
       (make-process pid stdin stdout stderr)))
   
   (define (wait-for-process process)
-    (values (yp:process-wait (process-pid process) #t)
+    (values (yp:process-wait (process-pid process) #f)
             #f))
   
   (define (close-process-ports process)
