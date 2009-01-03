@@ -3,7 +3,7 @@
 ;; Scheme implementations.
 (define-system spells
   (config-files interfaces s48-packages)
-  (spedl-files interfaces packages)
+  (r6rs-libs "libraries")
   (structures spells.parameter
               spells.define-values
               spells.opt-args
