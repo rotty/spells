@@ -1,7 +1,7 @@
 ;; condition.scm -- Conditions
 ; arch-tag: 068260f3-0c62-450f-8d2a-f5a42e9baa57
 
-;; Copyright (C) 2005-2006, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2005-2006, 2008, 2009 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Fri May 21, 2005 03:18
@@ -22,8 +22,9 @@
 
 ;;; Comentary:
 
-;; We have nothing in here; dialects that don't have an implementation
-;; of srfi-34/35 can (scmxlate-include "srfi-34/35.scm").
+;;
+;; These are common condition types which can be shared among
+;; libraries (instead of each re-defining them).
 
 ;;; Code:
 

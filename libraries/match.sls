@@ -1,5 +1,6 @@
 #!r6rs
 
+;;@ Pattern matching.
 (library (spells match)
   (export match
           match-lambda

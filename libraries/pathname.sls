@@ -1,4 +1,6 @@
 #!r6rs
+
+;;@ Pathname abstraction.
 (library (spells pathname)
   (export make-file
           file?

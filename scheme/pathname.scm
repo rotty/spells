@@ -143,7 +143,7 @@
                    directory
                    (pathname-file pathname))))
 
-;;@ Return a pathname like PATHNAME with a file of FILE.
+;;@ Return a pathname like @1 with a file of @2.
 (define (pathname-with-file pathname file)
   (let ((pathname (x->pathname pathname)))
     (make-pathname (pathname-origin pathname)
@@ -152,7 +152,7 @@
 
 ;;@ Return a pathname like @1.
 ;; Any null components of @1 are filled with the supplied
-;; arguments."
+;; arguments, @1, @2 and @3.
 (define (pathname-default pathname origin directory file)
   (let ((pathname (x->pathname pathname)))
     (make-pathname (or (pathname-origin pathname) origin)
@@ -207,10 +207,10 @@
     (and (pathname-directory pathname)  ;++ nil/false pun
          (not (pathname-file pathname)))))
 
-;;@ Return a pathname like PATHNAME, representing a directory.
-;; If PATHNAME has a file component, it is added to the end of the list of
+;;@ Return a pathname like @1, representing a directory.
+;; If @1 has a file component, it is added to the end of the list of
 ;; directory components, and the resultant pathname has no file.
-;; Otherwise, return PATHNAME.
+;; Otherwise, return @1.
 (define (pathname-as-directory pathname)
   (let* ((pathname (x->pathname pathname))
          (file (pathname-file pathname)))
@@ -223,7 +223,7 @@
                        #f)
         pathname)))
 
-;;@ Return a pathname of the directory that contains PATHNAME.
+;;@ Return a pathname of the directory that contains @1.
 (define (pathname-container pathname)
   (let* ((pathname (x->pathname pathname))
          (origin (pathname-origin pathname))
@@ -266,15 +266,15 @@
 
 ;;;; Pathname Expansion
 
-;;@ Return a pathname like PATHNAME but with the origin expanded.
-;; This is currently unimplemented and will simply return PATHNAME."
+;;@ Return a pathname like @1 but with the origin expanded.
+;; This is currently unimplemented and will simply return @1."
 (define (expand-pathname pathname)
   (error 'expand-pathname "Unimplemented: %S" `(expand-pathname ',pathname)))
 
 ;;@ Compare the pathnames @1 and @2 and return @code{#t} if they refer
 ;; to the same filesystem entity.
 ;;
-;; FIXME: doesn't deal with versions, 
+;; FIXME: doesn't deal with versions.
 (define (pathname=? x y)
   (and (equal? (pathname-origin x) (pathname-origin y))
        (equal? (pathname-directory x) (pathname-directory y))
@@ -305,6 +305,7 @@
              (pred (%->string (file-name file-x)) (%->string (file-name file-y))))
             (else
              #f)))))
+;;@stop
 
 (define pathname<? (make-pathname-file-comp string<?))
 (define pathname>? (make-pathname-file-comp string>?))
@@ -312,18 +313,18 @@
 
 ;;;; Namestrings
 
-;;@ Parse NAMESTRING and return a pathname representing it.
-;; Use FS-TYPE's namestring parser to parse NAMESTRING.
-;; If FS-TYPE is not supplied, it defaults to the local file system."
+;;@ Parse @1 and return a pathname representing it.
+;; Use @2's namestring parser to parse @1.
+;; If @2 is not supplied, it defaults to the local file system."
 (define/optional-args (parse-namestring namestring
                                         (optional (fs-type (local-file-system-type))))
   (fs-type/parse-namestring fs-type namestring))
 
 ;;@ Coerce @1 into a namestring.
-;; If @1 is a string, canonicalize it according to FS-TYPE.
-;; If @1 is a pathname, convert it according to FS-TYPE.
+;; If @1 is a string, canonicalize it according to @2.
+;; If @1 is a pathname, convert it according to @2.
 ;; Otherwise, signal an error.
-;; If FS-TYPE is not supplied, it defaults to the local file system type."
+;; If @2 is not supplied, it defaults to the local file system type."
 (define/optional-args (x->namestring object (optional
                                              (fs-type (local-file-system-type))))
   ;++ What if it's a symbol?  Use (MAKE-PATHNAME NIL NIL object)?
@@ -338,27 +339,27 @@
 (define (pathname->namestring pathname fs-type)
   (fs-type/pathname->namestring fs-type pathname))
 
-;;@ Return a string for PATHNAME's origin according to FS-TYPE.
-;; If FS-TYPE is not supplied, it defaults to the local file system type.
+;;@ Return a string for @1's origin according to @2.
+;; If @2 is not supplied, it defaults to the local file system type.
 (define/optional-args (origin-namestring pathname
                                          (optional (fs-type (local-file-system-type))))
   (fs-type/origin-namestring fs-type (x->pathname pathname)))
 
-;; Return a string for PATHNAME's directory according to FS-TYPE.
-;; If FS-TYPE is not supplied, it defaults to the local file system type.
+;; Return a string for @1's directory according to @2.
+;; If @2 is not supplied, it defaults to the local file system type.
 (define/optional-args (directory-namestring
                        pathname (optional (fs-type (local-file-system-type))))
   (fs-type/directory-namestring fs-type (x->pathname pathname)))
 
-;; Return a string for PATHNAME's file according to FS-TYPE.
-;; If FS-TYPE is not supplied, it defaults to the local file system type.
+;; Return a string for @1's file according to @2.
+;; If @2 is not supplied, it defaults to the local file system type.
 (define/optional-args (file-namestring pathname (optional
                                                  (fs-type (local-file-system-type))))
   (fs-type/file-namestring fs-type (x->pathname pathname)))
 
-;; Return a string naming PATHNAME relative to RELATIVE,
-;; according to FS-TYPE.
-;; If FS-TYPE is not supplied, it defaults to the local file system type."
+;; Return a string naming @1 relative to RELATIVE,
+;; according to @2.
+;; If @2 is not supplied, it defaults to the local file system type."
 (define/optional-args (enough-namestring pathname relative
                                          (optional (fs-type (local-file-system-type))))
   (fs-type/enough-namestring fs-type

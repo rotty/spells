@@ -1,4 +1,7 @@
 #!r6rs
+
+;;@ @uref{http://srfi.schemers.org/srfi-23/srfi-23.html, SRFI 23}
+;;  compatability library.
 (library (spells error)
   (export error error-who make-error-signaller)
   (import 

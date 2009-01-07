@@ -1,4 +1,6 @@
 #!r6rs
+
+;;@ File system interface.
 (library (spells filesys)
   (export file-exists?
           create-directory
@@ -42,6 +44,7 @@
           (spells pathname)
           (spells time-lib)
           (spells filesys compat)
+          (spells tracing)
           (spells include))
 
   (include-file ((spells scheme) filesys)))

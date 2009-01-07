@@ -1,5 +1,6 @@
 #!r6rs
 
+;;@ ASCII encoding utilities.
 (library (spells ascii)
   (export char->ascii ascii->char
           ascii-limit ascii-whitespaces

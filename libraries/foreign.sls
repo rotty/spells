@@ -1,5 +1,6 @@
 #!r6rs
 
+;;@ Foreign function interface.
 (library (spells foreign)
   (export c-type-sizeof c-type-alignof c-type-align
 

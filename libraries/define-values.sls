@@ -1,10 +1,16 @@
 #!r6rs
 
+;;@ @code{define-value} syntax.
 (library (spells define-values)
   (export define-values)
   (import (for (rnrs base) run expand)
           (for (rnrs syntax-case) run expand))
-  
+
+  ;;@args names body ...
+  ;;
+  ;; Evaluate @2, which should return as many values as there are
+  ;; elements in @1; each identifier in @1 gets bound to the repective
+  ;; value.
   (define-syntax define-values
     (lambda (form)
       (syntax-case form ()

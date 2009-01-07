@@ -1,5 +1,8 @@
 #!r6rs
 
+;;@ Implementation of
+;;  @uref{http://srfi.schemers.org/srfi-69/srfi-69.html, SRFI 69},
+;;  (Basic hash tables).
 (library (spells hash-tables)
   (export
    ;; Type constructors and predicate

@@ -1,6 +1,6 @@
 ;;; condition.sls --- Extra condition types
 
-;; Copyright (C) 2008 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -24,9 +24,6 @@
 #!r6rs
 
 ;;@ Additional condition types.
-;;
-;; These are common condition types which can be shared among
-;; libraries (instead of each re-defining them).
 (library (spells condition)
   (export &parser-error make-parser-error parser-error?
           parser-error-port

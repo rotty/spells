@@ -1,6 +1,6 @@
 ;; cells.sls -- Implementation of the cells datatype in terms of records
 
-;; Copyright (C) 2007, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2007, 2008, 2009 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann
 ;; Start date: Wed Aug 29 15:35:22 CEST 2007
@@ -20,17 +20,34 @@
 ;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 ;; 02110-1301, USA.
 
-;;; Comentary:
+;;; Commentary:
 
 ;; Heavyweight (but portable) implementation of cells.
 
 ;;; Code:
 #!r6rs
 
+;;@ Mutable cells.
 (library (spells cells)
   (export make-cell cell? cell-ref cell-set!)
   (import (rnrs base)
           (spells record-types))
+
+  ;;@defun make-cell value
+  ;;  Create a cell containing @var{value}.
+  ;;@end defun
+
+  ;;@defun cell? thing
+  ;;  Return @code{#t} if @var{thing} is a cell.
+  ;;@end defun
+
+  ;;@defun cell-ref cell
+  ;; Return the contents of @var{cell}.
+  ;;@end defun
+
+  ;;@defun cell-set! cell value
+  ;; Set the contents of @var{cell} to @var{value}.
+  ;;@end defun
 
   (define-record-type cell
     (make-cell value)

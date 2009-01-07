@@ -1,7 +1,7 @@
 ;; table.scm -- Hash tables
 ;; arch-tag: 7a68d589-df5f-4915-a2cc-5217717ea70e
 
-;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2008, 2009 by Free Software Foundation, Inc.
 
 ;; Author: Andreas Rottmann <rotty@debian.org>
 ;; Start date: Fri May 20, 2005 21:29
@@ -43,7 +43,8 @@
   ;;@ Table type predicate. Hash tables are a disjoint type.
   (define table? hashtable?)
 
-  ;;@ Lookup @2 in @1. If no value is found for key @2, return the value
+  ;;@args table key [ failure-thunk ]
+  ;; Lookup @2 in @1. If no value is found for key @2, return the value
   ;; obtained by invoking @3 with no arguments, or #f if the optional
   ;; argument @3 is not specified.
   (define table-ref

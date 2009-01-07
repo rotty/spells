@@ -9,6 +9,7 @@
 ;;; Code:
 #!r6rs
 
+;;@ Functional queues.
 (library (spells queue)
   (export queue? empty-queue queue-empty? queue-insert queue-remove queue-first)
 

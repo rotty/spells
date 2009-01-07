@@ -1,4 +1,6 @@
 #!r6rs
+
+;;@ Procedure annotations.
 (library (spells procedure-annotations)
   (export annotate-procedure
           procedure-annotation)

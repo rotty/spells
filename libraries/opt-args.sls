@@ -1,4 +1,6 @@
 #!r6rs
+
+;;@ Optional and named arguments.
 (library (spells opt-args)
   (export define/named-args
           define/optional-args

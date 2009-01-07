@@ -27,6 +27,9 @@
 
 #!r6rs
 
+;;@ Implementation of
+;;  @uref{http://srfi.schemers.org/srfi-45/srfi-45.html, SRFI 45}
+;;  (Primitives for Expressing Iterative Lazy Algorithms).
 (library (spells lazy)
   (export delay
           lazy

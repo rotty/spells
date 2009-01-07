@@ -1,5 +1,6 @@
 #!r6rs
 
+;;@ Reading delimited strings.
 (library (spells delimited-readers)
   (export read-line
 	  read-paragraph

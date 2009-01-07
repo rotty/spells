@@ -1,4 +1,6 @@
 #!r6rs
+
+;;@ A simple object system.
 (library (spells operations)
   (export object
           operation
