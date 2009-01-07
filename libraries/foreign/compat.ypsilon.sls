@@ -1,6 +1,6 @@
 ;;; compat.ypsilon.sls --- foreign compat library for Ypsilon
 
-;; Copyright (C) 2008 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -37,6 +37,7 @@
           
           dlopen dlsym dlclose dlerror)
   (import (rnrs)
+          (xitomatl srfi let-values)
           (spells foreign config)
           (spells alist)
           (core)
@@ -185,27 +186,39 @@
                          (cons
                           (case (car ats)
                             ((int)     (c-argument c-callout i int a))
+                            ((uint)    (c-argument c-callout i int a)) ; ?
+                            ((long)    (c-argument c-callout i long a))
                             ((pointer) (c-argument c-callout i void* a))
+                            ((double)  (c-argument c-callout i double a))
+                            ((float)   (c-argument c-callout i float a))
                             (else
                              (error 'make-c-callout
                                     "cannot handle argument type" (car ats))))
                           casted-args)))))))))
   
   (define (make-c-callout ret-type arg-types)
-    (define (rt-stub rt)
+    (define (rt-stub+cast rt)
       (case rt
-        ((void)     call-shared-object->void)
-        ((int)      call-shared-object->int)
-        ((double)   call-shared-object->double)
-        ((pointer)  call-shared-object->intptr)
-        (else       #f)))
-    (let ((stub (or (rt-stub ret-type)
-                    (rt-stub (resolve-alias ret-type))
-                    (error 'make-c-callout "invalid return type" ret-type)))
-          (cast-args (c-args-caster arg-types)))
-      (lambda (ptr)
-        (lambda args
-          (apply stub ptr (cast-args args))))))
+        ((void)     (values call-shared-object->void   #f))
+        ((int)      (values call-shared-object->int    #f))
+        ((uint)     (values call-shared-object->int    int->unsigned-int))
+        ((long)     (values call-shared-object->intptr #f))
+        ((ulong)    (values call-shared-object->intptr intptr->uintptr))
+        ((double)   (values call-shared-object->double #f))
+        ((pointer)  (values call-shared-object->intptr #f))
+        (else       (values #f                         #f))))
+    (let ((ret-alias (resolve-alias ret-type)))
+      (let-values (((stub cast-ret) (rt-stub+cast (or ret-alias ret-type)))
+                   ((cast-args) (c-args-caster arg-types)))
+        (unless stub
+          (error 'make-c-callout "invalid return type" ret-type))
+        (if cast-ret
+            (lambda (ptr)
+              (lambda (args)
+                (cast-ret (apply stub ptr (cast-args args)))))
+            (lambda (ptr)
+              (lambda args
+                (apply stub ptr (cast-args args))))))))
 
   (define (make-c-callback ret-type arg-types)
     (unless (memq ret-type '(int void))
@@ -251,21 +264,25 @@
       ((p1 p2 count)
        (memcpy p1 0 p2 0 count))))
   
-  (define memset (todo-proc 'memset))
+  (define (memset p v n)
+    (let ((p-bv (make-bytevector-mapping p n)))
+      (bytevector-fill! p-bv v))
+    p)
 
   (define *dlerror* #f)
   
   (define dlopen
     (case-lambda
       ((lib-name lazy? global?)
-       (guard (c (#t (set! *dlerror* c)))
+       (guard (c (#t (set! *dlerror* c) #f))
          (let ((result (load-shared-object lib-name)))
            (set! *dlerror* #f)
            result)))
       ((lib-name)
        (dlopen lib-name #f #f))
       (()
-       (dlopen #f #f #f))))
+       ;; Ypsilon doesn't support that yet
+       #f)))
 
   (define (dlsym lib str)
     (lookup-shared-object lib str))
@@ -274,5 +291,13 @@
   
   (define (dlerror)
     *dlerror*)
+
+  (define int->unsigned-int
+    (let ((unsigned-int-mask (- (bitwise-arithmetic-shift 1 (* sizeof:int 8)) 1)))
+      (lambda (val) (if (< val 0) (bitwise-and val unsigned-int-mask) val))))
   
+  (define intptr->uintptr
+    (let ((uintptr-mask (- (bitwise-arithmetic-shift 1 (* sizeof:void* 8)) 1)))
+      (lambda (val) (if (< val 0) (bitwise-and val uintptr-mask) val))))
+
 )
