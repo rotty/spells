@@ -8,6 +8,7 @@
           file-type
           file-types
           file-version
+          x->file
 
           make-pathname
           pathname?

@@ -56,16 +56,21 @@
   ())
 
 (define (make-pathname origin directory file)
-  (really-make-pathname origin
-                        directory
-                        (cond ((list? file)
-                               (case (length file)
-                                 ((0) (error 'make-pathname "empty list not allowed for file part"))
-                                 ((1) (make-file (first file) #f))
-                                 (else (make-file (first file) (cdr file)))))
-                              ((string? file)
-                               (make-file file #f))
-                              (else file))))
+  (really-make-pathname
+   origin
+   directory
+   (cond ((list? file)
+          (case (length file)
+            ((0) (error 'make-pathname "empty list not allowed for file part"))
+            ((1) (make-file (first file) #f))
+            (else (make-file (first file) (cdr file)))))
+         ((string? file)
+          (make-file file #f))
+         ((or (file? file)
+              (eqv? #f file))
+          file)
+         (else
+          (error 'make-pathname "invalid argument type for file part" file)))))
 
 ;; Coerce OBJECT to a pathname.
 ;; If OBJECT is a symbol, return a pathname with a relative origin, an
@@ -88,6 +93,15 @@
                                 (make-file (cadr object) #f)))
              (make-pathname #f (drop-right object 1) (make-file (last object) #f))))
         (else (error 'x->pathname "cannot coerce to a pathname" object))))
+
+(define/optional-args (x->file object (optional
+                                       (fs-type (local-file-system-type))))
+  (fs-type/parse-file-namestring
+   fs-type
+   (cond ((symbol? object) (symbol->string object))
+         ((string? object) object)
+         (else
+          (error 'x->file "cannot coerce to file" object)))))
 
 
 ;;;; Files
