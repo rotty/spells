@@ -8,14 +8,17 @@ Ensure that instructions in README work as advertised.
 
 *** TODO Clarify licensing
 
-List all authors an used licenses, and the respective files, at least.
+- List all authors an used licenses, and the respective files, at least.
+
+- Probably relicense to BSD.
 
 *** TODO Improve documentation
 
 Documentation should at least be sufficient to make spells usable for
 other people without poking around in the source tree.
 
-This depends on getting stexidoc up to speed again.
+This depends on getting stexidoc up to speed again, and clarifying how
+it interacts with implementation-specific files.
 
 *** TODO Make spells more self-contained
 
@@ -30,10 +33,43 @@ testeez, which is kind of inflexible anyway. This task includes:
 - Finishing up the R6RS adaption of Riastradh's testing framework, and
   include it into spells.
 
+*** TODO Review libraries
+
+- find-file doesn't really need to be in its own libary, it can be
+  merged into filesys.
+
+- Replace jas-match.scm with match.scm from Alex Shinn. This version
+  is not backwards-compatible, but has a nicer syntax, and a more
+  liberal license (PD).
+
+- Move the stuff in ~misc~ to more appropriate places.
+
+- Likewise for ~assert~. Probably move ~tracing~ to ~debug~, and move
+  ~cout~ and ~cerr~ from ~assert~ there. Maybe dump or rename the
+  ~assert~ macro, as R6RS provides this (although it is not
+  compatible).
+
+- Fix ~include~ to use ~read-annotated~, where available (this will
+  finally give source positions for errors in included files).
+
+- Implement a portable pretty-printer in ~pretty-print.sls~ or ensure
+  we use the implementation-provided one on all supported
+  implementations.
+
+- Get rid of all SRFI implementations that are provided by xitomatl,
+  and make sure we use the xitomatl SRFIs where we provide extended
+  versions thereof.
+
+- Probably rename ~weak-pointer~ to ~weak-cell~.
+
 *** TODO Investigate testsuite errors
 
 There's a bug in the streams.scm tests on Ypsilon. Probably a Ypsilon
 bug.
+
+*** TODO Get rid of =attic
+
+Ensure there's nothing of real value in there.
 
 * Things to think about
 

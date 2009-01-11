@@ -1,26 +1,20 @@
-;; assert.scm -- Unit tests for spells.util.misc
-;; arch-tag: c1d3c895-8707-4e2a-8b0d-5b4a5d1bf3ab
+;;; assert.scm --- Assertations and debugging aids.
 
-;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
-;; Author: Andreas Rottmann <rotty@debian.org>
-;; Start date: Fri Jul 30, 2005 16:39
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>, based on code taken
+;; from SSAX, written by Oleg Kiselyov and placed in the public
+;; domain.
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-;;
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-;; 02110-1301, USA.
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
 
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
 
 ;;@ Assert the truth of an expression (or of a sequence of expressions).
 ;;

@@ -1,22 +1,18 @@
-;; Copyright (C) 2005, 2007, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007 Jose Antonio Ortega Ruiz <jao@gnu.org>
+;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
-;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
-;; Start date: Sun Jun 12, 2005 22:09
+;; Authors: Andreas Rottmann <a.rottmann@gmx.at>
+;;          Jose Antonio Ortega Ruiz <jao@gnu.or>
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-;;
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-;; 02110-1301, USA.
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
 #!r6rs
 
 (library (spells sysutils)
@@ -49,5 +45,3 @@
   (define (os-release-name) "unknown")
   (define (os-version-name) "unknown")
   (define (machine-name) (system-type 'machine)))
-
-;;; sysutils.scm ends here

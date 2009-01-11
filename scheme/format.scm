@@ -1,29 +1,30 @@
-;; format.scm -- Intermediate format strings
-;; arch-tag: 55f8f849-993a-485d-941a-ddff672bc38e
+;;; format.scm --- Common-Lisp-style `format'.
 
-;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) Kenneth A Dickey (2003). All Rights Reserved.
 
-;; Author: Andreas Rottmann <rotty@debian.org>
-;; Start date: Fri Jul 30, 2005 17:46
+;; Permission is hereby granted, free of charge, to any person obtaining
+;; a copy of this software and associated documentation
+;; files (the "Software"), to deal in the Software without restriction,
+;; including without limitation the rights to use, copy, modify, merge,
+;; publish, distribute, sublicense, and/or sell copies of the Software,
+;; and to permit persons to whom the Software is furnished to do so,
+;; subject to the following conditions:
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-;;
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+;; The above copyright notice and this permission notice shall be
+;; included in all copies or substantial portions of the Software.
+
+;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+;; LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+;; OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+;; WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ;;; Comentary:
 
 ;; This is a slightly adapted version of the reference implementation
-;; of SRFI-48, Copyright (c) 2003, Ken Dickey.
+;; of SRFI-48, written by Kenneth A Dickey.
 
 ;;; Code:
 
@@ -38,7 +39,7 @@
 ;;
 ;; @0 is a a subset of the @code{format} procedure specified by
 ;; @uref{http://srfi.schemers.org/srfi-48/srfi-48.html, SRFI 48},
-;; requiring the port argument, which is optional is SRFI 48.
+;; requiring the port argument, which is optional in SRFI 48.
 (define (format output-port format-string . args)
   ((cond ((output-port? output-port) (lambda (proc)
                                        (proc output-port)))

@@ -1,45 +1,57 @@
-Project Maintainer:  Andreas Rottmann <rotty@debian.org>
+# -*- org -*-
 
-spells.assert	       Oleg Kiselyov, taken from http://ssax.sourceforge.net/
+Project Maintainer:  Andreas Rottmann <a.rottmann@gmx.at>
 
-spells.format	       Kenneth A Dickey:
-		       http://srfi.schemers.org/srfi-48/srfi-48.html
+In the following, all top-level libraries included in spells are
+listed grouped by their authors. All the R6RS library wrappers were
+written by Andreas Rottmann; I do not note this explicitly below, just
+considering actual code, not the interface provided by the .sls files.
 
-spells.pregexp         Dorai Sitaram:
-		       http://www.ccs.neu.edu/home/dorai/pregexp/pregexp.html
+For more information (including licenses), please refer to the
+corresponding files.
 
-spells.opt-args        Jose Antonio Ortega Ruiz <jao@gnu.org>,
-		       let-optional* code by Olin Shivers.
+Andreas Rottmann <a.rottmann@gmx.at>
 
+ - alist
+ - ascii
+ - cells
+ - condition
+ - define-values
+ - error
+ - filesys
+ - find-file
+ - foreign
+ - include
+ - logging
+ - misc
+ - operations
+ - pathname
+ - procedure-annotations
+ - process
+ - string-substitute
+ - sysutils
+ - table
+ - weak
 
-spells.table	       Andreas Rottmann <rotty@debian.org>
-		       Jose Antonio Ortega Ruiz <jao@gnu.org>
+Jose Antonio Ortega Ruiz <jao@gnu.org>
 
-spells.condition       Richard Kelsey, Michael Sperber:
-		       http://srfi.schemers.org/srfi-34/srfi-34.html
-		       http://srfi.schemers.org/srfi-35/srfi-35.html
+ - opt-args
+ - sysutils
+ - table
 
-spells.record-types    define=record-type* by Taylor Campbell
-spells.pathname	       Andreas Rottmann <rotty@debian.org>; based on the
-		       proposal by Taylor Campbell
-                       http://mumble.net/~campbell/proposals/pathname.text
-spells.filesys         Andreas Rottmann <rotty@debian.org>; based on the 
-                       proposal by Taylor Campbell
-		       http://mumble.net/~campbell/proposals/filesys.text
+Richard Kelsey, Jonathan Rees, Olin Shivers, Brian D. Carlstrom, 
+Martin Gasbichler (SCSH):
 
-spells.misc	       Jose Antonio Ortega Ruiz <jao@gnu.org>
-spells.file	       Jose Antonio Ortega Ruiz <jao@gnu.org>
-spells.file-list       Jose Antonio Ortega Ruiz <jao@gnu.org>
+ - delimited-readers :: http://ftp.scsh.net/pub/scsh/0.6/scsh-0.6.7.tar.gz
 
-spells.process	       Andreas Rottmann <rotty@debian.org>
-spells.ascii	       Andreas Rottmann <rotty@debian.org>
-spells.define-values   Andreas Rottmann <rotty@debian.org>
-spells.port	       Andreas Rottmann <rotty@debian.org>
-spells.alist	       Andreas Rottmann <rotty@debian.org>
+Kenneth A Dickey
+ 
+ - format :: http://srfi.schemers.org/srfi-48/srfi-48.html
 
-spells.parameter       Marc Feeley:
-		       http://srfi.schemers.org/srfi-39/srfi-39.html
+Olin Shivers
+ 
+ - opt-args :: http://ftp.scsh.net/pub/scsh/0.6/scsh-0.6.7.tar.gz
 
-spells.match	       Jens Axel Sogaard
+Taylor Campbell
 
-;; arch-tag: fea6a651-6c16-4df1-8467-1a91807f5973
+ - record-types :: http://mumble.net/~campbell/scheme/defrectype*.scm

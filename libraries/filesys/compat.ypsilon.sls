@@ -1,21 +1,14 @@
-;;; compat.ypsilon.sls --- filesys compat library for Ypsilon
+;;; compat.ypsilon.sls --- filesys compat library for Ypsilon.
 
-;; Copyright (C) 2008 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License
-;; as published by the Free Software Foundation; either version 3
-;; of the License, or (at your option) any later version.
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
 
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program. If not, see <http://www.gnu.org/licenses/>.
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
 
 ;;; Commentary:
 
@@ -48,7 +41,7 @@
           copy-file)
   (import (rnrs base)
           (prefix (rnrs files) rnrs:)
-          (spells receive)
+          (xitomatl srfi receive)
           (spells pathname)
           (spells filesys copy-file)
           (prefix (core files) yp:)

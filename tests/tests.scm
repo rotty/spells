@@ -27,7 +27,7 @@
   ("cut.scm" spells.cut)
   ;;("file-attr.scm" spells.file spells.misc spells.namestring)
   ("pathname.scm" spells.pathname)
-  ("filesys.scm" spells.filesys spells.pathname spells.lists)
+  ("filesys.scm" spells.filesys spells.pathname xitomatl.srfi.lists)
   ("find-file.scm" spells.find-file)
   ;;("port.scm" spells.port srfi-6) ;; superceded by R6RS
   ;;("file-traversal.scm" spells.file)
@@ -41,12 +41,12 @@
   ;;("byte-vectors.scm" spells.byte-vectors) ;; superceded by R6RS
   ;;("table.scm" spells.table) ;; superceded by R6RS
   ;;("blobs.scm" spells.blobs) ;; superceded by R6RS
-  ("delimited-readers.scm" spells.delimited-readers spells.misc spells.strings rnrs.io.ports)
+  ("delimited-readers.scm" spells.delimited-readers spells.misc xitomatl.srfi.strings rnrs.io.ports)
   ("operations.scm" spells.operations)
   ("logging.scm" spells.logging)
-  ("streams.scm" spells.streams)
-  ("process.scm" spells.process spells.strings rnrs.io.ports)
-  ("sysutils.scm" spells.sysutils spells.lists rnrs.lists)
+  ;;("streams.scm" xitomatl.srfi.streams)
+  ("process.scm" spells.process xitomatl.srfi.strings rnrs.io.ports)
+  ("sysutils.scm" spells.sysutils xitomatl.srfi.lists rnrs.lists)
   ("foreign.scm" spells.foreign)))
 
 ;;; tests.scm ends here

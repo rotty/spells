@@ -1,23 +1,14 @@
-;; -*- Mode: Scheme; scheme48-package: spells.operations; -*-
-;;
-;; Copyright (C) 2006-2007 by Free Software Foundation, Inc.
+;;; operations.scm --- T-like operations.
 
-;; Author: Andreas Rottmann <rotty@debian.org>
-;; Start date: Sat Jan  7 16:17:26 CET 2006
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-;;
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
 
 ;;; Commentary:
 

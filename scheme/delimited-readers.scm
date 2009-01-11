@@ -1,3 +1,23 @@
+;;; delimited-readers.scm --- Read delimited strings.
+
+;; Code taken from scsh:
+
+;; Copyright (c) 1993-2003 Richard Kelsey and Jonathan Rees
+;; Copyright (c) 1994-2003 by Olin Shivers and Brian D. Carlstrom.
+;; Copyright (c) 1999-2003 by Martin Gasbichler.
+;; Copyright (c) 2001-2003 by Michael Sperber.
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
+
+
 ;;; Delimited readers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; These procedures ran their inner I/O loop in a C primitive in

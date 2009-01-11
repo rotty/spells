@@ -1,4 +1,21 @@
-;; -*- Mode: Scheme; scheme48-package: spells.filesys; -*-
+;;; filesys.scm --- Filesystem interface.
+
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;; This file contains the non-primitive procedures that can be defined
+;; in terms of primitives.
+
+;;; Code:
 
 (define (directory-fold pathname combiner . seeds)
   (apply

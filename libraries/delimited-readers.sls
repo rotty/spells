@@ -1,3 +1,18 @@
+;;; delimited-readers.sls --- Read delimited strings.
+
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
 #!r6rs
 
 ;;@ Reading delimited strings.
@@ -8,9 +23,9 @@
 	  skip-char-set)
   (import (except (rnrs base) error string-copy string-for-each string->list)
           (rnrs io ports)
-          (spells receive)
-          (spells strings)
-          (spells char-set)
+          (xitomatl srfi receive)
+          (xitomatl srfi strings)
+          (xitomatl srfi char-set)
           (spells error)
           (spells opt-args)
           (spells include))

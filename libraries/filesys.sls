@@ -1,3 +1,18 @@
+;;; filesys.sls --- File system interface.
+
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
 #!r6rs
 
 ;;@ File system interface.
@@ -39,7 +54,7 @@
   (import (rnrs base)
           (rnrs conditions)
           (rnrs io simple)
-          (spells receive)
+          (xitomatl srfi receive)
           (spells lists)
           (spells pathname)
           (spells time-lib)

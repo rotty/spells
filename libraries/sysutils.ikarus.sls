@@ -11,10 +11,10 @@
           os-version-name
           machine-name)
   (import (rnrs base)
-          (spells receive)
+          (xitomatl srfi receive)
           (spells find-file)
-          (only (spells strings) string-tokenize string-index)
-          (only (spells char-set) char-set-complement char-set)
+          (only (xitomatl srfi strings) string-tokenize string-index)
+          (only (xitomatl srfi char-set) char-set-complement char-set)
           (only (ikarus)
                 getenv
                 host-info))
