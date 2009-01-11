@@ -1,0 +1,44 @@
+# -*- org -*-
+
+* Before release
+
+*** TODO Check README
+
+Ensure that instructions in README work as advertised.
+
+*** TODO Clarify licensing
+
+List all authors an used licenses, and the respective files, at least.
+
+*** TODO Improve documentation
+
+Documentation should at least be sufficient to make spells usable for
+other people without poking around in the source tree.
+
+This depends on getting stexidoc up to speed again.
+
+*** TODO Make spells more self-contained
+
+Currently, besides the xitomatl SRFIs (which are a dependency to stay,
+as there's no sense in duplicating the code inside the spells source
+tree), spells depends also on (xitomatl include). This can be easily
+fixed by including the needed (tiny bit of) code.
+
+Also, spells should contain a testing framework, and stop depending on
+testeez, which is kind of inflexible anyway. This task includes:
+
+- Finishing up the R6RS adaption of Riastradh's testing framework, and
+  include it into spells.
+
+*** TODO Investigate testsuite errors
+
+There's a bug in the streams.scm tests on Ypsilon. Probably a Ypsilon
+bug.
+
+* Things to think about
+
+- spells.opt-args
+
+   Do we really need to have so many optional argument macros (except
+   to support legacy code?). Actually, inside spells, I think I'll
+   forbid use of anything except DEFINE/OPTIONAL-ARGS.
