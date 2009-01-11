@@ -30,8 +30,15 @@ fixed by including the needed (tiny bit of) code.
 Also, spells should contain a testing framework, and stop depending on
 testeez, which is kind of inflexible anyway. This task includes:
 
-- Finishing up the R6RS adaption of Riastradh's testing framework, and
-  include it into spells.
+**** TODO Finishing up the R6RS adaption of Riastradh's testing framework
+
+This is nearly, done, just the output is a little ugly because of
+`fresh-line' missing. This should definitly be fixed before switching
+the spells test suite over.
+
+Also, the test suite itself needs a bit of coverage, especially the
+restarts part of it (which should be reviewed, and moved into seperate
+library).
 
 *** TODO Review libraries
 
