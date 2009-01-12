@@ -62,10 +62,7 @@
           (spells lists)
           (spells pathname)
           (spells time-lib)
-          (spells filesys compat)
-          (spells tracing)
-          (spells include))
-
+          (spells filesys compat))
   
 
 (define (directory-fold pathname combiner . seeds)

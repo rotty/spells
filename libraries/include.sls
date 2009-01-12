@@ -16,14 +16,44 @@
 #!r6rs
 
 (library (spells include)
-  (export include-file include/resolve)
+  (export include-file)
   (import (rnrs)
-          (for (xitomatl include compat) expand)
-          (for (only (xitomatl include) include/resolve include/lexical-context) run expand))
+          (for (only (spells filesys) find-file library-search-paths)
+               expand)
+          (for (only (spells pathname) x->namestring)
+               expand))
 
-  ;; We should use (spells find-file) here, but that still depends on
-  ;; us -- this can be fixed by elimating include-file usage from the
-  ;; (spells find-file) dependencies
+  (define-syntax include/lexical-context
+    (lambda (stx)
+      (define (error/conditions who msg irrts . cndts)
+        (raise
+         (apply condition
+                (make-error)
+                (make-who-condition who)
+                (make-message-condition msg)
+                (make-irritants-condition irrts)
+                cndts)))
+      (syntax-case stx ()
+        ((_ ctxt filename)
+         (and (identifier? #'ctxt)
+              (or (let ((path (syntax->datum #'filename)))
+                    (and (string? path)
+                         (positive? (string-length path))))
+                  (syntax-violation #f "not a path" stx #'filename)))
+         (let ((fn (syntax->datum #'filename)))
+           (with-exception-handler
+             (lambda (ex)
+               (error/conditions 'include/lexical-context
+                 "error while trying to include" (list fn)
+                 (if (condition? ex) ex (make-irritants-condition (list ex)))))
+             (lambda ()
+               (call-with-input-file fn
+                 (lambda (fip)
+                   (let loop ((x (read fip)) (a '()))
+                     (if (eof-object? x)
+                       (datum->syntax #'ctxt `(begin . ,(reverse a)))
+                       (loop (read fip) (cons x a)))))))))))))
+
   (define-syntax include-file
     (lambda (stx)
       (define (string-join lst sep)
@@ -48,13 +78,10 @@
 
       (syntax-case stx ()
         ((k <path>)
-         (let ((relpath (filespec->path (syntax->datum #'<path>))))
-           (let loop ((search (search-paths)))
-             (if (null? search)
+         (let* ((relpath (filespec->path (syntax->datum #'<path>)))
+                (pathname (find-file relpath (library-search-paths))))
+           (unless pathname
                (error 'include-file "cannot find file in search paths"
                       relpath
-                      (search-paths))
-               (let ((full (string-append (car search) "/" relpath)))
-                 (if (file-exists? full)
-                   #`(include/lexical-context k #,full)
-                   (loop (cdr search))))))))))))
+                      (library-search-paths)))
+           #`(include/lexical-context k #,(x->namestring pathname))))))))

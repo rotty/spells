@@ -12,6 +12,13 @@
 
 ;;; Commentary:
 
+;; This file is a kludge, as it uses define-macro, but that's way
+;; easier than rewriting Riastradh's define-record-type* expander
+;; (which is implemented as an explicit-renaming macro) to use
+;; syntax-case. In practice, the unhygiene should not be much of
+;; problem as define-record-type* will probably only be used at the
+;; top-level.
+
 ;;; Code:
 #!r6rs
 
@@ -24,12 +31,26 @@
           (for (rnrs lists) expand)
           (rnrs records procedural)
           (rnrs io simple)
+          (xitomatl srfi receive)
           (spells define-values)
-          (for (spells defrectype-expander) expand)
-          (spells include))
+          (for (spells record-types expand-drt) expand))
 
-  (include-file ((spells scheme) defmacro))
-  
+  (define-syntax define-macro
+    (lambda (stx)
+      (syntax-case stx ()
+        ((_ (macro . args) . body)
+         (syntax (define-macro macro (lambda args . body))))
+        ((_ macro transformer)
+         (syntax
+          (define-syntax macro
+            (lambda (stx2)
+              (let ((v (syntax->datum stx2)))
+                (datum->syntax
+                 ;; we need the *identifier* of the macro call
+                 ;; (there is probably a smarter way of extracting that ...)
+                 (syntax-case stx2 () ((name . more) (syntax name)))
+                 (apply transformer (cdr v)))))))))))
+
   (define-macro (define-record-type* . forms)
     (expand-define-record-type* (cons 'define-record-type* forms)
                                 (lambda (x) x)

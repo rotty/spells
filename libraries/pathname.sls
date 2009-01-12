@@ -45,8 +45,7 @@
           (spells opt-args)
           (spells parameter)
           (spells operations)
-          (spells pathname os-string)
-          (spells include))
+          (spells pathname os-string))
 
 ;;;; Portable Pathname Abstraction
 ;;;; Version 3 (beta)

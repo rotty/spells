@@ -54,7 +54,12 @@
   (import
     (rnrs base)
     (xitomatl srfi time)
-    (spells opt-args)
-    (spells include))
+    (spells opt-args))
 
-  (include-file ((spells scheme) time-lib)))
+  (define *posix-epoch* (date->time-utc (make-date 0 0 0 0 1 1 1970 0)))
+
+  (define/optional-args (posix-timestamp->time-utc timestamp (optional (nanoseconds 0)))
+    (add-duration *posix-epoch* (make-time time-duration nanoseconds timestamp)))
+
+  (define (time-utc->posix-timestamp time-utc)
+    (time-second (time-difference time-utc *posix-epoch*))))

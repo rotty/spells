@@ -1,4 +1,12 @@
-;;; -*- mode: scheme; scheme48-package: spells.define-record-type*-expander; -*-
+#!r6rs
+
+(library (spells record-types expand-drt)
+  (export expand-define-record-type*
+          expand-define-functional-fields)
+  (import (rnrs)
+          (only (xitomatl srfi lists) append-map)
+          (xitomatl srfi receive)
+          (spells parameter))
 
 ;;;;;; Alternative record type definition macro
 
@@ -9,14 +17,10 @@
   ((call-with-current-continuation
     (lambda (lose)
       (lambda ()
-        (parameterize (($lose (lambda (message . irritants)
+        (parameterize (($lose (lambda (message subform)
                                 (lose
                                  (lambda ()
-                                   ;; SYNTAX-ERROR is silly in Scheme48.
-                                   (apply syntax-error
-                                          "invalid define-record-type form"
-                                          form
-                                          message irritants))))))
+                                   (syntax-violation message form subform))))))
           (let ((type-name (cadr form))
                 (conser-name (caaddr form))
                 (conser-args (cdaddr form))
@@ -40,7 +44,7 @@
                         '())))))))))))
 
 (define $lose (make-parameter #f))
-(define (lose msg . irritants) (apply ($lose) msg irritants))
+(define (lose msg subform) (($lose) msg subform))
 
 (define (compute-vars+inits conser-args other-fields)
   (let ((vars (reverse-map
@@ -50,8 +54,7 @@
                              (symbol? (car x))
                              (null? (cdr x)))
                         (car x))
-                       (else (lose '(invalid maker argument specifier)
-                                   x))))
+                       (else (lose "invalid maker argument specifier" x))))
                conser-args)))
     (let loop ((fields other-fields)
                (needs-conser-layer? #f)
@@ -77,8 +80,7 @@
                          (cons (car field) arg-tags)
                          (cons (cadr field) inits)))
                   (else
-                   (lose '(invalid field specifier)
-                         field))))))))
+                   (lose "invalid field specifier" field))))))))
 
 (define (reverse-map proc list)
   (let loop ((list list) (tail '()))
@@ -153,3 +155,5 @@
                 (,(make-field-modifier type-name field) ,obj (,(r 'lambda) (v)
                                                               (,(r 'or) v ,value))))))
            fields)))))
+
+)
