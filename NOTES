@@ -20,17 +20,7 @@ other people without poking around in the source tree.
 This depends on getting stexidoc up to speed again, and clarifying how
 it interacts with implementation-specific files.
 
-*** TODO Make spells more self-contained
-
-Currently, besides the xitomatl SRFIs (which are a dependency to stay,
-as there's no sense in duplicating the code inside the spells source
-tree), spells depends also on (xitomatl include). This can be easily
-fixed by including the needed (tiny bit of) code.
-
-Also, spells should contain a testing framework, and stop depending on
-testeez, which is kind of inflexible anyway. This task includes:
-
-**** TODO Finishing up the R6RS adaption of Riastradh's testing framework
+*** TODO Finishing up the R6RS adaption of Riastradh's testing framework
 
 This is nearly, done, just the output is a little ugly because of
 `fresh-line' missing. This should definitly be fixed before switching
@@ -41,9 +31,6 @@ restarts part of it (which should be reviewed, and moved into seperate
 library).
 
 *** TODO Review libraries
-
-- find-file doesn't really need to be in its own libary, it can be
-  merged into filesys.
 
 - Replace jas-match.scm with match.scm from Alex Shinn. This version
   is not backwards-compatible, but has a nicer syntax, and a more
@@ -62,10 +49,6 @@ library).
 - Implement a portable pretty-printer in ~pretty-print.sls~ or ensure
   we use the implementation-provided one on all supported
   implementations.
-
-- Get rid of all SRFI implementations that are provided by xitomatl,
-  and make sure we use the xitomatl SRFIs where we provide extended
-  versions thereof.
 
 - Probably rename ~weak-pointer~ to ~weak-cell~.
 
