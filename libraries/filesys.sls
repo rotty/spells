@@ -53,7 +53,8 @@
 
           call-with-input-file-and-directory
 
-          search-directory-list)
+          find-file
+          library-search-paths)
   (import (rnrs base)
           (rnrs conditions)
           (rnrs io simple)
@@ -148,5 +149,12 @@
   file-unreachable-error? make-file-unreachable-error
   (pathname file-unreachable-error-pathname)
   (operator file-unreachable-error-operator))
+
+(define (find-file filename paths)
+  (let loop ((paths paths))
+    (if (null? paths)
+        #f
+        (let ((full-name (pathname-join (pathname-as-directory (car paths)) filename)))
+          (if (file-exists? full-name) full-name (loop (cdr paths)))))))
 
 )

@@ -38,7 +38,8 @@
           working-directory
           with-working-directory
 
-          copy-file)
+          copy-file
+          library-search-paths)
   (import (rnrs base)
           (rnrs lists)
           (rnrs conditions)
@@ -61,9 +62,11 @@
                         path->string
                         copy-file
                         current-directory
+                        current-library-collection-paths
 
                         car cdr memq)
-                  mz:))
+                  mz:)
+          (only (scheme mpair) list->mlist))
 
 (define x->f x->namestring)
 
@@ -150,4 +153,9 @@
            (lambda () (mz:current-directory wd)))))))
 
 (define (copy-file old-file new-file)
-  (mz:copy-file (x->f old-file) (x->f new-file))))
+  (mz:copy-file (x->f old-file) (x->f new-file)))
+
+(define (library-search-paths)
+  (list->mlist (mz:current-library-collection-paths)))
+
+)

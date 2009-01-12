@@ -38,16 +38,15 @@
           working-directory
           with-working-directory
 
-          copy-file)
+          copy-file
+          library-search-paths)
   (import (rnrs base)
           (prefix (rnrs files) rnrs:)
           (xitomatl srfi receive)
           (spells pathname)
           (spells filesys copy-file)
           (prefix (core files) yp:)
-          (prefix (only (core primitives)
-                        create-directory)
-                  yp:))
+          (prefix (core primitives) yp:))
 
   (define x->f x->namestring)
 
@@ -123,4 +122,7 @@
            (lambda () body ...)
            (lambda () (yp:current-directory wd)))))))
 
+  
+  (define library-search-paths yp:scheme-library-paths)
+  
   )

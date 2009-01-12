@@ -37,7 +37,8 @@
           working-directory
           with-working-directory
 
-          copy-file)
+          copy-file
+          library-search-paths)
   (import (rnrs base)
           (rnrs conditions)
           (xitomatl srfi receive)
@@ -123,5 +124,7 @@
                        (x->f (pathname-as-directory (x->pathname dir)))))
            (lambda () body ...)
            (lambda () (ik:current-directory wd)))))))
+
+(define library-search-paths ik:library-path)
 
 )

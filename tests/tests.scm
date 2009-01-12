@@ -28,7 +28,6 @@
   ;;("file-attr.scm" spells.file spells.misc spells.namestring)
   ("pathname.scm" spells.pathname)
   ("filesys.scm" spells.filesys spells.pathname xitomatl.srfi.lists)
-  ("find-file.scm" spells.find-file)
   ;;("port.scm" spells.port srfi-6) ;; superceded by R6RS
   ;;("file-traversal.scm" spells.file)
   ;;("file-write.scm" spells.file spells.namestring)

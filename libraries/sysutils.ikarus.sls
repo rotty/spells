@@ -12,7 +12,7 @@
           machine-name)
   (import (rnrs base)
           (xitomatl srfi receive)
-          (spells find-file)
+          (spells filesys)
           (only (xitomatl srfi strings) string-tokenize string-index)
           (only (xitomatl srfi char-set) char-set-complement char-set)
           (only (ikarus)
