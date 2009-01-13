@@ -27,7 +27,12 @@
 (library (spells condition)
   (export &parser-error make-parser-error parser-error?
           parser-error-port
-          &stacked make-stacked-condition stacked-condition? next-condition)
+          &stacked make-stacked-condition stacked-condition? next-condition
+
+          display-condition
+          
+          ;; This doesn't really belong here
+          limited-write)
   (import (rnrs)
           (spells include))
   
