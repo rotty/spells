@@ -37,7 +37,7 @@
           (rnrs io ports)
           (rnrs io simple)
           (xitomatl srfi receive)
-          (spells lists)
+          (xitomatl srfi lists)
           (xitomatl srfi strings)
           (spells pathname)
           (spells delimited-readers)

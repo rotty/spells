@@ -23,8 +23,8 @@
           operation
           define-operation
           join)
-  (import (rnrs base)
-          (spells lists)
+  (import (rnrs)
+          (xitomatl srfi lists)
           (spells procedure-annotations))
   
 ;; Auxiliary syntax

@@ -32,7 +32,7 @@
           (rnrs control)
           (rnrs mutable-pairs)
           (rnrs io simple)
-          (spells lists)
+          (xitomatl srfi lists)
           (spells time-lib)
           (spells error)
           (spells opt-args)

@@ -59,7 +59,7 @@
           (rnrs conditions)
           (rnrs io simple)
           (xitomatl srfi receive)
-          (spells lists)
+          (xitomatl srfi lists)
           (spells pathname)
           (spells time-lib)
           (spells filesys compat))

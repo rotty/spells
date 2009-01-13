@@ -39,7 +39,7 @@
   (import (except (rnrs base) string-copy string-for-each string->list)
           (xitomatl srfi receive)
           (xitomatl srfi strings)
-          (spells lists)
+          (xitomatl srfi lists)
           (xitomatl srfi char-set)
           (spells record-types)
           (spells opt-args)
