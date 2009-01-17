@@ -30,6 +30,7 @@
           configure-logger)
   (import (except (rnrs base) error)
           (rnrs control)
+          (rnrs lists)
           (rnrs mutable-pairs)
           (rnrs io simple)
           (xitomatl srfi lists)
