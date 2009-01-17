@@ -38,8 +38,8 @@
 
    test-verbosity      with-test-verbosity     set-test-verbosity!
    test-debug-errors?  with-test-debug-errors? set-test-debug-errors?!)
-  
-  (import (rnrs base)
+
+  (import (except (rnrs base) error)
           (rnrs lists)
           (rnrs mutable-pairs)
           (xitomatl srfi receive)
@@ -47,8 +47,11 @@
           (spells record-types)
           (spells include)
           (spells syn-param)
+          (only (spells error) make-error-signaller)
           (spells testing parameters))
 
+  (define error (make-error-signaller "trc-testing"))
+
   (include-file ((spells scheme) trc-testing))
-  
+
   )
