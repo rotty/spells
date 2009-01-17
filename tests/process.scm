@@ -19,7 +19,7 @@
 ;;; Code:
 
 (define (lines . strings)
-  (values 0 #f (string-join strings (string #\newline) 'suffix)))
+  (list 0 #f (string-join strings (string #\newline) 'suffix)))
 
 (define-test-suite process-tests
   "Process interface")
@@ -30,11 +30,13 @@
 
 (define-test-case process-tests.run-process echo ()
   (test-equal (lines "foo")
-    (run-process/string #f "/bin/echo" "foo")))
+    (receive results (run-process/string #f "/bin/echo" "foo")
+      results)))
 
 (define-test-case process-tests.run-process echo/-e ()
   (test-equal (lines "foo" "bar")
-    (run-process/string #f "/bin/echo" "-e" "foo\\nbar")))
+    (receive results (run-process/string #f "/bin/echo" "-e" "foo\\nbar")
+      results)))
 
 (define-test-case process-tests.run-process echo/-e/lines ()
   (test-equal (list 0 #f '("foo" "bar"))
@@ -56,7 +58,8 @@
 
 (define-test-case process-tests.call-with-process-output sleep/echo ()
   (test-equal (list 0 #f "foo")
-    (receive results (call-with-process-output #f '("/bin/sh" "-c" "sleep 1 && echo foo")
+    (receive results (call-with-process-output
+                         #f '("/bin/sh" "-c" "sleep 1 && echo foo")
                        get-line)
       results)))
 
