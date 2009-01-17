@@ -2,7 +2,7 @@
 
 ;;;; Testing Utility for Scheme
 
-;;; Copyright (c) 2007, Taylor R. Campbell
+;;; Copyright (c) 2007 Taylor R. Campbell
 ;;; See the COPYING.BSD file for licence terms.
 
 ;;; Parameters:
@@ -122,14 +122,16 @@
     ((define-test-suite (suite-name parent) description)
      (begin
        (define-test-suite suite-name description)
-       (add-test! parent 'suite-name suite-name)))
+       (define-values ()
+         (add-test! parent 'suite-name suite-name))))
     ((define-test-suite suite-name description)
      (define suite-name (make-test-suite 'suite-name 'description)))))
 
 (define-syntax define-test-case
   (syntax-rules ()
     ((define-test-case test-suite name test-case)
-     (add-test! test-suite 'name test-case))
+     (define-values () ; Make this expand into a definition
+       (add-test! test-suite 'name test-case)))
     ((define-test-case test-suite test-case-name (option ...) test ...)
      (define-test-case test-suite test-case-name
        (test-case test-case-name (option ...)

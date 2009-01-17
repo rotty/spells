@@ -43,6 +43,7 @@
           (rnrs lists)
           (rnrs mutable-pairs)
           (xitomatl srfi receive)
+          (spells define-values)
           (spells record-types)
           (spells include)
           (spells syn-param)
