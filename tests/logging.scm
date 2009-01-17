@@ -1,25 +1,19 @@
-;; delimited-readers.scm -- unit tests for delimited-readers.scm
-;; arch-tag: 9eded783-24d0-4fac-8044-b1bd464815de
+;;; logging.scm --- Unit tests for (spells logging)
 
-;; Copyright (C) 2006 by Free Software Foundation, Inc.
+;; Copyright (C) 2006, 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
-;; Author: Andreas Rottmann
-;; Start date: Wed Jan 18 12:32:10 CET 2006
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-;;
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-;; 02110-1301, USA.
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
+
 
 (define (expand-handlers note-taker config)
   (map (lambda (entry)
@@ -58,19 +52,27 @@
                (cons 'passed (reverse passes))))
          procs)))
 
-(testeez "Testing logging library"
-  (test/equal "handler invocation"
-    (tester '((() (handlers (root)))) (list (make-log '() 'info)))
-    '((passed root)))
-  (test/equal "propagation"
+(define-test-suite logging-tests
+  "Testing logging library")
+
+(define-test-case logging-tests handler-invocation ()
+  (test-equal '((passed root))
+    (tester '((() (handlers (root)))) (list (make-log '() 'info)))))
+
+(define-test-case logging-tests propagation ()
+  (test-equal
+      '((passed root) (passed test root))
     (tester '((() (handlers (root)))
-              ((test) (handlers (test))))
-            (list (make-log '() 'info)
-                  (make-log '(test) 'info)))
-    '((passed root) (passed test root)))
-  (test/equal "threshold"
+                ((test) (handlers (test))))
+              (list (make-log '() 'info)
+                    (make-log '(test) 'info)))))
+
+(define-test-case logging-tests threshold ()
+  (test-equal
+      '((passed test) (passed test root))
     (tester '((() (handlers (root error)))
-              ((test) (handlers (test))))
-            (list (make-log '(test) 'info)
-                  (make-log '(test) 'error)))
-    '((passed test) (passed test root))))
+                ((test) (handlers (test))))
+              (list (make-log '(test) 'info)
+                    (make-log '(test) 'error)))))
+
+(run-test-suite logging-tests)

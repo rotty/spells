@@ -4,19 +4,11 @@
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 3 of the License, or
-;; (at your option) any later version.
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
 
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-
-;; You should have received a copy of the GNU Lesser General Public
-;; License along with this program.  If not, see
-;; <http://www.gnu.org/licenses/>.
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
 
 ;;; Commentary:
 
@@ -30,15 +22,25 @@
 
 (define N 1000)
 
-(testeez "pointers"
-  (test-true "null pointer is a pointer" (pointer? (null-pointer)))
-  (test/equiv "pointer+ sanity"
-    (pointer+ (null-pointer) 777)
-    (pointer+ (pointer+ (null-pointer) 666) 111)
-    (pointer=?)))
+(define-test-suite foreign-tests
+  "Foreign Function Interface")
 
-(testeez "malloc/free, mem access"
-  (test/equal "stress"
+(define-test-suite (foreign-tests.pointers foreign-tests)
+  "Pointer abstraction")
+
+(define-test-case foreign-tests.pointers null-pointer
+  (test-equal #t (pointer? (null-pointer))))
+
+(define-test-case foreign-tests.pointers pointer+
+  (test-compare pointer=?
+                (pointer+ (null-pointer) 777)
+                (pointer+ (pointer+ (null-pointer) 666) 111)))
+
+(define-test-suite (foreign-tests.mem foreign-tests)
+  "Memory access, malloc/free")
+
+(define-test-case foreign-tests.mem stress ()
+  (test-equal (/ (* N (- N 1) 7) 2)
     (let loop ((i 0) (sum 0))
       (if (>= i N)
           sum
@@ -46,8 +48,7 @@
             (pointer-uint32-set! mem 0 (* i 7))
             (let ((v (pointer-uint32-ref mem 0)))
               (free mem)
-              (loop (+ i 1) (+ sum v))))))
-    (/ (* N (- N 1) 7) 2)))
+              (loop (+ i 1) (+ sum v))))))))
 
 (testeez "callout"
   (test-define "libc" libc (dlopen *libc-path*))

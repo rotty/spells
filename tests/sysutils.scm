@@ -1,5 +1,5 @@
 ;; sysutils.scm -*- scheme48-package: nil -*-
-;; Copyright (C) 2005, 2006-2007 by Jose Antonio Ortega 
+;; Copyright (C) 2005, 2006-2007, 2009 by Jose Antonio Ortega 
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>  
 ;; sysutils.scm -- Unit tests for spells.sysutils
@@ -7,29 +7,30 @@
 ;; Copyright (C) 2005 by Free Software Foundation, Inc.
 ;; Start date: Wed Dec 28, 2005 02:08 
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;; 
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;; 
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-;; 02110-1301, USA.
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
 
-;;; Code: 
-(all-dialects-except mzscheme ikarus ypsilon)
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
 
-(testeez "environment"
-  (test-false "lookup"
+;;; Commentary:
+
+;;; Code:
+
+
+(define-test-suite sysutils-tests
+  "System utilities")
+
+(define-test-suite (sysutils-tests.environment sysutils-tests)
+  "Environment variables")
+
+(define-test-case sysutils-tests.environment lookup ()
+  (test-equal #f
     (lookup-environment-variable "_AN_IMPR0B4BL3__NMAE_F0R_1__VAR__"))
-  (test-true "lookup" (string? (lookup-environment-variable "PATH")))
-  (test-true "extending"
+  (test-equal #t (string? (lookup-environment-variable "PATH"))))
+
+(define-test-case sysutils-tests.environment extending ()
+  (test-equal #t
     (let* ((path (lookup-environment-variable "PATH"))
            (home (string-append (lookup-environment-variable "HOME") "_"))
            (new-env (extend-process-environment
@@ -38,5 +39,7 @@
            (= (count (lambda (pr) (string=? (car pr) "HOME")) new-env) 1)
            (equal? (assoc "HOME" new-env) `("HOME" . ,home))
            (equal? (assoc "PATH" new-env) `("PATH" . ,path))))))
+
+(run-test-suite sysutils-tests)
 
 ;;; sysutils.scm ends here

@@ -1,69 +1,86 @@
-;; pathname.scm -- unit tests for (spells pathname)
-;; arch-tag: aaeb0020-2f1a-11d9-a288-00404513c0a4
+;;; pathname.scm --- unit tests for (spells pathname)
 
-;; Copyright (C) 2004, 2005-2006, 2008 by Free Software Foundation, Inc.
-
-;; Author: Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2004-2009 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Start date: Fri Nov 05, 2004 12:05
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-;;
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
 
 ;;; Code:
 
-(testeez "pathname comparison"
-  (test-true "empty" (pathname=? (make-pathname #f '() #f) (make-pathname #f '() #f)))
-  (test-false "one empty" (pathname=? (make-pathname #f '() #f) (make-pathname #f '() "foo"))))
+(define-test-suite pathname-tests
+  "Spells pathname library")
 
-(testeez "pathname s-expr parsing"
-  (test/equiv "string"
-    (x->pathname "foo")
-    (make-pathname #f '() "foo")
-    (pathname=?))
-  (test/equiv "dirlist, no filename"
-    (x->pathname '(("foo" "bar")))
-    (make-pathname #f '("foo" "bar") #f)
-    (pathname=?))
-  (test/equiv "dirlist, nonempty"
-    (x->pathname '(("foo" "bar") "baz"))
-    (make-pathname #f '("foo" "bar") "baz")
-    (pathname=?))
-  (test/equiv "dirlist, empty"
-    (x->pathname '(() "baz"))
-    (make-pathname #f '() "baz")
-    (pathname=?)))
+(define-test-case pathname-tests comparison ()
+  (test-compare pathname=? (make-pathname #f '() #f) (make-pathname #f '() #f))
+  (test-compare (compose not pathname=?)
+                (make-pathname #f '() #f)
+                (make-pathname #f '() "foo")))
+
+(define-test-suite (pathname-tests.s-expr pathname-tests)
+  "S-Expression parsing")
+
+(define-test-case pathname-tests.s-expr string ()
+  (test-compare
+   pathname=?
+   (x->pathname "foo")
+   (make-pathname #f '() "foo")))
+
+(define-test-case pathname-tests.s-expr dirlist-w/o-filename ()
+  (test-compare
+   pathname=?
+   (x->pathname '(("foo" "bar")))
+   (make-pathname #f '("foo" "bar") #f)))
+
+(define-test-case pathname-tests.s-expr dirlist-nonempty ()
+  (test-compare
+   pathname=?
+   (x->pathname '(("foo" "bar") "baz"))
+   (make-pathname #f '("foo" "bar") "baz")))
+
+(define-test-case pathname-tests.s-expr dirlist-empty ()
+  (test-compare
+   pathname=?
+   (x->pathname '(() "baz"))
+   (make-pathname #f '() "baz")))
 
 ;; The rest of the tests presume unix namestrings
-(testeez "namestring conversion"
+(define-test-suite (pathname-tests.conversion pathname-tests)
+  "Namestring conversion")
 
- (test/equal "relative"
-   (x->namestring (make-pathname #f '("foo" "bar") "baz"))
-   "foo/bar/baz")
- (test/equal "absolute"
-   (x->namestring (make-pathname '/ '("foo") "bar"))
-   "/foo/bar")
- (test/equal "empty"
-   (x->namestring (make-pathname #f '() #f))
-   ".")
- (test/equal "dir, but no file"
-   (x->namestring (make-pathname #f '("foo") #f))
-   "foo/"))
+(define-test-case pathname-tests.conversion relative ()
+  (test-equal (x->namestring (make-pathname #f '("foo" "bar") "baz"))
+    "foo/bar/baz"))
 
-(testeez "file type parsing"
-  (test/equiv "one type"
-    (x->pathname "foo.scm")
-    (make-pathname #f '() (make-file "foo" "scm"))
-    (pathname=?)))
+(define-test-case pathname-tests.conversion absolute ()
+  (test-equal (x->namestring (make-pathname '/ '("foo") "bar"))
+    "/foo/bar"))
+
+(define-test-case pathname-tests.conversion empty ()
+  (test-equal (x->namestring (make-pathname #f '() #f))
+    "."))
+
+(define-test-case pathname-tests.conversion dir ()
+  (test-equal (x->namestring (make-pathname #f '("foo") #f))
+    "foo/"))
+
+
+(define-test-suite (pathname-tests.type-parsing pathname-tests)
+  "Filename type parsing")
+
+(define-test-case pathname-tests.type-parsing one-type ()
+  (test-compare
+   pathname=?
+   (x->pathname "foo.scm")
+   (make-pathname #f '() (make-file "foo" "scm"))))
+
+(run-test-suite pathname-tests)
 
 ;;; pathname.scm ends here

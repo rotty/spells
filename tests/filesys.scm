@@ -10,30 +10,39 @@
 (define (test-file pathname)
   (pathname-join test-dir pathname))
 
-(testeez "filesystem operations"
-  (test/eqv "working state clear" (file-exists? test-dir) #f)
-  (test-eval "creating stage"
-    (begin
-      (create-directory test-dir)
-      (for-each create-test-file '("a" "b" "c" "foo.scm"))))
-  (test/equal "fold"
-    (directory-fold test-dir cons '())
-    (append (map (lambda (x)
-                   (pathname-with-file test-dir x))
-                 '("a" "b" "c"))
-            (list (pathname-with-file test-dir (make-file "foo" '("scm")))))
-    ((lambda (x y)
-       (lset= pathname=? x y))))
-  (test/equal "copy-file"
-    (begin
-      (copy-file (test-file "a") (test-file "a-copied"))
-      (file-size-in-bytes (test-file "a-copied")))
-    (file-size-in-bytes (test-file "a")))
-  (test-eval "deleting stage"
-    (begin
-      (for-each delete-test-file '("a" "b" "c" "foo.scm" "a-copied"))
-      (delete-file test-dir))))
+(define (pathname-set=? s1 s2)
+  (lset= pathname=? s1 s2))
 
-(testeez "find-file"
-  (test-false "nonexisting" (find-file ".abracadabra.khgafd" (library-search-paths)))
-  (test-true "existing" (and (find-file '((spells)) (library-search-paths)) #t)))
+(define-test-suite filesys-tests
+  "Filesystem interface")
+
+(define-test-case filesys-tests file-ops
+  ((description "File operations")
+   (setup
+    (when (file-exists? test-dir)
+      (test-failure "working stage not clear"  test-dir))
+    (create-directory test-dir)
+    (for-each create-test-file '("a" "b" "c" "foo.scm")))
+   (teardown
+    (for-each delete-test-file '("a" "b" "c" "foo.scm" "a-copied"))
+    (delete-file test-dir)))
+  (begin
+    (test-compare
+     pathname-set=?
+     (append (map (lambda (x)
+                    (pathname-with-file test-dir x))
+                  '("a" "b" "c"))
+             (list (pathname-with-file test-dir (make-file "foo" '("scm")))))
+     (directory-fold test-dir cons '()))
+    (test-equal (file-size-in-bytes (test-file "a"))
+      (begin
+        (copy-file (test-file "a") (test-file "a-copied"))
+        (file-size-in-bytes (test-file "a-copied"))))))
+
+(define-test-case filesys-tests find-file ()
+  (test-equal #f (find-file ".abracadabra.khgafd" (library-search-paths)))
+  (test-equal #t (cond ((find-file '((spells)) (library-search-paths))
+                        => file-directory?)
+                       (else #f))))
+
+(run-test-suite filesys-tests)

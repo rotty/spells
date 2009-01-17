@@ -1,25 +1,18 @@
 ;; delimited-readers.scm -- unit tests for delimited-readers.scm
 ;; arch-tag: 9eded783-24d0-4fac-8044-b1bd464815de
 
-;; Copyright (C) 2005, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
-;; Author: Andreas Rottmann
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 ;; Start date: Fri Nov 06, 2005 14:32
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-;;
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-;; 02110-1301, USA.
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
 
 ;;; Code:
 
@@ -41,40 +34,53 @@
                                 (else s)))
               args)))
 
-(let ((port (make-lines-port)))
-  (testeez
-   "read-line/simple"
-   (test/equal "simple-1" (read-line port) "A line")
-   (test/equal "simple-2" (read-line port) "Another line")
-   (test-true "eof" (eof-object? (read-line port)))))
+(define-test-suite rdelim-tests
+  "Delimited readers")
 
-(let ((port (make-lines-port)))
-  (testeez
-   "read-line/concat"
-   (test/equal "concat-1" (read-line port 'concat) (s "A line" #\newline))
-   (test/equal "concat-2" (read-line port 'concat) (s "Another line"))
-   (test-true "eof" (eof-object? (read-line port 'concat)))))
+(define-test-suite (rdelim-tests.read-line rdelim-tests)
+  "read-line")
 
-(let ((port (make-lines-port)))
-  (testeez
-   "read-line/split"
-   (test/equal "split-1" (read-line port 'split) (values "A line" #\newline))
-   (test/equal "split-2" (read-line port 'split) (values "Another line" (eof-object)))
-   (test/equal "eof" (read-line port 'split) (values (eof-object) (eof-object)))))
+(define-test-case rdelim-tests.read-line simple ()
+  (let ((port (make-lines-port)))
+    (test-equal "A line" (read-line port))
+    (test-equal "Another line" (read-line port))
+    (test-equal #t (eof-object? (read-line port)))))
 
-(let ((port (make-lines-port)))
-  (testeez
-   "read-line/peek"
-   (test/equal "peek-1-line" (read-line port 'peek) "A line")
-   (test/equal "peek-1-char" (read-char port) #\newline)
-   (test/equal "peek-2-line" (read-line port 'peek) "Another line")
-   (test-true "peek-2-char" (eof-object? (read-char port)))
-   (test-true "eof" (eof-object? (read-line port 'peek)))))
+(define-test-case rdelim-tests.read-line concat ()
+  (let ((port (make-lines-port)))
+    (test-equal (s "A line" #\newline) (read-line port 'concat))
+    (test-equal (s "Another line") (read-line port 'concat))
+    (test-equal #t (eof-object? (read-line port 'concat)))))
 
-(let ((port (make-paragraph-port)))
-  (testeez
-   "read-paragraph/simple"
-   (test/equal "simple-1" (read-paragraph port) (s "A line" #\newline
-                                                   "on the first paragraph" #\newline))
-   (test/equal "simple-2" (read-paragraph port) "Another paragraph")
-   (test-true "eof" (eof-object? (read-paragraph port)))))
+(define-test-case rdelim-tests.read-line split ()
+  (let ((port (make-lines-port)))
+    (test-equal (list "A line" #\newline)
+      (receive results (read-line port 'split)
+        results))
+    (test-equal (list "Another line" (eof-object))
+      (receive results (read-line port 'split)
+        results))
+    (test-equal (list (eof-object) (eof-object))
+      (receive results (read-line port 'split)
+        results))))
+
+(define-test-case rdelim-tests.read-line peek ()
+  (let ((port (make-lines-port)))
+    (test-equal "A line" (read-line port 'peek))
+    (test-equal #\newline (read-char port))
+    (test-equal "Another line" (read-line port 'peek))
+    (test-equal #t (eof-object? (read-char port)))
+    (test-equal #t (eof-object? (read-line port 'peek)))))
+
+(define-test-suite (rdelim-tests.read-paragraph rdelim-tests)
+  "read-paragraph")
+
+(define-test-case rdelim-tests.read-paragraph simple ()
+  (let ((port (make-paragraph-port)))
+    (test-equal (s "A line" #\newline
+                   "on the first paragraph" #\newline)
+      (read-paragraph port))
+    (test-equal "Another paragraph" (read-paragraph port))
+    (test-equal #t (eof-object? (read-paragraph port)))))
+
+(run-test-suite rdelim-tests)
