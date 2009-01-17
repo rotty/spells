@@ -199,11 +199,11 @@
 ;;;; Test Conditions
 
   (define (with-test-restarters index thunk)
-    (call-with-exiting-restarter 'ABORT
+    (call-with-exiting-restarter 'abort
         (test-restarter-description index "Abort")
       (lambda (exit)
         (let loop ()
-          (with-exiting-restarter 'RETRY
+          (with-exiting-restarter 'retry
               (test-restarter-description index "Retry")
             (lambda ()
               (thunk)

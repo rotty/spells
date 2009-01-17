@@ -45,6 +45,7 @@
           (xitomatl srfi receive)
           (spells record-types)
           (spells include)
+          (spells syn-param)
           (spells testing parameters))
 
   (include-file ((spells scheme) trc-testing))
