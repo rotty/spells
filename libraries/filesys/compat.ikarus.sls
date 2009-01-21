@@ -41,7 +41,7 @@
           library-search-paths)
   (import (rnrs base)
           (rnrs conditions)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells pathname)
           (spells time-lib)
           (spells filesys copy-file)

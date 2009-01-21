@@ -47,7 +47,7 @@
          rnrs/arithmetic/bitwise-6
          rnrs/lists-6
          rnrs/bytevectors-6
-         (lib "xitomatl/srfi/and-let%2a.sls")
+         (lib "srfi/%3a2/and-let%2a.sls")
          (lib "spells/alist.sls")
          (lib "spells/parameter.sls")
          (lib "spells/foreign/config.sls")

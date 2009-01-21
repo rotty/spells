@@ -32,7 +32,7 @@
           (rnrs io ports)
           (only (mzscheme)
                 subprocess subprocess-wait subprocess-status)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells record-types)
           (spells pathname))
 

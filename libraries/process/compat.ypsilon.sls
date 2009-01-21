@@ -30,7 +30,7 @@
           call-with-process-output)
   (import (rnrs base)
           (rnrs io ports)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells record-types)
           (spells pathname)
           (prefix (only (core primitives)

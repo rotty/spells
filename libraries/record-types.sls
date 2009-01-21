@@ -31,7 +31,7 @@
           (for (rnrs lists) expand)
           (rnrs records procedural)
           (rnrs io simple)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells define-values)
           (for (spells record-types expand-drt) expand))
 

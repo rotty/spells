@@ -29,7 +29,7 @@
    with-restarter-invoker-hook
    )
   (import (rnrs)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (only (spells record-types) define-record-discloser)
           (spells parameter))
 

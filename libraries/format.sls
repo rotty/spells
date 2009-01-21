@@ -25,7 +25,7 @@
           (rnrs r5rs)
           (spells error)
           (spells pretty-print)
-          (xitomatl srfi sharing)
+          (srfi :38 with-shared-structure)
           (spells include))
 
   (define char->ascii char->integer)

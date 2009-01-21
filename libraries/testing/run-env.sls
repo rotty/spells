@@ -3,7 +3,7 @@
   (export this-directory
           test-environment)
   (import (rnrs base)
-          (xitomatl srfi lists)
+          (srfi :1 lists)
           (spells parameter)
           (spells pathname)
           (spells include))

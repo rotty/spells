@@ -24,7 +24,7 @@
           define-operation
           join)
   (import (rnrs)
-          (xitomatl srfi lists)
+          (srfi :1 lists)
           (spells procedure-annotations))
   
 ;; Auxiliary syntax

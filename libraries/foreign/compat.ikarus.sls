@@ -33,7 +33,7 @@
           (rnrs arithmetic bitwise)
           (rnrs lists)
           (rnrs bytevectors)
-          (xitomatl srfi and-let*)
+          (srfi :2 and-let*)
           (spells alist)
           (spells parameter)
           (spells foreign config)

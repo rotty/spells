@@ -42,7 +42,7 @@
   (import (except (rnrs base) error)
           (rnrs lists)
           (rnrs mutable-pairs)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells define-values)
           (spells record-types)
           (spells include)

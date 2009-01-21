@@ -38,7 +38,7 @@
           copy-file)
   (import (rnrs base)
           (rnrs conditions)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells pathname)
           (spells time-lib)
           (primitives parameterize)

@@ -42,7 +42,7 @@
           library-search-paths)
   (import (rnrs base)
           (prefix (rnrs files) rnrs:)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells pathname)
           (spells filesys copy-file)
           (prefix (core files) yp:)

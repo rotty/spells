@@ -4,8 +4,8 @@
   (export expand-define-record-type*
           expand-define-functional-fields)
   (import (rnrs)
-          (only (xitomatl srfi lists) append-map)
-          (xitomatl srfi receive)
+          (only (srfi :1 lists) append-map)
+          (srfi :8 receive)
           (spells parameter))
 
 ;;;;;; Alternative record type definition macro

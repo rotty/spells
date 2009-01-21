@@ -53,7 +53,7 @@
     )
   (import
     (rnrs base)
-    (xitomatl srfi time)
+    (srfi :19 time)
     (spells opt-args))
 
   (define *posix-epoch* (date->time-utc (make-date 0 0 0 0 1 1 1970 0)))

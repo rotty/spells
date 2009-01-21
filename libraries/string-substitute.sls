@@ -26,9 +26,9 @@
           (rnrs control)
           (rnrs io simple)
           (rnrs io ports)
-          (xitomatl srfi receive)
-          (xitomatl srfi strings)
-          (xitomatl srfi char-set))
+          (srfi :8 receive)
+          (srfi :13 strings)
+          (srfi :14 char-sets))
 
   (define string-substitute
     (case-lambda

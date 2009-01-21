@@ -29,7 +29,7 @@
           
           dlopen dlsym dlclose dlerror)
   (import (rnrs)
-          (xitomatl srfi let-values)
+          (srfi :11 let-values)
           (spells foreign config)
           (spells alist)
           (core)

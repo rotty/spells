@@ -19,7 +19,7 @@
 (library (spells pretty-print)
   (export pretty-print)
   (import (rnrs base)
-          (xitomatl srfi sharing))
+          (srfi :38 with-shared-structure))
 
   ;;@defun pretty-print object [ port ]
   ;; Ouput a pretty-printed representation of @var{object} to @var{port},

@@ -26,8 +26,9 @@
           (rnrs lists)
           (rnrs exceptions)
           (rnrs programs)
-          (xitomatl srfi strings)
-          (xitomatl srfi char-set)
+          (srfi :13 strings)
+          (srfi :14 char-sets)
+          (srfi :8 receive)
           (spells misc)
           (spells parameter)
           (spells filesys)
@@ -70,15 +71,17 @@
       (newline)
       (display (list "Loading " filename "... "))
       (newline)
-      (call-with-input-file filename
-        (lambda (port)
-          (let loop ((forms '()))
-            (let ((form (read port)))
-              (if (eof-object? form)
-                  (eval `(let () ,@(reverse forms)) env)
-                  (loop (cons form forms)))))))
-      (display (list "..." filename "done"))
-      (newline)))
+      (receive results
+               (call-with-input-file filename
+                 (lambda (port)
+                   (let loop ((forms '()))
+                     (let ((form (read port)))
+                       (if (eof-object? form)
+                           (eval `(let () ,@(reverse forms)) env)
+                           (loop (cons form forms)))))))
+        (display (list "..." filename "done"))
+        (newline)
+        (apply values results))))
 
   (define package-name->import-spec
     (let ((all-but-dot (char-set-complement (char-set #\.))))
@@ -101,7 +104,7 @@
                 (spells testing)
                 (spells testing run-env))
               imports))))
-  
+
   ;; test spec grammar:
   ;;
   ;; <test spec> -> (<clause> ...)
@@ -137,7 +140,7 @@
                         env))))))))
            (cdr spec)))))
      test-spec))
-  
+
   (define (main args)
     (for-each (lambda (tests-file)
                 (call-with-input-file tests-file

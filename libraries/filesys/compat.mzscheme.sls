@@ -43,7 +43,7 @@
   (import (rnrs base)
           (rnrs lists)
           (rnrs conditions)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells pathname)
           (spells time-lib)
 

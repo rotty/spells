@@ -22,7 +22,7 @@
   ("cut.scm" spells.cut)
   ;;("file-attr.scm" spells.file spells.misc spells.namestring)
   ("pathname.scm" spells.pathname spells.misc)
-  ("filesys.scm" spells.filesys spells.pathname xitomatl.srfi.lists rnrs.control)
+  ("filesys.scm" spells.filesys spells.pathname srfi.:1.lists rnrs.control)
   ("string-substitute.scm" spells.string-substitute)
   ("format.scm" spells.format)
   ("misc.scm" spells.misc rnrs.lists)
@@ -33,11 +33,11 @@
   ("delimited-readers.scm"
    spells.delimited-readers
    spells.misc
-   xitomatl.srfi.receive
-   xitomatl.srfi.strings
+   srfi.:8.receive
+   srfi.:13.strings
    rnrs.io.ports)
   ("operations.scm" spells.operations rnrs.lists)
   ("logging.scm" spells.logging rnrs.lists)
-  ("process.scm" spells.process xitomatl.srfi.receive xitomatl.srfi.strings rnrs.io.ports)
-  ;;("sysutils.scm" spells.sysutils xitomatl.srfi.lists rnrs.lists)
+  ("process.scm" spells.process srfi.:8.receive srfi.:13.strings rnrs.io.ports)
+  ;;("sysutils.scm" spells.sysutils srfi.:1.lists rnrs.lists)
   ("foreign.scm" spells.foreign)))

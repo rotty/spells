@@ -13,7 +13,7 @@
   (import (rnrs base)
           (rnrs control)
           (rnrs io simple)
-          (xitomatl srfi receive))
+          (srfi :8 receive))
 
   (define display-prefix
     (lambda (ls t)

@@ -36,7 +36,7 @@
                         wstatus-exit-status
                         wstatus-received-signal)
                   ik:)
-          (xitomatl srfi receive)
+          (srfi :8 receive)
           (spells record-types)
           (spells pathname))
 
