@@ -64,12 +64,12 @@
 
   (define-syntax define-aux
     (syntax-rules ()
-      [(_ id ...)
+      ((_ id ...)
 	(begin
 	  (define-syntax id
 	    (lambda (x)
 	      (syntax-violation #f "invalid use of auxiliary keyword" x 'id)))
-	  ...)]))
+	  ...))))
 
   (define-aux
     for
@@ -125,8 +125,8 @@
   (define-syntax syntactic-error
     (lambda (x)
       (syntax-case x ()
-	[(_ msg form)
-	  (syntax-violation #f (syntax->datum #'msg) #'form)])))
+	((_ msg form)
+	  (syntax-violation #f (syntax->datum #'msg) #'form)))))
 
   ;;; Utility for reporting syntax errors in LOOP clauses.
 
@@ -701,7 +701,7 @@
 
   ;;;; List Iteration
 
-  ;;; (FOR <elt> [<pair>] (IN-LIST <list> [<successor>]))
+  ;;; (FOR <elt> (<pair>) (IN-LIST <list> (<successor>)))
   ;;;   Step across <list>, letting <pair> be each successive pair in
   ;;;   <list>, stepping by (<successor> <pair>), or (CDR <pair>) if no
   ;;;   successor procedure is explicitly provided.  Let <elt> be the car
@@ -776,7 +776,7 @@
 
   ;;;; Vector and String Iteration
 
-  ;;; (FOR <elt> [<index>] (IN-VECTOR <vector> [<start> [<end>]]))
+  ;;; (FOR <elt> (<index>) (IN-VECTOR <vector> (<start> (<end>))))
   ;;;
   ;;; IN-VECTOR-REVERSE, IN-STRING, and IN-STRING-REVERSE all have the
   ;;; same syntax.
@@ -891,7 +891,7 @@
 
   ;;;; Input
 
-  ;;; (FOR <item> (IN-PORT <input-port> [<reader> [<eof?>]]))
+  ;;; (FOR <item> (IN-PORT <input-port> (<reader> (<eof?>))))
   ;;;
   ;;; IN-FILE has the same syntax, but with a pathname in the place of
   ;;; the input port.
