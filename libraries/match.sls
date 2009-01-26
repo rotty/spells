@@ -19,12 +19,13 @@
 (library (spells match)
   (export match
           match-lambda
+          match-lambda*
           match-let
           match-let*
-          match-define-values)
+          match-letrec)
   (import (rnrs base)
+          (rnrs mutable-pairs)
           (spells define-values)
           (spells include))
 
   (include-file ((spells scheme) match)))
-
