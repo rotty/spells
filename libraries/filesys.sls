@@ -137,6 +137,8 @@
   (create-directory* dest)
   (copy-file src dest))
 
+;;@ Call @2, with the a file input port corresponding to @1, with a
+;; working directory as specified by the directory part of @1.
 (define (call-with-input-file-and-directory pathname proc)
   (let ((pathname (x->pathname pathname)))
     (with-working-directory (directory-namestring pathname)
@@ -147,11 +149,12 @@
   (pathname file-unreachable-error-pathname)
   (operator file-unreachable-error-operator))
 
-(define (find-file filename paths)
+;;@ Find @1 in the list of directories @2.
+(define (find-file pathname paths)
   (let loop ((paths paths))
     (if (null? paths)
         #f
-        (let ((full-name (pathname-join (pathname-as-directory (car paths)) filename)))
+        (let ((full-name (pathname-join (pathname-as-directory (car paths)) pathname)))
           (if (file-exists? full-name) full-name (loop (cdr paths)))))))
 
 )

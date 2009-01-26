@@ -29,21 +29,21 @@
 ;;; pair.
 ;;;
 
-;;; (read-delimited delims [port delim-action])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Returns a string or the EOF object. DELIM-ACTION determines what to do
-;;; with the terminating delimiter:
-;;; - PEEK
-;;;   Leave it in the input stream for later reading.
-;;; - TRIM (the default)
-;;;   Drop it on the floor.
-;;; - CONCAT
-;;;   Append it to the returned string.
-;;; - SPLIT
-;;;   Return it as a second return value.
-;;;
-
-
+;;@args delims [port delim-action]
+;; Read a delimited string.
+;;
+;; Returns a string or the EOF object. @var{delim-action} determines what
+;; to do with the terminating delimiter:
+;; @table @code
+;; @item 'peek
+;;   Leave it in the input stream for later reading.
+;; @item 'trim
+;;   Drop it on the floor (the default).
+;; @item 'concat
+;;   Append it to the returned string.
+;; @item 'split
+;;   Return it as a second return value.
+;; @end table
 (define (read-delimited delims . args)
   (let-optionals* args ((port         (current-input-port))
                         (delim-action 'trim))
@@ -75,13 +75,14 @@
           (set! result (eof-object)))
       (if split (values result split) result)))
 
-;;; (read-line [port delim-action])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Read in a line of data. Input is terminated by either a newline or EOF.
-;;; The newline is trimmed from the string by default.
 
 (define charset:newline (char-set #\newline))
 
+;;@args [ port delim-action ]
+;; Read in a line of data.
+;;
+;; Input is terminated by either a newline or EOF.  The newline is
+;; trimmed from the string by default.
 (define (read-line . args)
   (let-optionals* args ((port (current-input-port))
                         (delim-action 'trim))
@@ -90,12 +91,11 @@
         (%read-delimited charset:newline port delim-action))))
 
 
-;;; (read-paragraph [port handle-delim])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (define (blank-line? line)
   (string-every char-set:whitespace line))
 
+;;@args [ port handle-delim ]
+;; Read a paragraph.
 (define (read-paragraph . args)
   (let-optionals* args ((port         (current-input-port))
                         (handle-delim 'trim))

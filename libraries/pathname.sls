@@ -1,3 +1,21 @@
+;;; pathname.sls --- Portable Pathname Abstraction
+
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+
+;; Ported to Scheme and modified by Andreas Rottmann.
+;;
+;; Original ELisp code written by Taylor Campbell and placed in the
+;; Public Domain.
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
 #!r6rs
 
 ;;@ Pathname abstraction.
@@ -35,7 +53,8 @@
           origin-namestring
           x->namestring
 
-          parse-unix-file-types)
+          parse-unix-file-types
+          local-file-system-type)
   (import (except (rnrs base) string-copy string-for-each string->list)
           (srfi :8 receive)
           (srfi :13 strings)
@@ -47,32 +66,32 @@
           (spells operations)
           (spells pathname os-string))
 
-;;;; Portable Pathname Abstraction
-;;;; Version 3 (beta)
+;;@subheading Introduction
+;;
+;; @emph{Pathnames} are platform-independent representations of
+;; locations of objects on file systems.  A pathname consists of three
+;; components, each of which is optional:
+;;
+;; @itemize @bullet
+;; @item
+;;      The @emph{origin} is the place from which the path begins.  It
+;;      might be the Unix root directory, a user's home directory, a
+;;      DOS device/drive, an Apollo logical name, a Unix environment
+;;      variable, a VMS host, &c.  A pathname with a @code{#f} origin
+;;      is a relative pathname.
+;; @item
+;;      The @emph{directory} is a list of directory names from the
+;;      origin leading up to the file.  Each directory name is a string
+;;      or a symbol.
+;; @item
+;;      The @emph{filename} is the name of the file itself along with
+;;      the type and version.  The name is a string or a symbol.  There
+;;      may be zero or more types, each of which is also a string or a
+;;      symbol.  The version is either a non-negative integer or the
+;;      symbol `newest'.
+;; @end itemize
 
-;;; This code is written by Taylor Campbell and placed in the Public
-;;; Domain.  All warranties are disclaimed.
-
-;;; /Pathnames/ are platform-independent representations of locations
-;;; of objects on file systems.  A pathname consists of three
-;;; components, each of which is optional:
-;;;
-;;;   - The /origin/ is the place from which the path begins.  It might
-;;;     be the Unix root directory, a user's home directory, a DOS
-;;;     device/drive, an Apollo logical name, a Unix environment
-;;;     variable, a VMS host, &c.  Origins can also have expansions
-;;;     defined in Emacs.  A pathname with a null origin is a relative
-;;;     pathname.
-;;;
-;;;   - The /directory/ is a list of directory names from the origin
-;;;     leading up to the file.  Each directory name is as string or a
-;;;     symbol.
-;;;
-;;;   - The /filename/ is the name of the file itself along with the type
-;;;     and version.  The name is a string or a symbol.  There may be
-;;;     zero or more types, each of which is also a string or a symbol.
-;;;     The version is either a non-negative integer or the symbol
-;;;     `newest'.
+;;@stop
 
 ;++ Still missing:
 ;++
@@ -102,6 +121,13 @@
   (really-make-pathname origin directory file)
   ())
 
+;;@ Construct a pathname.
+;;
+;; A pathname with @1 and @2 as the origin and directory fields is
+;; returned. The file field is derived from @3, which may be either a
+;; file object, a string (representing the file name), a list of one
+;; or more strings (representing the file name and types), or
+;; @code{#f}, representing an empty file field.
 (define (make-pathname origin directory file)
   (really-make-pathname
    origin
@@ -119,13 +145,15 @@
          (else
           (error 'make-pathname "invalid argument type for file part" file)))))
 
-;; Coerce OBJECT to a pathname.
-;; If OBJECT is a symbol, return a pathname with a relative origin, an
-;; empty directory, and a file whose name is the symbol.
-;; If OBJECT is a string, parse it according to the optional file system
-;; type FS-TYPE, which defaults to the local file system type.
-;; If OBJECT is a pathname, return it.
-;; any other case, signal an error.
+;;@ Coerce @1 to a pathname.
+;;
+;; If @1 is a symbol, return a pathname with a relative origin, an
+;; empty directory, and a file whose name is the symbol.  If @1 is a
+;; string, parse it according to the optional file system type @2,
+;; which defaults to the local file system type.  If @1 is a pathname,
+;; return it.  In any other case, signal an error.
+;;
+;; @emph{FIXME}: Document how pairs are parsed.
 (define/optional-args (x->pathname object (optional
                                            (fs-type (local-file-system-type))))
   (cond ((symbol?    object) (make-pathname #f '() object))
@@ -141,6 +169,11 @@
              (make-pathname #f (drop-right object 1) (make-file (last object) #f))))
         (else (error 'x->pathname "cannot coerce to a pathname" object))))
 
+;;@ Coerce @1 to a file.
+;;
+;; Parse @1, which may be a string or a symbol, as file component,
+;; according to the optional file system type @2, which defaults to
+;; the local file system type.
 (define/optional-args (x->file object (optional
                                        (fs-type (local-file-system-type))))
   (fs-type/parse-file-namestring
@@ -168,6 +201,8 @@
 ;; recent version of the file.
 (define/optional-args (make-file name type (optional (version #f)))
   (really-make-file name (make-file/type type) version))
+
+;;@stop
 
 (define (make-file/type type)
   (cond ((not type) '())
@@ -518,8 +553,11 @@
                           (cdr file-parts))))
          (make-file namestring '())))))
 
+;;@ A parameter controlling if file types are parsed by the UNIX file
+;; system type.
 (define parse-unix-file-types (make-parameter #t))
 
+;;@ Returns the local file system type.
 (define (local-file-system-type)
   unix-file-system-type)
 
