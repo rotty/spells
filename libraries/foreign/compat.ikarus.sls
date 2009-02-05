@@ -151,6 +151,8 @@
         ((uint)   pointer-set-c-int!)
         ((long)   pointer-set-c-long!)
         ((ulong)  pointer-set-c-long!)
+        ((llong)  pointer-set-c-long-long!)
+        ((ullong) pointer-set-c-long-long!)
         ((float)  pointer-set-c-float!)
         ((double) pointer-set-c-double!)
         ((pointer) pointer-set-c-pointer!)
