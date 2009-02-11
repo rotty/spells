@@ -17,8 +17,4 @@ aclocal
 automake --add-missing
 autoconf
 
-./configure "$@"
-
-
-
-
+./configure  --enable-maintainer-mode "$@"
