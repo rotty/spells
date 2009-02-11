@@ -32,6 +32,7 @@
           (spells cells)
           (spells condition)
           (spells parameter)
+          (spells ports)
           (spells testing restart))
 
 
@@ -261,37 +262,36 @@
   
 ;;;; Nested Notification Utility
 
-  ;; TODO: Implement tracking ala scheme48
-  (define (current-row port)
-    0)
-  (define (current-column port)
-    0)
-  (define (fresh-line port)
-    (newline port))
-  
   (define force-output flush-output-port)
+
+  (define notification-output-port-tracker
+    (make-parameter (make-port-tracker (current-output-port))))
   
-  (define notification-output-port (make-parameter (current-output-port)))
+  (define (notification-output-port)
+    (port-tracker-port (notification-output-port-tracker)))
 
   (define notification-level (make-parameter 0))
 
-  (define (start-notification-line output-port)
-    (fresh-line output-port)
-    (write-char #\; output-port)
-    (write-string (make-string (* 2 (notification-level))
-                               #\space)
-                  output-port))
+  (define (start-notification-line tracker)
+    (let ((output-port (port-tracker-port tracker)))
+      (port-tracker-fresh-line tracker)
+      (write-char #\; output-port)
+      (write-string (make-string (* 2 (notification-level))
+                                 #\space)
+                    output-port)))
 
   (define (write-notification-line message-writer)
-    (let ((output-port (notification-output-port)))
-      (start-notification-line output-port)
+    (let ((tracker (notification-output-port-tracker))
+          (output-port (notification-output-port)))
+      (start-notification-line tracker)
       (message-writer output-port)
       (force-output output-port)))
 
   (define (with-notification message-writer thunk)
-    (let ((output-port (notification-output-port)))
+    (let ((output-port (notification-output-port))
+          (tracker (notification-output-port-tracker)))
       (define (start-notification suffix)
-        (start-notification-line output-port)
+        (start-notification-line tracker)
         (message-writer output-port)
         (write-string suffix output-port))
       (let ((row #f)
@@ -300,16 +300,16 @@
           (lambda ()
             (start-notification "...")
             (force-output output-port)
-            (set! row (current-row output-port))
-            (set! column (current-column output-port)))
+            (set! row (port-tracker-row tracker))
+            (set! column (port-tracker-column tracker)))
           (lambda ()
             (parameterize ((notification-level (+ (notification-level) 1)))
               (thunk)))
           (lambda ()
             (if (not (and row
                           column
-                          (= row (current-row output-port))
-                          (= column (current-column output-port))))
+                          (= row (port-tracker-row tracker))
+                          (= column (port-tracker-column tracker))))
                 (start-notification " --"))
             (write-string " done" output-port)
             (newline output-port)
