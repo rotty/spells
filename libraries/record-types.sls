@@ -25,6 +25,7 @@
 (library (spells record-types)
   (export define-record-type
           define-record-type*
+          define-functional-fields
           define-record-discloser)
   (import (for (rnrs base) run expand)
           (for (rnrs syntax-case) run expand)
