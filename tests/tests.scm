@@ -38,6 +38,7 @@
    srfi.:13.strings
    rnrs.io.ports)
   ("operations.scm" spells.operations rnrs.lists)
+  ("ports.scm" spells.ports srfi.:8.receive rnrs.io.ports)
   ("logging.scm" spells.logging rnrs.lists)
   ("process.scm" spells.process srfi.:8.receive srfi.:13.strings rnrs.io.ports)
   ;;("sysutils.scm" spells.sysutils srfi.:1.lists rnrs.lists)
