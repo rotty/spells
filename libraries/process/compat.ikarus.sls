@@ -31,13 +31,14 @@
   (import (rnrs base)
           (rnrs io ports)
           (prefix (only (ikarus)
-                        process
+                        process-nonblocking
                         waitpid
                         wstatus-exit-status
                         wstatus-received-signal)
                   ik:)
           (srfi :8 receive)
-          (spells record-types)
+          (srfi :9 records)
+          (spells ports)
           (spells pathname))
 
   (define-record-type process
@@ -53,12 +54,14 @@
            (cond ((string? s)   s)
                  ((pathname? s) (x->namestring s))
                  (else
-                  (error "cannot coerce to string list" lst))))
+                  (error 'x->strlist
+                         "cannot coerce to string list"
+                         lst))))
          lst))
 
   (define (spawn-process env prog . args)
     (receive (pid stdin-port stdout-port stderr-port)
-        (apply ik:process (x->strlist (cons prog args)))
+        (apply ik:process-nonblocking (x->strlist (cons prog args)))
       (make-process pid stdin-port stdout-port stderr-port)))
 
   (define (wait-for-process process)
@@ -75,7 +78,13 @@
       (if errors (close-port errors))))
 
   (define (run-process env prog . args)
-    (let ((p (apply spawn-process env prog args)))
+    (let ((p (apply spawn-process env prog args))
+          (stdout (standard-output-port))
+          (stderr (standard-error-port)))
+      (copy-port (process-errors p) stderr)
+      (flush-output-port stderr)
+      (copy-port (process-output p) stdout)
+      (flush-output-port stdout)
       (close-process-ports p)
       (wait-for-process p)))
 
