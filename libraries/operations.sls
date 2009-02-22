@@ -47,10 +47,12 @@
 
 (define-syntax operation
   (syntax-rules ()
+    ((operation "%named" ?name ?default ?method-clause ...)
+     (make-operation '?name ?default (%method-clauses->handler ?method-clause ...)))
     ((operation ?default ?method-clause ...)
-     (make-operation ?default (%method-clauses->handler ?method-clause ...)))))
+     (operation "%named" #f ?default ?method-clause ...))))
 
-(define (make-operation default handler)
+(define (make-operation name default handler)
   (letrec ((op (make-object
                 (lambda (obj . args)
                   (cond ((and (procedure? obj) ((procedure-annotation obj) op))
@@ -59,16 +61,19 @@
                         (default
                           (apply default obj args))
                         (else
-                         (error 'make-operation "operation is not available" obj op))))
+                         (error 'operation
+                                "operation is not available"
+                                obj
+                                (or name op)))))
                 handler)))
     op))
 
 (define-syntax define-operation
   (syntax-rules ()
     ((define-operation (?name ?arg ...))
-     (define ?name (operation #f)))
+     (define ?name (operation "%named" ?name #f)))
     ((define-operation (?name ?arg ...) ?body1 ?body ...)
-     (define ?name (operation (lambda (?arg ...) ?body1 ?body ...))))))
+     (define ?name (operation "%named" ?name (lambda (?arg ...) ?body1 ?body ...))))))
 
 (define (join object1 . objects)
   (make-object object1
