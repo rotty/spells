@@ -1,18 +1,38 @@
-
 #!r6rs
 (library (spells ports)
-  (export make-port-tracker
+  (export copy-port
+
+          make-port-tracker
           port-tracker-port
           port-tracker-column
           port-tracker-row
           port-tracker-fresh-line)
   (import (except (rnrs base) string-copy string-for-each string->list)
           (rnrs control)
+          (rnrs bytevectors)
           (rnrs io ports)
-          (srfi :13 strings)
-          (spells record-types)
-          (only (spells assert) cout)
-          (spells tracing))
+          (srfi :9 records)
+          (srfi :13 strings))
+
+  (define (copy-port in-port out-port)
+    (cond ((and (binary-port? in-port)
+                (binary-port? out-port))
+           (let* ((buf-size 4000)
+                  (buffer (make-bytevector buf-size 0)))
+             (let loop ()
+               (let ((n (get-bytevector-n! in-port buffer 0 buf-size)))
+                 (cond ((not (eof-object? n))
+                        (put-bytevector out-port buffer 0 n)
+                        (loop)))))))
+          ((and (textual-port? in-port)
+                (textual-port? out-port))
+           (let* ((buf-size 4000)
+                  (buffer (make-string buf-size)))
+             (let loop ()
+               (let ((n (get-string-n! in-port buffer 0 buf-size)))
+                 (cond ((not (eof-object? n))
+                        (put-string out-port buffer 0 n)
+                        (loop)))))))))
 
   (define-record-type port-tracker
     (really-make-port-tracker %port %row %column)
@@ -24,15 +44,15 @@
 
   (define (%port-tracker-sync tracker)
     (flush-output-port (port-tracker-port tracker)))
-  
+
   (define (port-tracker-column tracker)
     (%port-tracker-sync tracker)
     (%port-tracker-column tracker))
-  
+
   (define (port-tracker-row tracker)
     (%port-tracker-sync tracker)
     (%port-tracker-row tracker))
-  
+
   (define make-port-tracker
     (case-lambda
       ((port row column)
@@ -72,5 +92,5 @@
   (define (port-tracker-fresh-line tracker)
     (unless (= (port-tracker-column tracker) 0)
       (put-char (port-tracker-port tracker) #\newline)))
-  
+
   )
