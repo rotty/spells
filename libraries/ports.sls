@@ -32,7 +32,11 @@
                (let ((n (get-string-n! in-port buffer 0 buf-size)))
                  (cond ((not (eof-object? n))
                         (put-string out-port buffer 0 n)
-                        (loop)))))))))
+                        (loop)))))))
+          (else
+           (error 'copy-port
+                  "provided ports must be both binary or both textual"
+                  in-port out-port))))
 
   (define-record-type port-tracker
     (really-make-port-tracker %port %row %column)
