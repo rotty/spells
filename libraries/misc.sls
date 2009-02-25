@@ -25,10 +25,13 @@
           and-map
           or-map
           and=>
+          topological-sort
           scheme-dialect)
   (import (rnrs base)
+          (rnrs lists)
           (rnrs io simple)
           (rnrs sorting)
+          (rnrs hashtables)
           (spells include)
           (spells misc compat))
 
