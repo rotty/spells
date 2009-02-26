@@ -33,6 +33,8 @@
               spells.hash
               spells.misc
               spells.match)
-  (internal-structures spells.define-record-type*-expander))
+  (internal-structures spells.define-record-type*-expander)
+
+  (extra-dist "configure"))
 
 ;; arch-tag: 8717975c-90a7-4442-87e2-e2ba9efecca3
