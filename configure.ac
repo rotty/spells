@@ -7,8 +7,6 @@ AC_SUBST(TARGET_CPU, $target_cpu)
 AC_SUBST(TARGET_VENDOR, $target_vendor)
 AC_SUBST(TARGET_OS, $target_os)
 
-AM_INIT_AUTOMAKE
-
 #
 # Check type sizes
 #
@@ -40,5 +38,5 @@ AC_CHECK_TYPE(time_t, [AC_CHECK_SIZEOF(time_t)
                        AC_SUBST(SIZEOF_TIME_T, $ac_cv_sizeof_time_t)],
 		      [AC_SUBST(SIZEOF_TIME_T, [\#f])],)
 
-AC_CONFIG_FILES(Makefile libraries/foreign/config.sls)
+AC_CONFIG_FILES(libraries/foreign/config.sls)
 AC_OUTPUT
