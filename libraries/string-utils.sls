@@ -30,20 +30,6 @@
           (srfi :26 cut))
 
 
-  ;; -- procedure+: string-split STRING
-  ;; -- procedure+: string-split STRING '()
-  ;; -- procedure+: string-split STRING '() MAXSPLIT
-  ;;
-  ;; Returns a list of whitespace delimited words in STRING.
-  ;; If STRING is empty or contains only whitespace, then the empty list
-  ;; is returned. Leading and trailing whitespaces are trimmed.
-  ;; If MAXSPLIT is specified and positive, the resulting list will
-  ;; contain at most MAXSPLIT elements, the last of which is the string
-  ;; remaining after (MAXSPLIT - 1) splits. If MAXSPLIT is specified and
-  ;; non-positive, the empty list is returned. "In time critical
-  ;; applications it behooves you not to split into more fields than you
-  ;; really need."
-  ;;
   ;; -- procedure+: string-split STRING CHARSET
   ;; -- procedure+: string-split STRING CHARSET MAXSPLIT
   ;;
@@ -72,30 +58,7 @@
   ;; ==> ("/usr/local/bin" "/usr/bin" "/usr/ucb/bin")
   ;; (string-split "/usr/local/bin" '(#\/)) ==> ("" "usr" "local" "bin")
   ;;
-  (define (string-split str . rest)
-    ;; maxsplit is a positive number
-    (define (split-by-whitespace str maxsplit)
-      (define (skip-ws i yet-to-split-count)
-        (cond
-         ((>= i (string-length str)) '())
-         ((char-whitespace? (string-ref str i))
-          (skip-ws (+ i 1) yet-to-split-count))
-         (else (scan-beg-word (+ i 1) i yet-to-split-count))))
-      (define (scan-beg-word i from yet-to-split-count)
-        (cond
-         ((zero? yet-to-split-count)
-          (cons (substring str from (string-length str)) '()))
-         (else (scan-word i from yet-to-split-count))))
-      (define (scan-word i from yet-to-split-count)
-        (cond
-         ((>= i (string-length str))
-          (cons (substring str from i) '()))
-         ((char-whitespace? (string-ref str i))
-          (cons (substring str from i)
-                (skip-ws (+ i 1) (- yet-to-split-count 1))))
-         (else (scan-word (+ i 1) from yet-to-split-count))))
-      (skip-ws 0 (- maxsplit 1)))
-
+  (define (string-split str splitter . rest)
     ;; maxsplit is a positive number
     ;; str is not empty
     (define (split-by-charset str cs maxsplit)
@@ -118,19 +81,16 @@
     ;; resolver of overloading...
     ;; if omitted, maxsplit defaults to
     ;; (inc (string-length str))
-    (if (string-null? str) '()
-        (if (null? rest)
-            (split-by-whitespace str (+ 1 (string-length str)))
-            (let ((charset (car rest))
-                  (maxsplit
-                   (if (pair? (cdr rest)) (cadr rest) (+ 1 (string-length str)))))
-              (cond
-               ((not (positive? maxsplit)) '())
-               ((null? charset) (split-by-whitespace str maxsplit))
-               ((pair? charset)
-                (split-by-charset str (list->char-set charset) maxsplit))
-               (else
-                (split-by-charset str (->char-set charset) maxsplit))))))
+    (if (string-null? str)
+        '()
+        (let ((maxsplit
+               (if (pair? rest) (car rest) (+ 1 (string-length str)))))
+          (cond
+           ((not (positive? maxsplit)) '())
+           ((pair? splitter)
+            (split-by-charset str (list->char-set splitter) maxsplit))
+           (else
+            (split-by-charset str (->char-set splitter) maxsplit)))))
     )
 
   ;;@ Simple template string substitution.

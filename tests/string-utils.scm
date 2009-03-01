@@ -4,11 +4,6 @@
 (define-test-suite (strutils-tests.split strutils-tests)
   "string-split")
 
-(define-test-case strutils-tests.split whitespace ()
-  (test-equal '("abc" "d" "e" "f") (string-split " abc d e f  "))
-  (test-equal '("abc d e f  ") (string-split " abc d e f  " '() 1))
-  (test-equal '() (string-split " abc d e f  " '() 0)))
-
 (define-test-case strutils-tests.split charset ()
   (test-equal '("" "abc" "d" "e" "" "f" "") (string-split ":abc:d:e::f:" '(#\:)))
   (test-equal '("" "") (string-split ":" '(#\:)))
