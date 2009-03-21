@@ -22,7 +22,9 @@
   ("cut.scm" spells.cut)
   ;;("file-attr.scm" spells.file spells.misc spells.namestring)
   ("pathname.scm" spells.pathname spells.misc)
-  ("filesys.scm" spells.filesys spells.pathname srfi.:1.lists rnrs.control)
+  ("filesys.scm"
+   spells.filesys spells.pathname srfi.:1.lists
+   rnrs.control rnrs.exceptions)
   ("string-utils.scm" spells.string-utils)
   ("format.scm" spells.format)
   ("misc.scm" spells.misc rnrs.lists)

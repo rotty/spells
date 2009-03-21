@@ -52,18 +52,21 @@
           with-working-directory
 
           call-with-input-file-and-directory
+          call-with-output-file/atomic
 
           find-file
           library-search-paths)
   (import (rnrs base)
           (rnrs conditions)
           (rnrs io simple)
+          (rnrs io ports)
+          (rnrs exceptions)
           (srfi :8 receive)
           (srfi :1 lists)
           (spells pathname)
           (spells time-lib)
           (spells filesys compat))
-  
+
 
 (define (directory-fold pathname combiner . seeds)
   (apply
@@ -143,6 +146,36 @@
   (let ((pathname (x->pathname pathname)))
     (with-working-directory (directory-namestring pathname)
       (call-with-input-file (file-namestring pathname) proc))))
+
+;;@ Call @2, with a file output port corresponding to a temporary
+;; file. When @2 returns normally, the temporary file is renamed to
+;; @1, which normally is an atomic operation.
+(define (call-with-output-file/atomic pathname proc)
+  (receive (tmp-filename tmp-port) (create-temp-file pathname)
+    (guard (c (#t
+               (close-port tmp-port)
+               (delete-file tmp-filename)
+               (raise c)))
+      (receive results (call-with-port tmp-port proc)
+        (rename-file tmp-filename pathname)
+        (apply values results)))))
+
+(define create-temp-file
+  (let ((count 1))
+    (lambda (path)
+      (let ((prefix (file-namestring path)))
+        (let loop ((i count))
+          (let ((pathname (pathname-with-file
+                           path
+                           (string-append prefix (number->string i) ".tmp"))))
+            (guard (c ((i/o-file-already-exists-error? c)
+                       (loop (+ i 1))))
+              (let ((port (open-file-output-port (x->namestring pathname)
+                                                 (file-options)
+                                                 'block
+                                                 (native-transcoder))))
+                (set! count (+ i 1))
+                (values pathname port)))))))))
 
 (define-condition-type &file-unreachable-error &error
   file-unreachable-error? make-file-unreachable-error
