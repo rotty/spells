@@ -68,10 +68,23 @@
 (define-test-case foreign-tests.callouts realloc ()
   (let* ((libc (dlopen *libc-path*))
          (realloc ((make-c-callout 'pointer '(pointer size_t))
-                                  (dlsym libc "realloc"))))
+                   (dlsym libc "realloc")))
+         ;; need to use libc's free here, as it might differ from the
+         ;; one provided by (spells foreign)
+         (free ((make-c-callout 'void '(pointer))
+                (dlsym libc "free"))))
     (let ((mem (realloc (null-pointer) 1024)))
       (test-equal #t (pointer? mem))
       (free mem))))
+
+;; (define-test-case foreign-tests.callouts strtoll ()
+;;   (let* ((libc (dlopen *libc-path*))
+;;          (strtoll ((make-c-callout 'llong '(pointer pointer int))
+;;                    (dlsym libc "stroll")))
+;;          (num-utf8z-ptr (string->utf8z-ptr "-8223372036854775807")))
+;;     (test-equal -8223372036854775807
+;;       (strtoll num-utf8z-ptr (null-pointer) 10))
+;;     (free num-utf8z-ptr)))
 
 (define-test-case foreign-tests callback ()
   (let ((bsearch
