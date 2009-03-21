@@ -29,10 +29,10 @@
   (define-syntax define-values
     (lambda (form)
       (syntax-case form ()
-        ((_ () exp0 exp ...)
+        ((_ () exp ...)
          (with-syntax (((dummy) (generate-temporaries (list 'dummy))))
            (syntax
-            (define dummy (begin exp0 exp ... 'dummy)))))
+            (define dummy (begin exp ... 'dummy)))))
 	((_ (id ...) exp0 exp ...)
 	 ;; Mutable-ids are needed so that ids defined by
 	 ;; define-values can be exported from a library (mutated
