@@ -165,8 +165,8 @@
              (make-pathname #f (car object)
                             (if (null? (cdr object))
                                 #f
-                                (make-file (cadr object) #f)))
-             (make-pathname #f (drop-right object 1) (make-file (last object) #f))))
+                                (cadr object)))
+             (make-pathname #f (drop-right object 1) (last object))))
         (else (error 'x->pathname "cannot coerce to a pathname" object))))
 
 ;;@ Coerce @1 to a file.
