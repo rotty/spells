@@ -81,7 +81,8 @@
   (apply directory-fold* pathname
          (lambda (pathname . seeds)
            (if (file-directory? pathname)
-               (receive (new-fc new-dc proceed . new-seeds) (apply dir-combiner pathname seeds)
+               (receive (new-fc new-dc proceed . new-seeds)
+                        (apply dir-combiner pathname seeds)
                  (cond ((and new-fc new-dc)
                         (receive newest-seeds
                                  (apply directory-fold-tree*
@@ -113,7 +114,8 @@
 (define (create-directory* pathname)
   (let ((pathname (pathname-as-directory (x->pathname pathname))))
     (fold (lambda (new path)
-            (let ((new-dir (merge-pathnames (make-pathname #f (list new) #f) path)))
+            (let ((new-dir (merge-pathnames (make-pathname #f (list new) #f)
+                                            path)))
               (or (file-exists? new-dir) (create-directory new-dir))
               new-dir))
           (make-pathname (pathname-origin pathname) '() #f)
@@ -187,7 +189,8 @@
   (let loop ((paths paths))
     (if (null? paths)
         #f
-        (let ((full-name (pathname-join (pathname-as-directory (car paths)) pathname)))
+        (let ((full-name (pathname-join (pathname-as-directory (car paths))
+                                        pathname)))
           (if (file-exists? full-name) full-name (loop (cdr paths)))))))
 
 )
