@@ -32,7 +32,9 @@
           run-process
           run-process/string
           run-process/lines
-          run-process/sexps)
+          run-process/sexps
+
+          run-shell-command)
   (import (except (rnrs base) string-copy string-for-each string->list)
           (rnrs io ports)
           (rnrs io simple)

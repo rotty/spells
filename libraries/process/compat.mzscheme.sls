@@ -27,11 +27,15 @@
           close-process-ports
           run-process
           call-with-process-input
-          call-with-process-output)
+          call-with-process-output
+
+          run-shell-command)
   (import (rnrs base)
           (rnrs io ports)
-          (only (mzscheme)
+          (only (scheme base)
                 subprocess subprocess-wait subprocess-status)
+          (only (scheme system)
+                system/exit-code)
           (srfi :8 receive)
           (spells record-types)
           (spells pathname))
@@ -87,4 +91,12 @@
       (receive results (receiver port)
         (close-process-ports process)
         (receive status+signal (wait-for-process process)
-          (apply values (append status+signal results)))))))
+          (apply values (append status+signal results))))))
+
+  (define (run-shell-command cmd)
+    (let ((retval (system/exit-code cmd)))
+      (if (>= 0 retval)
+          (values retval #f)
+          (values retval 'unknown))))
+
+  )

@@ -27,7 +27,6 @@
 (define-test-suite (process-tests.run-process process-tests)
   "run-process")
 
-
 (define-test-case process-tests.run-process echo ()
   (test-equal (lines "foo")
     (receive results (run-process/string #f "/bin/echo" "foo")
@@ -63,6 +62,13 @@
                        get-line)
       results)))
 
+(define-test-case process-tests run-shell-command ()
+  (test-equal '(42 #f)
+    (receive results (run-shell-command "exit 42")
+      results)))
+
 (run-test-suite process-tests)
 
-;;; process.scm ends here
+;; Local Variables:
+;; scheme-indent-styles: (trc-testing)
+;; End:

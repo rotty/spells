@@ -27,14 +27,18 @@
           close-process-ports
           run-process
           call-with-process-input
-          call-with-process-output)
+          call-with-process-output
+
+          run-shell-command)
   (import (rnrs base)
+          (rnrs arithmetic bitwise)
           (rnrs io ports)
           (prefix (only (ikarus)
                         process-nonblocking
                         waitpid
                         wstatus-exit-status
-                        wstatus-received-signal)
+                        wstatus-received-signal
+                        system)
                   ik:)
           (srfi :8 receive)
           (srfi :9 records)
@@ -101,4 +105,12 @@
       (receive results (receiver port)
         (close-process-ports process)
         (receive status+signal (wait-for-process process)
-          (apply values (append status+signal results)))))))
+          (apply values (append status+signal results))))))
+
+  (define (run-shell-command cmd)
+    ;; This is a hack, but works (at least) on Linux. See
+    ;; <https://bugs.launchpad.net/ikarus/+bug/349210>.
+    (let* ((wstatus (ik:system cmd))
+           (sig (bitwise-and wstatus #xff)))
+      (values (bitwise-arithmetic-shift-right wstatus 8)
+              (if (= sig 0) #f sig)))))
