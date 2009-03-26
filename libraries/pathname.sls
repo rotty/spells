@@ -313,9 +313,9 @@
     (if file
         (make-pathname (pathname-origin pathname)
                        (let ((directory (pathname-directory pathname)))
-                         (if directory
-                             (append directory (list (file-namestring pathname)))
-                             (list (file-namestring pathname))))
+                         (if (null? directory)
+                             (list (file-namestring pathname))
+                             (append directory (list (file-namestring pathname)))))
                        #f)
         pathname)))
 
@@ -356,7 +356,8 @@
                           (cons (pathname-directory step) dirs)
                           (pathname-file step))
                     (loop (cdr steps)
-                          (cons (pathname-directory (pathname-as-directory step)))
+                          (cons (pathname-directory (pathname-as-directory step))
+                                dirs)
                           file))))))))
 
 

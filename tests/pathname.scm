@@ -15,11 +15,16 @@
 
 ;;; Code:
 
+(define-syntax test-pn=
+  (syntax-rules ()
+    ((test-pn= expected actual)
+     (test-compare pathname=? expected actual))))
+
 (define-test-suite pathname-tests
   "Spells pathname library")
 
 (define-test-case pathname-tests comparison ()
-  (test-compare pathname=? (make-pathname #f '() #f) (make-pathname #f '() #f))
+  (test-pn= (make-pathname #f '() #f) (make-pathname #f '() #f))
   (test-compare (compose not pathname=?)
                 (make-pathname #f '() #f)
                 (make-pathname #f '() "foo")))
@@ -28,28 +33,39 @@
   "S-Expression parsing")
 
 (define-test-case pathname-tests.s-expr string ()
-  (test-compare
-   pathname=?
-   (x->pathname "foo")
-   (make-pathname #f '() "foo")))
+  (test-pn= (x->pathname "foo")
+    (make-pathname #f '() "foo")))
 
 (define-test-case pathname-tests.s-expr dirlist-w/o-filename ()
-  (test-compare
-   pathname=?
-   (x->pathname '(("foo" "bar")))
-   (make-pathname #f '("foo" "bar") #f)))
+  (test-pn= (x->pathname '(("foo" "bar")))
+    (make-pathname #f '("foo" "bar") #f)))
 
 (define-test-case pathname-tests.s-expr dirlist-nonempty ()
-  (test-compare
-   pathname=?
-   (x->pathname '(("foo" "bar") "baz"))
-   (make-pathname #f '("foo" "bar") "baz")))
+  (test-pn= (x->pathname '(("foo" "bar") "baz"))
+    (make-pathname #f '("foo" "bar") "baz")))
 
 (define-test-case pathname-tests.s-expr dirlist-empty ()
-  (test-compare
-   pathname=?
-   (x->pathname '(() "baz"))
+  (test-pn= (x->pathname '(() "baz"))
    (make-pathname #f '() "baz")))
+
+(define-test-suite (pathname-tests.ops pathname-tests)
+  "Pathname operations")
+
+(define-test-case pathname-tests.ops as-directory ()
+  (test-pn= (x->pathname '(("foo")))
+    (pathname-as-directory '(("foo"))))
+  (test-pn= (x->pathname '(("foo" "bar" "baz")))
+    (pathname-as-directory '(("foo" "bar") "baz"))))
+
+(define-test-case pathname-tests.ops join ()
+  (test-pn= (x->pathname '(("foo" "bar") "baz"))
+    (pathname-join '(("foo" "bar") "file") '(() "baz")))
+  (test-pn= (x->pathname '(("foo" "bar" "baz") "file2"))
+    (pathname-join '(("foo" "bar") "file1") '(("baz") "file2")))
+  (test-pn= (x->pathname '(("foo" "bar" "baz" "f2" "qux") "f3"))
+    (pathname-join '(("foo" "bar") "f1")
+                   '(("baz") "f2")
+                   '(("qux") "f3"))))
 
 ;; The rest of the tests presume unix namestrings
 (define-test-suite (pathname-tests.conversion pathname-tests)
@@ -76,11 +92,11 @@
   "Filename type parsing")
 
 (define-test-case pathname-tests.type-parsing one-type ()
-  (test-compare
-   pathname=?
-   (x->pathname "foo.scm")
-   (make-pathname #f '() (make-file "foo" "scm"))))
+  (test-pn= (x->pathname "foo.scm")
+    (make-pathname #f '() (make-file "foo" "scm"))))
 
 (run-test-suite pathname-tests)
 
-;;; pathname.scm ends here
+;; Local Variables:
+;; scheme-indent-styles: (trc-testing (test-pn= 1))
+;; End:
