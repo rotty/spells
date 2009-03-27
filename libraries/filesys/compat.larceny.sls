@@ -91,11 +91,10 @@
 (define (working-directory)
   (x->pathname (la:current-directory)))
 
-(define-syntax with-working-directory
-  (syntax-rules ()
-    ((with-working-directory dir body ...)
-     (parameterize ((la:current-directory (x->f (pathname-as-directory (x->pathname dir)))))
-       body ...))))
+(define (with-working-directory dir thunk)
+  (parameterize ((la:current-directory
+                  (x->f (pathname-as-directory (x->pathname dir)))))
+    (thunk)))
 
 (define (copy-file old-file new-file)
   (error 'copy-file "please implement me for larceny"))

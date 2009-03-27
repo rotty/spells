@@ -142,15 +142,13 @@
 (define (working-directory)
   (x->pathname (mz:current-directory)))
 
-(define-syntax with-working-directory
-  (syntax-rules ()
-    ((with-working-directory dir body ...)
-     (let ((wd (mz:current-directory)))
-       (dynamic-wind
-           (lambda () (mz:current-directory
-                       (x->f (pathname-as-directory (x->pathname dir)))))
-           (lambda () body ...)
-           (lambda () (mz:current-directory wd)))))))
+(define (with-working-directory dir thunk)
+  (let ((wd (mz:current-directory)))
+    (dynamic-wind
+      (lambda () (mz:current-directory
+                  (x->f (pathname-as-directory (x->pathname dir)))))
+      thunk
+      (lambda () (mz:current-directory wd)))))
 
 (define (copy-file old-file new-file)
   (mz:copy-file (x->f old-file) (x->f new-file)))

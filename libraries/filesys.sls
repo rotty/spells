@@ -155,7 +155,8 @@
 (define (call-with-input-file-and-directory pathname proc)
   (let ((pathname (x->pathname pathname)))
     (with-working-directory (directory-namestring pathname)
-      (call-with-input-file (file-namestring pathname) proc))))
+      (lambda ()
+        (call-with-input-file (file-namestring pathname) proc)))))
 
 ;;@ Call @2, with a file output port corresponding to a temporary
 ;; file. When @2 returns normally, the temporary file is renamed to

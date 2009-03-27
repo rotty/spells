@@ -116,15 +116,13 @@
 (define (working-directory)
   (x->pathname (ik:current-directory)))
 
-(define-syntax with-working-directory
-  (syntax-rules ()
-    ((with-working-directory dir body ...)
-     (let ((wd (ik:current-directory)))
-       (dynamic-wind
-           (lambda () (ik:current-directory
-                       (x->f (pathname-as-directory (x->pathname dir)))))
-           (lambda () body ...)
-           (lambda () (ik:current-directory wd)))))))
+(define (with-working-directory dir thunk)
+  (let ((wd (ik:current-directory)))
+    (dynamic-wind
+      (lambda () (ik:current-directory
+                  (x->f (pathname-as-directory (x->pathname dir)))))
+      thunk
+      (lambda () (ik:current-directory wd)))))
 
 (define library-search-paths ik:library-path)
 

@@ -115,17 +115,15 @@
   (define (working-directory)
     (yp:current-directory))
 
-  (define-syntax with-working-directory
-    (syntax-rules ()
-      ((with-working-directory dir body ...)
-       (let ((wd (yp:current-directory)))
-         (dynamic-wind
-           (lambda () (yp:current-directory
-                       (x->f (pathname-as-directory (x->pathname dir)))))
-           (lambda () body ...)
-           (lambda () (yp:current-directory wd)))))))
+  (define (with-working-directory dir thunk)
+    (let ((wd (yp:current-directory)))
+      (dynamic-wind
+        (lambda () (yp:current-directory
+                    (x->f (pathname-as-directory (x->pathname dir)))))
+        thunk
+        (lambda () (yp:current-directory wd)))))
 
-  
+
   (define library-search-paths yp:scheme-library-paths)
-  
+
   )
