@@ -68,6 +68,14 @@
           (spells filesys compat))
 
 
+;;@ Fold @2 over the contents of the directory @1.
+;;
+;; If the directory @1 has the contents @var{f1}, @var{f2},
+;; @var{@dots{}}, this procedure first applies @2 to
+;; @code{(pathname-with-file (pathname-as-directory @1) @var{f1})} as
+;; first, and @3 as further arguments. The values returned by the
+;; application are used as new seed values for the next application of
+;; @2. It returns the results of the last application of @2.
 (define (directory-fold pathname combiner . seeds)
   (apply
    directory-fold* pathname

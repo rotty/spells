@@ -97,20 +97,21 @@
   (or (string=? "." f) (string=? ".." f)))
 
 (define (directory-fold* pathname combiner . seeds)
-  (define (full-pathname entry)
-    (pathname-with-file pathname (pathname-file (x->pathname entry))))
-  (let loop ((entries (ik:directory-list (x->f pathname))) (seeds seeds))
-    (if (null? entries)
-        (apply values seeds)
-        (let ((entry (car entries)))
-          (cond ((dot-or-dotdot? entry)
-                 (loop (cdr entries) seeds))
-                (else
-                 (receive (continue? . new-seeds)
-                     (apply combiner (full-pathname entry) seeds)
-                   (if continue?
-                       (loop (cdr entries) new-seeds)
-                       (apply values new-seeds)))))))))
+  (let ((dirname (pathname-as-directory pathname)))
+    (define (full-pathname entry)
+      (pathname-with-file dirname (pathname-file (x->pathname entry))))
+    (let loop ((entries (ik:directory-list (x->f dirname))) (seeds seeds))
+      (if (null? entries)
+          (apply values seeds)
+          (let ((entry (car entries)))
+            (cond ((dot-or-dotdot? entry)
+                   (loop (cdr entries) seeds))
+                  (else
+                   (receive (continue? . new-seeds)
+                            (apply combiner (full-pathname entry) seeds)
+                     (if continue?
+                         (loop (cdr entries) new-seeds)
+                         (apply values new-seeds))))))))))
 
 (define (working-directory)
   (x->pathname (ik:current-directory)))
