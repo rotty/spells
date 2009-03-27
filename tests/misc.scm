@@ -42,6 +42,17 @@
     (test-equal #f (and=> (assq 'qux alist) cadr))
     (test-equal 42 (and=> (assq 'foo alist) cadr))))
 
+(define-test-case misc-tests topological-sort ()
+  (test-equal '(foo bar baz)
+    (topological-sort '((foo bar) (bar baz) (baz))))
+  (test-one-of equal? '((foo bar baz)
+                        (baz foo bar)
+                        (foo baz bar))
+    (topological-sort '((foo bar) (bar) (baz)))))
+
 (run-test-suite misc-tests)
 
-;;; misc.scm ends here
+;; Local Variables:
+;; scheme-indent-styles: (trc-testing)
+;; End:
+
