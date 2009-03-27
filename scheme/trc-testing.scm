@@ -114,6 +114,18 @@
   (syntax-rules ()
     ((test-eq expected-expression actual-expression)
      (test-compare equal? expected-expression actual-expression))))
+
+(define-syntax test-one-of
+  (syntax-rules ()
+    ((test-one-of comparator-expression expected-expression actual-expression)
+     (let ((comparator comparator-expression))
+       (test-compare (lambda (expected-datums actual-datum)
+                       (exists (lambda (e)
+                                 (comparator e actual-datum))
+                               expected-datums))
+                     expected-expression
+                     actual-expression)))))
+
 
 ;;;; syntactic sugar
 

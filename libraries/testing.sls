@@ -28,6 +28,7 @@
    test-eq
    test-eqv
    test-equal
+   test-one-of
 
    ;; Reexport these for convenience.  Ordinarily reexportation is
    ;; anathema, but I think that here it is probably safe, because
