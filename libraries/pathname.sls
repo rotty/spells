@@ -530,13 +530,15 @@
      (let ((parts (remove string-null? (string-split namestring #\/ 0)))
            (absolute? (string-prefix? "/" namestring))
            (directory? (string-suffix? "/" namestring)))
-       (make-pathname
-        (if absolute? '/ #f)
-        (if directory? parts (drop-right parts 1))
-        (if directory?
-            #f
-            (let ((file-part (last parts)))
-              (fs-type/parse-file-namestring self file-part))))))
+       (receive (origin parts directory?)
+                (normalize-directory parts directory?)
+         (make-pathname
+          (if absolute? '/ origin)
+          (if directory? parts (drop-right parts 1))
+          (if directory?
+              #f
+              (let ((file-part (last parts)))
+                (fs-type/parse-file-namestring self file-part)))))))
 
     ((fs-type/parse-file-namestring self namestring)
      (if (parse-unix-file-types)
@@ -553,6 +555,24 @@
                (make-file (string-append prefix (first file-parts))
                           (cdr file-parts))))
          (make-file namestring '())))))
+
+(define (normalize-directory parts directory?)
+  (let loop ((parts parts) (n-backs 0) (dir '()) (dir? #f))
+    (if (null? parts)
+        (values (if (= n-backs 0)
+                    #f
+                    (make-list n-backs 'back))
+                (reverse dir)
+                (or directory? dir?))
+        (let ((part (car parts)))
+          (cond ((string=? part ".")
+                 (loop (cdr parts) n-backs dir #t))
+                ((string=? part "..")
+                 (if (null? dir)
+                     (loop (cdr parts) (+ n-backs 1) dir #t)
+                     (loop (cdr parts) n-backs (cdr dir) #t)))
+                (else
+                 (loop (cdr parts) n-backs (cons part dir) #f)))))))
 
 ;;@ A parameter controlling if file types are parsed by the UNIX file
 ;; system type.

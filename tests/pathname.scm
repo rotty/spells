@@ -72,28 +72,42 @@
   "Namestring conversion")
 
 (define-test-case pathname-tests.conversion relative ()
-  (test-equal (x->namestring (make-pathname #f '("foo" "bar") "baz"))
-    "foo/bar/baz"))
+  (test-equal "foo/bar/baz"
+    (x->namestring (make-pathname #f '("foo" "bar") "baz"))))
 
 (define-test-case pathname-tests.conversion absolute ()
-  (test-equal (x->namestring (make-pathname '/ '("foo") "bar"))
-    "/foo/bar"))
+  (test-equal "/foo/bar"
+    (x->namestring (make-pathname '/ '("foo") "bar"))))
 
 (define-test-case pathname-tests.conversion empty ()
-  (test-equal (x->namestring (make-pathname #f '() #f))
-    "."))
+  (test-equal "."
+    (x->namestring (make-pathname #f '() #f))))
 
 (define-test-case pathname-tests.conversion dir ()
   (test-equal (x->namestring (make-pathname #f '("foo") #f))
     "foo/"))
 
 
-(define-test-suite (pathname-tests.type-parsing pathname-tests)
-  "Filename type parsing")
+(define-test-suite (pathname-tests.parsing pathname-tests)
+  "Filename parsing")
 
-(define-test-case pathname-tests.type-parsing one-type ()
-  (test-pn= (x->pathname "foo.scm")
-    (make-pathname #f '() (make-file "foo" "scm"))))
+(define-test-case pathname-tests.parsing types ()
+  (test-pn= (make-pathname #f '() (make-file "foo" "scm"))
+    (x->pathname "foo.scm"))
+  (test-pn= (make-pathname #f '() (make-file "foo" '("scm" "in")))
+    (x->pathname "foo.scm.in")))
+
+(define-test-case pathname-tests.parsing dot ()
+  (test-pn= (make-pathname #f '("some" "dir" "somewhere") #f)
+    (x->pathname "./some/dir/./somewhere/")))
+
+(define-test-case pathname-tests.parsing dotdot ()
+  (test-pn= (make-pathname #f '("some") "foo")
+    (x->pathname "some/dir/../foo"))
+  (test-pn= (make-pathname #f '() #f)
+    (x->pathname "some/dir/../.."))
+  (test-pn= (make-pathname '(back back) '("some" "dir") "file")
+    (x->pathname "ignore/this/../../../../some/dir/file")))
 
 (run-test-suite pathname-tests)
 
