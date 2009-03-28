@@ -109,6 +109,21 @@
   (test-pn= (make-pathname '(back back) '("some" "dir") "file")
     (x->pathname "ignore/this/../../../../some/dir/file")))
 
+(define-test-suite (pathname-tests.to-ns pathname-tests)
+  "Namestring serialization")
+
+(define-test-case pathname-tests.to-ns types ()
+  (test-equal "foo.scm"
+    (x->namestring (make-pathname #f '() (make-file "foo" "scm"))))
+  (test-equal "foo.scm.in"
+    (x->namestring (make-pathname #f '() (make-file "foo" '("scm" "in"))))))
+
+(define-test-case pathname-tests.to-ns dotdot ()
+  (test-equal "../../some/dir/foo.scm"
+    (x->namestring (make-pathname '(back back)
+                                  '("some" "dir")
+                                  (make-file "foo" "scm")))))
+
 (run-test-suite pathname-tests)
 
 ;; Local Variables:

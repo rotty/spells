@@ -56,6 +56,7 @@
           parse-unix-file-types
           local-file-system-type)
   (import (except (rnrs base) string-copy string-for-each string->list)
+          (rnrs lists)
           (srfi :8 receive)
           (srfi :13 strings)
           (srfi :1 lists)
@@ -375,8 +376,9 @@
 (define (pathname=? x y)
   (and (equal? (pathname-origin x) (pathname-origin y))
        (equal? (pathname-directory x) (pathname-directory y))
-       (or (and (eqv? (pathname-file x) #f)
-                (eqv? (pathname-file y) #f))
+       (or (and (memv (pathname-file x) '(#f ()))
+                (memv (pathname-file y) '(#f ()))
+                #t)
            (and (pathname-file x) (pathname-file y)
                 (equal? (file-name (pathname-file x))
                         (file-name (pathname-file y)))
@@ -492,10 +494,21 @@
   (object #f
     ((fs-type/origin-namestring self pathname)
      (let ((origin (pathname-origin pathname)))
-       (cond ((eqv? origin #f) "")
+       (define (lose)
+         (error 'unix/origin-namestring
+                "invalid origin for unix file system" origin))
+       (cond ((memv origin '(#f ())) "")
              ((or (eq? origin '/) (equal? origin "/")) "/")
+             ((pair? origin)
+              (let loop ((o origin) (parts '()))
+                (if (null? o)
+                    (string-join (reverse parts) "/" 'suffix)
+                    (case (car o)
+                      ((back) (loop (cdr o) (cons ".." parts)))
+                      (else
+                       (lose))))))
              (else
-              (error 'unix/origin-namestring "invalid origin for unix file system" origin)))))
+              (lose)))))
     
     ((fs-type/directory-namestring self pathname)
      (let ((dir (pathname-directory pathname)))
