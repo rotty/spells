@@ -1,7 +1,7 @@
 ;; util.misc.scm -- Misc utilites for MzScheme
 ;; arch-tag: b27f4a34-4209-44ab-8586-49fd8c1b8322
 
-;; Copyright (C) 2005, 2007, 2008 by Free Software Foundation, Inc.
+;; Copyright (C) 2005, 2007, 2008, 2009 by Free Software Foundation, Inc.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sun Jun 12, 2005 22:16
@@ -25,13 +25,13 @@
 ;;; Code:
 
 (library (spells misc compat)
-  (export sleep-seconds thunk? exit scheme-dialect)
+  (export sleep-seconds thunk? exit scheme-implementation)
   (import (rnrs base)
           (only (mzscheme)
                 sleep procedure-arity-includes? exit))
 
   (define sleep-seconds sleep)
   (define (thunk? p) (and (procedure? p) (procedure-arity-includes? p 0)))
-  (define (scheme-dialect) 'mzscheme))
+  (define (scheme-implementation) 'mzscheme))
 
 ;;; misc.scm ends here

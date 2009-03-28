@@ -1,5 +1,5 @@
 (library (spells misc compat)
-  (export sleep-seconds exit scheme-dialect)
+  (export sleep-seconds exit scheme-implementation)
   (import (rnrs base))
 
   (define (sleep-seconds t)
@@ -8,5 +8,5 @@
   (define (exit status)
     (error 'exit "please implement EXIT for this implementation"))
   
-  (define (scheme-dialect)
+  (define (scheme-implementation)
     'larceny))

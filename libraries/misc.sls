@@ -26,7 +26,7 @@
           or-map
           and=>
           topological-sort
-          scheme-dialect)
+          scheme-implementation)
   (import (rnrs base)
           (rnrs lists)
           (rnrs io simple)

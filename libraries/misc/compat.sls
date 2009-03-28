@@ -1,5 +1,5 @@
 (library (spells misc compat)
-  (export sleep-seconds scheme-dialect)
+  (export sleep-seconds scheme-implementation)
   (import (rnrs base))
 
   ;;@ Sleep @1 seconds.
@@ -7,5 +7,5 @@
     (error "please implement SLEEP-SECONDS for this implementation"))
 
   ;;@ Return a symbol indicating the scheme implementation
-  (define (scheme-dialect)
+  (define (scheme-implementation)
     'unknown))
