@@ -27,15 +27,19 @@
           close-process-ports
           run-process
           call-with-process-input
-          call-with-process-output)
+          call-with-process-output
+
+          run-shell-command)
   (import (rnrs base)
           (rnrs io ports)
+          (rnrs arithmetic bitwise)
           (srfi :8 receive)
           (spells record-types)
           (spells pathname)
           (prefix (only (core primitives)
                         process
-                        process-wait)
+                        process-wait
+                        system)
                   yp:)
           (only (core destructuring) destructuring-bind))
 
@@ -61,8 +65,10 @@
       (make-process pid stdin stdout stderr)))
 
   (define (wait-for-process process)
-    (values (yp:process-wait (process-pid process) #f)
-            #f))
+    (let ((status (yp:process-wait (process-pid process) #f)))
+      (if status
+          (values status #f)
+          (values #f 'unknown))))
 
   (define (close-process-ports process)
     (let ((input (process-input process))
@@ -92,4 +98,11 @@
         (receive status+signal (wait-for-process process)
           (apply values (append status+signal results))))))
 
+  (define (run-shell-command cmd)
+    ;; This is a hack, but works (at least) on Linux. See
+    ;; <http://code.google.com/p/ypsilon/issues/detail?id=88>.
+    (let* ((wstatus (yp:system cmd))
+           (sig (bitwise-and wstatus #xff)))
+      (values (bitwise-arithmetic-shift-right wstatus 8)
+              (if (= sig 0) #f sig))))
 )
