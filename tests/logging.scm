@@ -20,8 +20,8 @@
          (case (car entry)
            ((handlers) (cons 'handlers
                              (map (lambda (params)
-                                    (apply make-log-handler
-                                           (note-taker (car params)) (cdr params)))
+                                    (append (cdr params)
+                                            (list (note-taker (car params))) ))
                                   (cdr entry))))
            (else entry)))
        config))

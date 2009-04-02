@@ -23,19 +23,18 @@
           log-entry-level-name
           log-entry-object
 
-          make-log-handler
-
           default-log-formatter
 
           configure-logger)
-  (import (except (rnrs base) error)
+  (import (rnrs base)
           (rnrs control)
           (rnrs lists)
           (rnrs mutable-pairs)
           (rnrs io simple)
           (srfi :1 lists)
+          (spells alist)
           (spells time-lib)
-          (spells error)
+          (spells match)
           (spells opt-args)
           (spells record-types)
           (spells include))
