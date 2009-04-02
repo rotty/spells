@@ -68,7 +68,8 @@
   (define (delete-file pathname)
     (rnrs:delete-file (x->f pathname)))
 
-  (define rename-file (todo-proc 'rename-file))
+  (define (rename-file source-pathname target-pathname)
+    (yp:rename-file (x->f source-pathname) (x->f target-pathname)))
 
   (define (file-regular? pathname)
     (yp:file-regular? (x->f pathname)))
@@ -86,7 +87,9 @@
   (define (file-executable? pathname)
     (yp:file-executable? (x->f pathname)))
 
-  (define file-modification-time (todo-proc 'file-modification-time))
+  (define (file-modification-time pathname)
+    (let ((nsecs (yp:file-stat-mtime (x->f pathname))))
+      (posix-timestamp->time-utc (div nsecs #e1e9) (mod nsecs #e1e9))))
 
   (define (file-size-in-bytes pathname)
     (yp:file-size-in-bytes (x->f pathname)))
