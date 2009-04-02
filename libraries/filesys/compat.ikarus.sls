@@ -37,14 +37,12 @@
           working-directory
           with-working-directory
 
-          copy-file
           library-search-paths)
   (import (rnrs base)
           (rnrs conditions)
           (srfi :8 receive)
           (spells pathname)
           (spells time-lib)
-          (spells filesys copy-file)
           (prefix (ikarus) ik:))
 
 (define x->f x->namestring)

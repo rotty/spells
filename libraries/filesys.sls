@@ -57,6 +57,7 @@
           find-file
           library-search-paths)
   (import (rnrs base)
+          (rnrs control)
           (rnrs conditions)
           (rnrs io simple)
           (rnrs io ports)
@@ -65,6 +66,7 @@
           (srfi :1 lists)
           (spells pathname)
           (spells time-lib)
+          (spells ports)
           (spells filesys compat))
 
 
@@ -150,6 +152,13 @@
   (create-directory* dest)
   (copy-file src dest))
 
+(define (copy-file src-pathname dst-pathname)
+  (call-with-port (open-file-input-port (x->namestring src-pathname))
+    (lambda (in-port)
+      (call-with-output-file/atomic dst-pathname 'block #f
+        (lambda (out-port)
+          (copy-port in-port out-port))))))
+
 ;;@ Call @2, with the a file input port corresponding to @1, with a
 ;; working directory as specified by the directory part of @1.
 (define (call-with-input-file-and-directory pathname proc)
@@ -161,19 +170,26 @@
 ;;@ Call @2, with a file output port corresponding to a temporary
 ;; file. When @2 returns normally, the temporary file is renamed to
 ;; @1, which normally is an atomic operation.
-(define (call-with-output-file/atomic pathname proc)
-  (receive (tmp-filename tmp-port) (create-temp-file pathname)
-    (guard (c (#t
-               (close-port tmp-port)
-               (delete-file tmp-filename)
-               (raise c)))
-      (receive results (call-with-port tmp-port proc)
-        (rename-file tmp-filename pathname)
-        (apply values results)))))
+(define call-with-output-file/atomic
+  (case-lambda
+    ((pathname buffer-mode transcoder proc)
+     (receive (tmp-filename tmp-port)
+              (create-temp-file pathname buffer-mode transcoder)
+       (guard (c (#t
+                  (close-port tmp-port)
+                  (delete-file tmp-filename)
+                  (raise c)))
+         (receive results (call-with-port tmp-port proc)
+           (rename-file tmp-filename pathname)
+           (apply values results)))))
+    ((pathname buffer-mode proc)
+     (call-with-output-file/atomic pathname buffer-mode #f proc))
+    ((pathname proc)
+     (call-with-output-file/atomic pathname 'block (native-transcoder) proc))))
 
 (define create-temp-file
   (let ((count 1))
-    (lambda (path)
+    (lambda (path buffer-mode transcoder)
       (let ((prefix (file-namestring path)))
         (let loop ((i count))
           (let ((pathname (pathname-with-file
@@ -183,8 +199,8 @@
                        (loop (+ i 1))))
               (let ((port (open-file-output-port (x->namestring pathname)
                                                  (file-options)
-                                                 'block
-                                                 (native-transcoder))))
+                                                 buffer-mode
+                                                 transcoder)))
                 (set! count (+ i 1))
                 (values pathname port)))))))))
 

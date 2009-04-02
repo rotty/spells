@@ -38,7 +38,6 @@
           working-directory
           with-working-directory
 
-          copy-file
           library-search-paths)
   (import (rnrs base)
           (rnrs lists)
@@ -60,7 +59,6 @@
                         file-size
                         directory-list
                         path->string
-                        copy-file
                         current-directory
                         current-library-collection-paths
 
@@ -149,9 +147,6 @@
                   (x->f (pathname-as-directory (x->pathname dir)))))
       thunk
       (lambda () (mz:current-directory wd)))))
-
-(define (copy-file old-file new-file)
-  (mz:copy-file (x->f old-file) (x->f new-file)))
 
 (define (library-search-paths)
   (list->mlist (mz:current-library-collection-paths)))

@@ -38,13 +38,12 @@
           working-directory
           with-working-directory
 
-          copy-file
           library-search-paths)
   (import (rnrs base)
           (prefix (rnrs files) rnrs:)
           (srfi :8 receive)
           (spells pathname)
-          (spells filesys copy-file)
+          (spells time-lib)
           (prefix (core files) yp:)
           (prefix (core primitives) yp:))
 
