@@ -34,10 +34,12 @@
           pathname=?
           pathname<?
           pathname>?
+          pathname-hash
           
           pathname-origin
           pathname-directory
           pathname-file
+          pathname-components
           pathname-with-origin
           pathname-with-directory
           pathname-with-file
@@ -55,16 +57,22 @@
 
           parse-unix-file-types
           local-file-system-type)
-  (import (except (rnrs base) string-copy string-for-each string->list)
+  (import (rnrs base)
           (rnrs lists)
+          (only (rnrs hashtables) string-hash symbol-hash)
+          (rnrs arithmetic fixnums)
           (srfi :8 receive)
-          (srfi :13 strings)
+          (except (srfi :13 strings)
+                  string-hash string-copy string->list string-for-each)
           (srfi :1 lists)
           (srfi :14 char-sets)
           (spells record-types)
           (spells opt-args)
           (spells parameter)
           (spells operations)
+          (spells match)
+          (spells tracing)
+          (spells string-utils)
           (spells pathname os-string))
 
 ;;@subheading Introduction
@@ -114,6 +122,12 @@
 (define (string-or-symbol? object)
   (or (string? object)
       (symbol? object)))
+
+(define (substring-split s sep start)
+  (if (= 0 start)
+      (string-split s sep)
+      (string-split (substring/shared s start (string-length s)) sep)))
+
 
 ;;;; Pathnames
 
@@ -131,7 +145,7 @@
 ;; @code{#f}, representing an empty file field.
 (define (make-pathname origin directory file)
   (really-make-pathname
-   origin
+   (or origin '())
    directory
    (cond ((list? file)
           (case (length file)
@@ -157,18 +171,24 @@
 ;; @emph{FIXME}: Document how pairs are parsed.
 (define/optional-args (x->pathname object (optional
                                            (fs-type (local-file-system-type))))
+  (define (lose)
+    (error 'x->pathname "cannot coerce to a pathname" object))
   (cond ((symbol?    object) (make-pathname #f '() object))
         ((string?    object) (parse-namestring object fs-type))
         ((os-string? object) (parse-namestring (os-string->string object)))
         ((pathname?  object) object)
         ((pair? object)
-         (if (or (null? (car object)) (pair? (car object)))
-             (make-pathname #f (car object)
-                            (if (null? (cdr object))
-                                #f
-                                (cadr object)))
-             (make-pathname #f (drop-right object 1) (last object))))
-        (else (error 'x->pathname "cannot coerce to a pathname" object))))
+         (match object
+           (((dir ___))
+            (make-pathname #f dir #f))
+           (((dir ___) file)
+            (make-pathname #f dir file))
+           ((origin (dir ___) file)
+            (make-pathname origin dir file))
+           (else
+            (lose))))
+        (else
+         (lose))))
 
 ;;@ Coerce @1 to a file.
 ;;
@@ -247,6 +267,12 @@
                    (pathname-directory pathname)
                    file)))
 
+;;@ Return the origin, directory and file components of @1.
+(define (pathname-components pathname)
+  (values (pathname-origin pathname)
+          (pathname-directory pathname)
+          (pathname-file pathname)))
+
 ;;@ Return a pathname like @1.
 ;; Any null components of @1 are filled with the supplied
 ;; arguments, @1, @2 and @3.
@@ -292,8 +318,10 @@
 ;;@ Return a pathname whose merging with RELATIVE produces PATHNAME.
 ;; This is currently unimplemented and will simply return PATHNAME."
 (define (enough-pathname pathname relative)
-  (error 'enough-pathname "Unimplemented: %S"
-         `(enough-pathname ',pathname ',relative)))
+  ;;(error 'enough-pathname "Unimplemented: %S"
+  ;;       `(enough-pathname ',pathname ',relative))
+  pathname)
+
 
 ;;;; Directory Pathnames
 
@@ -322,18 +350,17 @@
 
 ;;@ Return a pathname of the directory that contains @1.
 (define (pathname-container pathname)
-  (let* ((pathname (x->pathname pathname))
-         (origin (pathname-origin pathname))
-         (directory (pathname-directory pathname))
-         (file (pathname-file pathname)))
-    (let loop ((pathname pathname))
+  (let loop ((pathname (x->pathname pathname)))
+    (let ((origin (pathname-origin pathname))
+          (directory (pathname-directory pathname))
+          (file (pathname-file pathname)))
       (cond (file
              (make-pathname origin directory #f))
             ((and directory (not (null? directory)))
              (make-pathname origin (drop-right directory 1) #f))
             (else
              (let ((expansion (expand-pathname pathname)))
-               (if (equal? expansion pathname)
+               (if (pathname=? expansion pathname)
                    (error 'pathname-container
                           "Unable to find pathname's container: %S"
                           pathname)
@@ -346,20 +373,74 @@
   (let ((base (x->pathname base)))
     (if (null? steps)
         base
-        (let loop ((steps steps) (dirs (list (pathname-directory base))) (file #f))
+        (let loop ((steps steps)
+                   (o (pathname-origin base))
+                   (o-parts (let ((o (pathname-origin base)))
+                              (and (list? o) (reverse o))))
+                   (dir (reverse (pathname-directory base)))
+                   (file #f))
           (if (null? steps)
-              (make-pathname (pathname-origin base)
-                             (concatenate (reverse dirs))
-                             file)
-              (let ((step (x->pathname (car steps))))
-                (if (null? (cdr steps))
+              (make-pathname (if o-parts (reverse o-parts) o) (reverse dir) file)
+              (let* ((step (x->pathname (car steps)))
+                     (step-o (or (pathname-origin step) '())))
+                (define (iterate o o-parts dir)
+                  (if (null? (cdr steps))
                     (loop (cdr steps)
-                          (cons (pathname-directory step) dirs)
+                          o o-parts
+                          (append-reverse (pathname-directory step) dir)
                           (pathname-file step))
                     (loop (cdr steps)
-                          (cons (pathname-directory (pathname-as-directory step))
-                                dirs)
-                          file))))))))
+                          o o-parts
+                          (append-reverse (pathname-directory
+                                           (pathname-as-directory step))
+                                          dir)
+                          file)))
+                (cond ((not (list? step-o))
+                       (iterate step-o #f '()))
+                      (else
+                       (receive (backs others)
+                                (span (lambda (x) (eq? x 'back)) (reverse step-o))
+                         (let ((n-drop (min (length backs)
+                                            (length dir))))
+                           (if o-parts
+                               (iterate o
+                                        (append (drop step-o n-drop) o-parts)
+                                        (drop dir n-drop))
+                               (iterate o #f (drop dir n-drop)))))))))))))
+
+;;;; Pathname hashing
+
+(define hash-bits (- (fixnum-width) 1))
+
+(define (hash-combine h1 h2)
+  (fxxor (fxrotate-bit-field h1 0 hash-bits 7)
+         (fxrotate-bit-field h2 0 hash-bits (- hash-bits 6))))
+
+(define (hash-fold hasher lst)
+  (fold (lambda (e hash)
+          (hash-combine hash (hasher e)))
+        null-hash
+        lst))
+
+(define (str/sym-hash x)
+  (string-hash (if (symbol? x) (symbol->string x) x)))
+
+(define null-hash 0)
+
+(define (file-hash file)
+  (if file
+      (hash-combine (str/sym-hash (file-name file))
+                    (hash-fold str/sym-hash (file-types file)))
+      null-hash))
+
+(define (pathname-hash pathname)
+  (receive (origin dir file) (pathname-components pathname)
+    (hash-combine (cond ((pair? origin)  (hash-fold symbol-hash origin))
+                        ((symbol? origin) (symbol-hash origin))
+                        ((string? origin) (string-hash origin))
+                        (else             null-hash))
+                  (hash-combine (hash-fold str/sym-hash dir)
+                                (file-hash file)))))
 
 
 ;;;; Pathname Expansion
@@ -367,7 +448,8 @@
 ;;@ Return a pathname like @1 but with the origin expanded.
 ;; This is currently unimplemented and will simply return @1."
 (define (expand-pathname pathname)
-  (error 'expand-pathname "Unimplemented: %S" `(expand-pathname ',pathname)))
+  ;;(error 'expand-pathname "Unimplemented: %S" `(expand-pathname ',pathname))
+  pathname)
 
 ;;@ Compare the pathnames @1 and @2 and return @code{#t} if they refer
 ;; to the same filesystem entity.
@@ -376,8 +458,8 @@
 (define (pathname=? x y)
   (and (equal? (pathname-origin x) (pathname-origin y))
        (equal? (pathname-directory x) (pathname-directory y))
-       (or (and (memv (pathname-file x) '(#f ()))
-                (memv (pathname-file y) '(#f ()))
+       (or (and (eqv? (pathname-file x) #f)
+                (eqv? (pathname-file y) #f)
                 #t)
            (and (pathname-file x) (pathname-file y)
                 (equal? (file-name (pathname-file x))
@@ -487,9 +569,6 @@
 (define-operation (fs-type/parse-file-namestring fs-type namestring)
   (make-file namestring '() #f))
 
-(define (string-split s c start)
-  (string-tokenize s (char-set-complement (char-set c))))
-
 (define unix-file-system-type
   (object #f
     ((fs-type/origin-namestring self pathname)
@@ -540,7 +619,7 @@
                       (list "." (string-join (file-types file) "."))))))))
     
     ((fs-type/parse-namestring self namestring)
-     (let ((parts (remove string-null? (string-split namestring #\/ 0)))
+     (let ((parts (remp string-null? (string-split namestring #\/)))
            (absolute? (string-prefix? "/" namestring))
            (directory? (string-suffix? "/" namestring)))
        (receive (origin parts directory?)
@@ -561,8 +640,8 @@
                         ((string-skip namestring #\.)
                          => (lambda (idx)
                               (values (substring/shared namestring 0 idx)
-                                      (string-split namestring #\. idx))))
-                        (else (values "" (string-split namestring #\. 0))))
+                                      (substring-split namestring #\. idx))))
+                        (else (values "" (string-split namestring #\.))))
            (if (and (null? file-parts) (string-null? prefix))
                #f
                (make-file (string-append prefix (first file-parts))

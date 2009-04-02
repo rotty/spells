@@ -65,7 +65,14 @@
   (test-pn= (x->pathname '(("foo" "bar" "baz" "f2" "qux") "f3"))
     (pathname-join '(("foo" "bar") "f1")
                    '(("baz") "f2")
-                   '(("qux") "f3"))))
+                   '(("qux") "f3")))
+  (test-pn= (x->pathname '((back back) ("some") "file2"))
+    (pathname-join '((back back) ("some" "dir") "file1")
+                   '((back) () "file2")))
+  (test-pn= (x->pathname '(/ ("another" "dir2") "file"))
+    (pathname-join '(("ignore") "me")
+                   '(/ ("another" "dir") #f)
+                   '((back) ("dir2") "file"))))
 
 ;; The rest of the tests presume unix namestrings
 (define-test-suite (pathname-tests.conversion pathname-tests)
@@ -96,6 +103,10 @@
     (x->pathname "foo.scm"))
   (test-pn= (make-pathname #f '() (make-file "foo" '("scm" "in")))
     (x->pathname "foo.scm.in")))
+
+(define-test-case pathname-tests.parsing absolute ()
+  (test-pn= (make-pathname '/ '("foo") "bar")
+    (x->pathname "/foo/bar")))
 
 (define-test-case pathname-tests.parsing dot ()
   (test-pn= (make-pathname #f '("some" "dir" "somewhere") #f)
