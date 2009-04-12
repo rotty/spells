@@ -23,7 +23,8 @@
   ;;("file-attr.scm" spells.file spells.misc spells.namestring)
   ("pathname.scm" spells.pathname spells.misc)
   ("filesys.scm"
-   spells.filesys spells.pathname srfi.:1.lists
+   spells.filesys spells.pathname
+   (except (srfi :1 lists) for-each map)
    rnrs.control rnrs.exceptions)
   ("string-utils.scm" spells.string-utils)
   ("format.scm" spells.format)

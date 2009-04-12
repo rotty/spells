@@ -39,7 +39,7 @@
           (rnrs io ports)
           (rnrs io simple)
           (srfi :8 receive)
-          (srfi :1 lists)
+          (except (srfi :1 lists) map for-each)
           (srfi :13 strings)
           (spells pathname)
           (spells delimited-readers)

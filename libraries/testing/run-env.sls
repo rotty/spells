@@ -3,7 +3,7 @@
   (export this-directory
           test-environment)
   (import (rnrs base)
-          (srfi :1 lists)
+          (except (srfi :1 lists) map for-each)
           (spells parameter)
           (spells pathname)
           (spells include))

@@ -23,8 +23,9 @@
           operation
           define-operation
           join)
-  (import (rnrs)
-          (srfi :1 lists)
+  (import (rnrs base)
+          (rnrs lists)
+          (only (srfi :1 lists) any)
           (spells procedure-annotations))
   
 ;; Auxiliary syntax

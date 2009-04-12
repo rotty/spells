@@ -64,7 +64,7 @@
           (rnrs io ports)
           (rnrs exceptions)
           (srfi :8 receive)
-          (srfi :1 lists)
+          (except (srfi :1 lists) map for-each)
           (spells pathname)
           (spells time-lib)
           (spells ports)

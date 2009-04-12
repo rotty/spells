@@ -8,7 +8,8 @@
           let-optionals*
           *optional
           opt-lambda)
-  (import (rnrs base))
+  (import (rnrs base)
+          (rnrs lists))
 
 
 ;; The following code is taken from scsh, file scsh/let-opt.scm.
