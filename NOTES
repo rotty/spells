@@ -22,19 +22,14 @@ it interacts with implementation-specific files.
 
 *** TODO Finishing up the R6RS adaption of Riastradh's testing framework
 
-This is nearly, done, just the output is a little ugly because of
-`fresh-line' missing. This should definitly be fixed before switching
-the spells test suite over.
+This is nearly done, however, I still need to add an option to reduce
+the verbosity.
 
 Also, the test suite itself needs a bit of coverage, especially the
 restarts part of it (which should be reviewed, and moved into seperate
 library).
 
 *** TODO Review libraries
-
-- Replace jas-match.scm with match.scm from Alex Shinn. This version
-  is not backwards-compatible, but has a nicer syntax, and a more
-  liberal license (PD).
 
 - Move the stuff in ~misc~ to more appropriate places.
 

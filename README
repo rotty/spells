@@ -20,8 +20,8 @@ environment-variable tweaking for you.
 * Status
 
 Spells has been tested on Ikarus, Ypsilon and PLT Scheme. It currently
-provides the following libraries, beyond ones that just alias SRFIs,
-or implement features readily coded using only R6RS functionality:
+provides the following libraries, beyond ones that implement features
+readily coded using only R6RS functionality:
 
 - (spells filesys) :: File system interface
 - (spells foreign) :: Foreign function interface -- call C functions
