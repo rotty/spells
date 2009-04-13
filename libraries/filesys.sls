@@ -29,6 +29,7 @@
           install-file
           create-symbolic-link
           create-hard-link
+          create-temp-file
 
           file-regular?
           file-directory?
@@ -122,7 +123,7 @@
 
 ;;@ Create directories, with intermediary ones when needed.
 (define (create-directory* pathname)
-  (let ((pathname (pathname-as-directory (x->pathname pathname))))
+  (let ((pathname (pathname-as-directory pathname)))
     (fold (lambda (new path)
             (let ((new-dir (merge-pathnames (make-pathname #f (list new) #f)
                                             path)))
@@ -131,20 +132,32 @@
           (make-pathname (pathname-origin pathname) '() #f)
           (pathname-directory pathname))))
 
-;;@ Search @1, a list of directories for an occurance of a file as
-;; specified by pathname.
-(define (search-directory-list dir-list pathname)
-  (let ((pathname (x->pathname pathname)))
-    (cond ((pathname-origin pathname)
-           pathname)
-          (else
-           (let loop ((lst dir-list))
-             (if (null? lst)
-                 #f
-                 (let ((path (merge-pathnames pathname (car lst))))
-                   (if (file-exists? path)
-                       path
-                       (loop (cdr lst))))))))))
+;;@ Search @var{dir-list}, a list of directories for an occurance of a
+;; file as specified by @var{pathname}. If @var{pred} is specified, it
+;; must be a single-argument procedure, which is used as an additional
+;; predicate that must be satisfied.
+(define find-file
+  (case-lambda
+    ((pathname dir-list pred)
+     (let ((pathname (x->pathname pathname)))
+       (cond ((null? (pathname-origin pathname))
+              (let loop ((lst dir-list))
+                (if (null? lst)
+                    #f
+                    (let ((path (pathname-join
+                                 (pathname-as-directory (car lst))
+                                 pathname)))
+                      (if (and (file-exists? path)
+                               (or (not pred) (pred path)))
+                          path
+                          (loop (cdr lst)))))))
+             ((and (file-exists? pathname)
+                   (or (not pred) (pred pathname)))
+              pathname)
+             (else
+              #f))))
+    ((pathname dir-list)
+     (find-file pathname dir-list #f))))
 
 ;;@ Vanilla file installation procedure that simply copies the
 ;; file, creating any needed directory.
@@ -189,33 +202,32 @@
 
 (define create-temp-file
   (let ((count 1))
-    (lambda (path buffer-mode transcoder)
-      (let ((prefix (file-namestring path)))
-        (let loop ((i count))
-          (let ((pathname (pathname-with-file
-                           path
-                           (string-append prefix (number->string i) ".tmp"))))
-            (guard (c ((i/o-file-already-exists-error? c)
-                       (loop (+ i 1))))
-              (let ((port (open-file-output-port (x->namestring pathname)
-                                                 (file-options)
-                                                 buffer-mode
-                                                 transcoder)))
-                (set! count (+ i 1))
-                (values pathname port)))))))))
+    (case-lambda
+      ((pathname buffer-mode transcoder)
+       (let* ((pathname (x->pathname pathname))
+              (types (file-types (pathname-file pathname)))
+              (fname (file-name (pathname-file pathname))))
+         (let loop ((i count))
+           (let ((pathname (pathname-with-file
+                            pathname
+                            (make-file (string-append fname (number->string i))
+                                       (cons "tmp" types)))))
+             (guard (c ((i/o-file-already-exists-error? c)
+                        (loop (+ i 1))))
+               (let ((port (open-file-output-port (x->namestring pathname)
+                                                  (file-options)
+                                                  buffer-mode
+                                                  transcoder)))
+                 (set! count (+ i 1))
+                 (values pathname port)))))))
+      ((pathname buffer-mode)
+       (create-temp-file pathname buffer-mode #f))
+      ((pathname)
+       (create-temp-file pathname 'block (native-transcoder))))))
 
 (define-condition-type &file-unreachable-error &error
   file-unreachable-error? make-file-unreachable-error
   (pathname file-unreachable-error-pathname)
   (operator file-unreachable-error-operator))
-
-;;@ Find @1 in the list of directories @2.
-(define (find-file pathname paths)
-  (let loop ((paths paths))
-    (if (null? paths)
-        #f
-        (let ((full-name (pathname-join (pathname-as-directory (car paths))
-                                        pathname)))
-          (if (file-exists? full-name) full-name (loop (cdr paths)))))))
 
 )
