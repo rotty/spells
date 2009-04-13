@@ -411,10 +411,11 @@
 ;;;; Pathname hashing
 
 (define hash-bits (- (fixnum-width) 1))
+(define hash-mask (fxnot (fxarithmetic-shift -1 hash-bits)))
 
 (define (hash-combine h1 h2)
-  (fxxor (fxrotate-bit-field h1 0 hash-bits 7)
-         (fxrotate-bit-field h2 0 hash-bits (- hash-bits 6))))
+  (fxxor (fxrotate-bit-field (fxand h1 hash-mask) 0 hash-bits 7)
+         (fxrotate-bit-field (fxand h2 hash-mask) 0 hash-bits (- hash-bits 6))))
 
 (define (hash-fold hasher lst)
   (fold (lambda (e hash)
@@ -576,7 +577,7 @@
        (define (lose)
          (error 'unix/origin-namestring
                 "invalid origin for unix file system" origin))
-       (cond ((memv origin '(#f ())) "")
+       (cond ((null? origin) "")
              ((or (eq? origin '/) (equal? origin "/")) "/")
              ((pair? origin)
               (let loop ((o origin) (parts '()))
@@ -671,8 +672,7 @@
 (define parse-unix-file-types (make-parameter #t))
 
 ;;@ Returns the local file system type.
-(define (local-file-system-type)
-  unix-file-system-type)
+(define local-file-system-type (make-parameter unix-file-system-type))
 
 ;; these go last, since it may expand to an expression, not a definition
 (define-record-discloser pathname
