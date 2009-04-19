@@ -1,6 +1,6 @@
 ;;; sysutils.ypsilon.sls --- Ypsilon sysutils
 
-;; Copyright (C) 2008 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -28,34 +28,39 @@
           current-process-environment
           extend-process-environment
           find-exec-path
-          os-name
-          os-node-name
-          os-release-name
-          os-version-name
-          machine-name)
+          host-info)
   (import (rnrs base)
-          (only (core) getenv))
+          (rnrs records syntactic)
+          (srfi :8 receive)
+          (spells string-utils)
+          (spells filesys)
+          (spells sysutils run-uname)
+          (only (core)
+                architecture-feature
+                getenv
+                process-environment->alist)
+          (only (ypsilon ffi) on-posix))
 
   (define (todo-proc who)
     (lambda args
       (error who "please implement me!")))
-  
+
+  (define (find-exec-path prog)
+    (let ((paths (string-split (getenv "PATH") #\:)))
+      (find-file prog paths file-executable?)))
+
   (define lookup-environment-variable getenv)
-  
-  (define current-process-environment (todo-proc 'current-process-environment))
-  
+
+  (define current-process-environment process-environment->alist)
+
   (define extend-process-environment (todo-proc 'extend-process-environment))
-  
-  (define find-exec-path (todo-proc 'find-exec-path))
-  
-  (define os-name (todo-proc 'os-name))
-  
-  (define os-node-name (todo-proc 'os-node-name))
-  
-  (define os-release-name (todo-proc 'os-release-name))
-  
-  (define os-version-name (todo-proc 'os-version-name))
-  
-  (define machine-name (todo-proc 'machine-name))
-  
+
+  (define (host-info)
+    (let ((os (architecture-feature 'operating-system)))
+      (values
+       (architecture-feature 'machine-hardware)
+       "unknown"
+       (cond ((string=? os "linux") "linux-gnu")
+             (else                  os)))))
+
   )
