@@ -62,7 +62,7 @@
 
   (define (spawn-process env stdin stdout stderr prog . args)
     (receive (pid p-in p-out p-err)
-             (apply ik:process* #f stdin stdout stderr
+             (apply ik:process* #f env stdin stdout stderr
                     (x->strlist (cons prog args)))
       (make-process pid p-in p-out p-err)))
 

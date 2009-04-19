@@ -29,7 +29,7 @@
 (define (run-process env prog . args)
   (wait-for-process 
    (apply spawn-process
-          #f
+          env
           (standard-input-port)
           (standard-output-port)
           (standard-error-port)
