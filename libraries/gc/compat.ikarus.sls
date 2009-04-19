@@ -1,4 +1,4 @@
-;;; weak.ikarus.sls --- Weak pointers for Ikarus.
+;;; compat.ikarus.sls --- GC-interacting procedures for Ikarus.
 
 ;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -15,18 +15,18 @@
 ;;; Code:
 
 
-(library (spells weak)
-  (export make-weak-pointer weak-pointer-ref weak-pointer?
+(library (spells gc compat)
+  (export make-weak-cell weak-cell-ref weak-cell?
           make-guardian)
   (import (rnrs base)
           (only (ikarus) weak-cons weak-pair? bwp-object? make-guardian))
 
-  (define (make-weak-pointer obj)
+  (define (make-weak-cell obj)
     (weak-cons obj #f))
 
-  (define (weak-pointer? thing)
+  (define (weak-cell? thing)
     (weak-pair? thing))
 
-  (define (weak-pointer-ref weak-pointer)
-    (let ((obj (car weak-pointer)))
+  (define (weak-cell-ref weak-cell)
+    (let ((obj (car weak-cell)))
       (and (not (bwp-object? obj)) obj))))
