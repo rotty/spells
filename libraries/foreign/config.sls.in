@@ -34,29 +34,30 @@
              ((int16 uint16)              2)
              ((int32 uint32)              4)
              ((int64 uint64)              8)
-             ((short ushort)   @SIZEOF_SHORT@)
-             ((int uint)       @SIZEOF_INT@)
-             ((long ulong)     @SIZEOF_LONG@)
-             ((llong ullong)   @SIZEOF_LONG_LONG@)
-             ((pointer)        @SIZEOF_POINTER@)
-             ((float)          @SIZEOF_FLOAT@)
-             ((double)         @SIZEOF_DOUBLE@)
-             ((size_t ssize_t) @SIZEOF_SIZE_T@)
-             ((time_t)         @SIZEOF_TIME_T@)
+             ((short ushort)   #!@(c-sizeof short))
+             ((int uint)       #!@(c-sizeof int))
+             ((long ulong)     #!@(c-sizeof long))
+             ((llong ullong)   #!@(c-sizeof (long long)))
+             ((pointer)        #!@(c-sizeof (void *)))
+             ((float)          #!@(c-sizeof float))
+             ((double)         #!@(c-sizeof double))
+             ((size_t ssize_t) #!@(c-sizeof size_t "stddef.h"))
+             ((time_t)         #!@(c-sizeof time_t "time.h"))
              (else #f))))
       (or size
           (error 'c-type-sizeof "size of type unknown" sym))))
 
   (define c-type-alignof
-    (let ((target '(@TARGET_CPU@ @TARGET_OS@)))
+    (let ((target '("#!@(host-info os)"
+                    "#!@(host-info cpu)")))
       (cond
-       ((member target '((x86_64 linux-gnu)))
+       ((member target '(("linux-gnu" "x86_64")))
         c-type-sizeof)
-       ((member target '((i686 linux-gnu)))
+       ((member target '(("linux-gnu" "i686")))
         (lambda (type)
           (let ((size (c-type-sizeof type)))
             (if (= size 8)
                 4
                 size))))
        (else
-        (error 'c-type-alignment "unknown target" target))))))
+        (error 'c-type-alignof "unknown target" target))))))
