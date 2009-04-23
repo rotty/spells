@@ -34,7 +34,6 @@
           (srfi :8 receive)
           (spells string-utils)
           (spells filesys)
-          (spells sysutils run-uname)
           (only (core)
                 architecture-feature
                 getenv
