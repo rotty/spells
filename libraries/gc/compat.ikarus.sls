@@ -17,9 +17,12 @@
 
 (library (spells gc compat)
   (export make-weak-cell weak-cell-ref weak-cell?
-          make-guardian)
+          make-guardian
+          collect)
   (import (rnrs base)
-          (only (ikarus) weak-cons weak-pair? bwp-object? make-guardian))
+          (only (ikarus)
+                weak-cons weak-pair? bwp-object? make-guardian
+                collect))
 
   (define (make-weak-cell obj)
     (weak-cons obj #f))

@@ -2,7 +2,8 @@
 (library (spells gc)
   (export unwind-protect
           make-guardian
-          make-weak-cell weak-cell-ref weak-cell?)
+          make-weak-cell weak-cell-ref weak-cell?
+          collect)
   (import (rnrs base)
           (rnrs control)
           (spells misc)
@@ -10,7 +11,7 @@
 
 
 
-;; Code ind comments in this section is adapted from
+;; Code and comments in this section is adapted from
 ;; <http://mumble.net/~campbell/scheme/unwind-protect.scm>, authored
 ;; by Taylor Campbell.
 

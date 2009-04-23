@@ -17,7 +17,8 @@
 
 (library (spells gc compat)
   (export make-weak-cell weak-cell-ref weak-cell?
-          make-guardian)
+          make-guardian
+          collect)
   (import (rnrs base)
           (rnrs control)
           (spells misc)
@@ -25,7 +26,8 @@
                 make-weak-mapping
                 weak-mapping?
                 weak-mapping-key
-                weak-mapping-value))
+                weak-mapping-value
+                collect))
 
   (define (make-weak-cell obj)
     (make-weak-mapping obj #f))
