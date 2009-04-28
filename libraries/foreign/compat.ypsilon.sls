@@ -187,13 +187,10 @@
       (lambda (proc)
         (make-cdecl-callback yp-rt yp-ats proc))))
 
-  (define libc (load-shared-object
-                (cond (on-linux "libc.so.6")
-                      (else
-                       (error 'libc "unsupported system")))))
+  (define process-dso (load-shared-object))
 
-  (define malloc (c-function libc "libc" void* malloc (size_t)))
-  (define free (c-function libc "libc" void free (void*)))
+  (define malloc (c-function process-dso "libc" void* malloc (size_t)))
+  (define free (c-function process-dso "libc" void free (void*)))
 
   (define memcpy
     (case-lambda
@@ -221,14 +218,15 @@
     (case-lambda
       ((lib-name lazy? global?)
        (guard (c (#t (set! *dlerror* c) #f))
-         (let ((result (load-shared-object lib-name)))
+         (let ((result (if lib-name
+                           (load-shared-object lib-name)
+                           (load-shared-object))))
            (set! *dlerror* #f)
            result)))
       ((lib-name)
        (dlopen lib-name #f #f))
       (()
-       ;; Ypsilon doesn't support that yet
-       #f)))
+       (dlopen #f #f #f))))
 
   (define (dlsym lib str)
     (lookup-shared-object lib str))
