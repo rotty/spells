@@ -30,7 +30,7 @@
           (srfi :14 char-sets)
           (srfi :8 receive)
           (spells misc)
-          (spells parameter)
+          (srfi :39 parameters)
           (spells filesys)
           (spells pathname)
           (spells condition)

@@ -31,7 +31,6 @@
   ("misc.scm" spells.misc rnrs.lists)
   ("match.scm" spells.match)
   ;;("opt-args.scm" spells.opt-args) ;; temporarily disabled (can't eval definitions in R6RS)
-  ("parameter.scm" spells.parameter)
   ;;("table.scm" spells.table) ;; superceded by R6RS
   ;;("blobs.scm" spells.blobs) ;; superceded by R6RS
   ("delimited-readers.scm"

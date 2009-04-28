@@ -21,7 +21,7 @@
   (export error error-who make-error-signaller)
   (import 
     (rename (rnrs base) (error rnrs:error))
-    (spells parameter))
+    (srfi :39 parameters))
   
   (define error-who (make-parameter #f))
   

@@ -31,7 +31,7 @@
   (import (rnrs)
           (srfi :8 receive)
           (only (spells record-types) define-record-discloser)
-          (spells parameter))
+          (srfi :39 parameters))
 
 (define-record-type restarter
   (fields tag description invoker interactor)

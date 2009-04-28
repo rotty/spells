@@ -4,7 +4,7 @@
           test-environment)
   (import (rnrs base)
           (except (srfi :1 lists) map for-each)
-          (spells parameter)
+          (srfi :39 parameters)
           (spells pathname)
           (spells include))
   

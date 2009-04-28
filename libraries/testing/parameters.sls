@@ -31,7 +31,7 @@
   (import (rnrs)
           (spells cells)
           (spells condition)
-          (spells parameter)
+          (srfi :39 parameters)
           (spells ports)
           (spells testing restart))
 

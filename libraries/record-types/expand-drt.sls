@@ -6,7 +6,7 @@
   (import (rnrs)
           (only (srfi :1 lists) append-map)
           (srfi :8 receive)
-          (spells parameter))
+          (srfi :39 parameters))
 
 ;;;;;; Alternative record type definition macro
 

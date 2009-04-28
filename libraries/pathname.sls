@@ -67,7 +67,7 @@
           (srfi :14 char-sets)
           (spells record-types)
           (spells opt-args)
-          (spells parameter)
+          (srfi :39 parameters)
           (spells operations)
           (spells match)
           (spells tracing)
