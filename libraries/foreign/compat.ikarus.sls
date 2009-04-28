@@ -129,6 +129,8 @@
         ((uint) 'unsigned-int)
         ((long) 'signed-long)
         ((ulong) 'unsigned-long)
+        ((llong) 'signed-long-long)
+        ((ulong) 'unsigned-long-long)
         ((float) 'float)
         ((double) 'double)
         ((pointer) 'pointer)
