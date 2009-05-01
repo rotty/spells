@@ -23,9 +23,10 @@
           pointer+
 
           (rename (spells:make-c-callout make-c-callout)
-                  (spells:make-c-callback make-c-callback))
+                  (spells:make-c-callback make-c-callback)
+                  (spells:memcpy memcpy))
 
-          malloc free memcpy memset
+          malloc free memset
 
           dlopen dlsym dlclose dlerror)
   (import (rnrs base)
@@ -163,24 +164,13 @@
           (or (and alias (primitive-set alias))
               (error 'make-pointer-c-setter "invalid type" sym)))))
 
-  (define memcpy
+  (define spells:memcpy
     (case-lambda
       ((p1 offset1 p2 offset2 count)
-       (cond ((and (pointer? p1) (bytevector? p2))
-              (do ((i offset1 (+ i 1))
-                   (j offset2 (+ j 1)))
-                  ((>= (- i offset1) count))
-                (pointer-set-c-char! p1 i (bytevector-u8-ref p2 j))))
-             ((and (bytevector? p1) (pointer? p2))
-              (do ((i offset1 (+ i 1))
-                   (j offset2 (+ j 1)))
-                  ((>= (- i offset1) count))
-                (bytevector-u8-set! p1 i (pointer-ref-c-unsigned-char p2 j))))
-             (else
-              (error 'memcpy "need pointer and bytevector" p1 p2)))
+       (memcpy p1 offset1 p2 offset2 count)
        p1)
       ((p1 p2 count)
-       (memcpy p1 0 p2 0 count))))
+       (spells:memcpy p1 0 p2 0 count))))
 
   (define (memset p v n)
     (do ((i 0 (+ i 1)))
