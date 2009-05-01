@@ -1,7 +1,8 @@
 #!r6rs
 (library (spells ports)
   (export copy-port
-
+          port->sexps
+          
           make-port-tracker
           port-tracker-port
           port-tracker-column
@@ -11,6 +12,7 @@
           (rnrs control)
           (rnrs bytevectors)
           (rnrs io ports)
+          (only (srfi :1) unfold)
           (srfi :9 records)
           (srfi :13 strings))
 
@@ -37,6 +39,9 @@
            (error 'copy-port
                   "provided ports must be both binary or both textual"
                   in-port out-port))))
+
+  (define (port->sexps port)
+    (unfold eof-object? values (lambda (seed) (get-datum port)) (get-datum port)))
 
   (define-record-type port-tracker
     (really-make-port-tracker %port %row %column)
