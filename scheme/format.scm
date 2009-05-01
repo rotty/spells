@@ -161,11 +161,11 @@
            ))
         (else
          (error
-          (format "FORMAT: ~F requires a number or a string, got ~s" number-or-string)))
+          (format #f "FORMAT: ~F requires a number or a string, got ~s" number-or-string)))
         ))
 
      (define documentation-string
-       "(format [<port>] <format-string> [<arg>...]) -- <port> is #t, #f or an output-port
+       "(format <port> <format-string> [<arg>...]) -- <port> is #t, #f or an output-port
 OPTION  [MNEMONIC]      DESCRIPTION     -- Implementation Assumes ASCII Text Encoding
 ~H      [Help]          output this text
 ~A      [Any]           (display arg) for humans
@@ -319,7 +319,7 @@ OPTION  [MNEMONIC]      DESCRIPTION     -- Implementation Assumes ASCII Text Enc
                                     )
                           (if (>= index length-of-format-string)
                               (error
-                               (format "FORMAT: improper numeric format directive in ~s" format-strg))
+                               (format #f "FORMAT: improper numeric format directive in ~s" format-strg))
                               (let ( (next-char (string-ref format-strg index)) )
                                 (cond
                                  ((char-numeric? next-char)
@@ -349,20 +349,20 @@ OPTION  [MNEMONIC]      DESCRIPTION     -- Implementation Assumes ASCII Text Enc
                                             d-digits
                                             #f)
                                       (error
-                                       (format "FORMAT: too many commas in directive ~s" format-strg)))
+                                       (format #f "FORMAT: too many commas in directive ~s" format-strg)))
                                   )
                                  (else
-                                  (error (format "FORMAT: ~~w.dF directive ill-formed in ~s" format-strg))))))
+                                  (error (format #f "FORMAT: ~~w.dF directive ill-formed in ~s" format-strg))))))
                           ))
                        ((#\? #\K) ; indirection -- take next arg as format string
                         (cond ;  and following arg as list of format args
                          ((< (length arglist) 2)
                           (error
-                           (format "FORMAT: less arguments than specified for ~~?: ~s" arglist))
+                           (format #f "FORMAT: less arguments than specified for ~~?: ~s" arglist))
                           )
                          ((not (string? (car arglist)))
                           (error
-                           (format "FORMAT: ~~? requires a string: ~s" (car arglist)))
+                           (format #f "FORMAT: ~~? requires a string: ~s" (car arglist)))
                           )
                          (else
                           (format-help (car arglist) (cadr arglist))
@@ -373,7 +373,8 @@ OPTION  [MNEMONIC]      DESCRIPTION     -- Implementation Assumes ASCII Text Enc
                         (anychar-dispatch (+ pos 1) arglist #t)
                         )
                        (else                
-                        (error (format "FORMAT: unknown tilde escape: ~s"
+                        (error (format #f
+                                       "FORMAT: unknown tilde escape: ~s"
                                        (string-ref format-strg pos))))
                        )))
                    ))                   ; end tilde-dispatch   
@@ -388,7 +389,7 @@ OPTION  [MNEMONIC]      DESCRIPTION     -- Implementation Assumes ASCII Text Enc
      (let ( (unused-args (format-help format-string args)) )
        (if (not (null? unused-args))
            (error
-            (format "FORMAT: unused arguments ~s" unused-args))))
+            (format #f "FORMAT: unused arguments ~s" unused-args))))
      )))
 
 ;;; format.scm ends here
