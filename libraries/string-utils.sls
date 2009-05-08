@@ -18,6 +18,7 @@
 
 (library (spells string-utils)
   (export string-split
+          string-escape
           string-substitute)
   (import (except (rnrs base) string-copy string-for-each string->list)
           (rnrs control)
@@ -92,6 +93,20 @@
            (else
             (split-by-charset str (->char-set splitter) maxsplit)))))
     )
+
+  (define string-escape
+    (case-lambda
+      ((s to-escape escape-char)
+       (let ((escaped-cs (char-set-adjoin (->char-set to-escape)
+                                          escape-char)))
+         (string-concatenate
+          (map (lambda (c)
+                 (if (char-set-contains? escaped-cs c)
+                     (string escape-char c)
+                     (string c)))
+               (string->list s)))))
+      ((s to-escape)
+       (string-escape s to-escape #\\))))
 
   ;;@ Simple template string substitution.
   ;;
