@@ -42,7 +42,7 @@
 
   (define-record-type promise
     (fields (mutable val)))
-  
+
   (define-syntax lazy
     (syntax-rules ()
       ((lazy exp)
@@ -59,12 +59,18 @@
     (let ((content (promise-val promise)))
       (case (car content)
         ((eager) (cdr content))
-        ((lazy)  (let* ((promise* ((cdr content)))        
-                        (content  (promise-val promise))) ; * 
+        ((lazy)  (let* ((promise* ((cdr content)))
+                        (content  (promise-val promise))) ; *
                    (if (not (eqv? (car content) 'eager)) ; *
                        (begin (set-car! content
                                         (car (promise-val promise*)))
                               (set-cdr! content
                                         (cdr (promise-val promise*)))
                               (promise-val-set! promise* content)))
-                   (force promise)))))))
+                   (force promise))))))
+
+  ;; (*) These two lines re-fetch and check the original promise in case
+  ;;     the first line of the let* caused it to be forced.  For an example
+  ;;     where this happens, see reentrancy test 3 below.
+
+  )

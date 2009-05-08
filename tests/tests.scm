@@ -20,6 +20,10 @@
   ;;("assert.scm" spells.assert)
   ;;("condition.scm" spells.condition)
   ("cut.scm" spells.cut)
+  ("lazy.scm"
+   (spells lazy)
+   (rnrs io ports))
+  
   ;;("file-attr.scm" spells.file spells.misc spells.namestring)
   ("pathname.scm" spells.pathname spells.misc)
   ("filesys.scm"
