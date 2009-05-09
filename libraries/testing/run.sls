@@ -34,6 +34,7 @@
           (spells filesys)
           (spells pathname)
           (spells condition)
+          (only (spells testing) with-test-verbosity)
           (spells testing run-env))
 
   ;;@ Run specified tests.
@@ -68,7 +69,7 @@
 
   (define (run-tests-in-file file env)
     (let ((filename (x->namestring file)))
-      (newline)
+      (display "\n;")
       (display (list "Loading " filename "... "))
       (newline)
       (receive results
@@ -79,6 +80,7 @@
                        (if (eof-object? form)
                            (eval `(let () ,@(reverse forms)) env)
                            (loop (cons form forms)))))))
+        (display ";")
         (display (list "..." filename "done"))
         (newline)
         (apply values results))))
@@ -91,7 +93,7 @@
             spec))))
 
   (define (construct-test-environment imports)
-    (guard (c (#t (display "(Error constructing environment: ")
+    (guard (c (#t (display ";#(Error constructing environment: ")
                   (newline)
                   (display-condition c)
                   (display ")")
@@ -130,14 +132,15 @@
                       (env (construct-test-environment pkgs)))
                  (when env
                    (parameterize ((test-environment env))
-                     (guard (c (#t (display
-                                    (list "Uncaught exception during tests: " c))
-                                   (newline)))
-                       (unless (null? code)
-                         (eval `(let () ,@code) env))
-                       (run-tests
-                        (list (pathname-with-file pathname fpath))
-                        env))))))))
+                     (guard (c (#t (display "Uncaught exception during tests:\n")
+                                   (display-condition c)))
+                       (with-test-verbosity 'quiet
+                         (lambda ()
+                           (unless (null? code)
+                             (eval `(let () ,@code) env))
+                           (run-tests
+                            (list (pathname-with-file pathname fpath))
+                            env))))))))))
            (cdr spec)))))
      test-spec))
 
