@@ -2,8 +2,23 @@
 
 ;;;; Testing Utility for Scheme
 
-;;; Copyright (c) 2007 Taylor R. Campbell
-;;; See the COPYING.BSD file for licence terms.
+;;; Copyright (C) 2007, 2009 Taylor R. Campbell.
+;;;
+;;; This file is part of TRC-Testing.
+;;;
+;;; TRC-Testing is free software: you can redistribute it and/or modify
+;;; it under the terms of the GNU Lesser General Public License as
+;;; published by the Free Software Foundation, either version 3 of the
+;;; License, or (at your option) any later version.
+;;;
+;;; TRC-Testing is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;;; Lesser General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU Lesser General Public
+;;; License along with TRC-Testing.  If not, see
+;;; <http://www.gnu.org/licenses/>.
 
 ;;; Parameters:
 ;;;
@@ -70,18 +85,18 @@
 (define (run-test test)
   (cond ((test-case? test) (run-test-case test))
         ((test-suite? test) (run-test-suite test))
-        (else (error "invalid test:" test))))
+        (else (error "Invalid test:" test))))
 
 (define (find-test suite name)
   (let loop ((tests (test-suite/tests suite)))
     (cond ((not (pair? tests))
-           (error "no such test by name in suite:" name suite))
+           (error "No such test by name in suite:" name suite))
           ((eqv? name (caar tests))
            (cdar tests))
           (else
            (loop (cdr tests))))))
 
-;;;; test macros
+;;;; Test Macros
 
 (define-syntax test-predicate
   (syntax-rules ()
@@ -143,12 +158,12 @@
   (syntax-rules ()
     ((define-test-case test-suite name test-case)
      (define-values () ; Make this expand into a definition
-       (add-test! test-suite 'name test-case)))
+       (add-test! test-suite `name test-case)))
     ((define-test-case test-suite test-case-name (option ...) test ...)
-     (define-test-case test-suite test-case-name
-       (test-case test-case-name (option ...)
-         test
-         ...)))))
+     (define-values () ; ditto
+       (let ((name `test-case-name))
+         (add-test! test-suite name
+                    (test-case ,name (option ...) test ...)))))))
 
 (define-syntax test-case
   (syntax-rules ()
@@ -181,7 +196,7 @@
                  (test ...)
                  (setup-body0 setup-body1 ...)
                  (teardown-body0 teardown-body1 ...))
-     (make-test-case 'name
+     (make-test-case `name
                      'description
                      (lambda ()
                        (values (lambda () setup-body0 setup-body1 ...)
