@@ -40,7 +40,7 @@
   (define (queue-remove Q) ; queue -> (values queue elm)
     (cond
      ((and (null? (queue-front Q)) (null? (queue-back Q)))
-      (error "remove: The queue is empty"))
+      (error 'queue-remove "The queue is empty"))
      ((null? (queue-front Q))
       (queue-remove (make-queue (reverse (queue-back Q)) '())))
      (else
@@ -51,7 +51,7 @@
   (define (queue-first Q) ; queue -> element
     (cond
      ((queue-empty? Q)
-      (error "first: The queue is empty"))
+      (error 'queue-first "The queue is empty"))
      ((null? (queue-front Q))
       (queue-first (make-queue (reverse (queue-back Q)) '())))
      (else
