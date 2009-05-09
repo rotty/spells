@@ -1,8 +1,0 @@
-configure
-^Makefile$
-^Makefile\.in$
-^aclocal\.m4$
-^config\.(log|status)$
-^autom4te\.cache$
-^libraries/foreign/config\.sls$
-.*~$
