@@ -33,7 +33,7 @@
           (spells record-types)
           (spells pathname)
           (prefix (only (core primitives)
-                        process*
+                        process-spawn
                         process
                         process-wait
                         system)
@@ -58,7 +58,7 @@
 
   (define (spawn-process env stdin stdout stderr prog . args)
     (destructuring-bind (pid p-in p-out p-err)
-                        (apply yp:process* #f env stdin stdout stderr
+                        (apply yp:process-spawn #f env stdin stdout stderr
                                (x->strlist 'spawn-process (cons prog args)))
       (make-process pid p-in p-out p-err)))
 
