@@ -15,14 +15,17 @@
 (define (pathname-set=? s1 s2)
   (lset= pathname=? s1 s2))
 
+(define (assert-clear-stage)
+  (when (file-exists? test-dir)
+    (test-failure "working stage not clear"  test-dir)))
+
 (define-test-suite filesys-tests
   "Filesystem interface")
 
 (define-test-case filesys-tests file-ops
   ((description "File operations")
    (setup
-    (when (file-exists? test-dir)
-      (test-failure "working stage not clear"  test-dir))
+    (assert-clear-stage)
     (create-directory test-dir)
     (for-each create-test-file '("a" "b" "c" "foo.scm")))
    (teardown
@@ -55,6 +58,21 @@
                                  (raise 'exception)))))
              (r2 (call-with-input-file outfile-name read)))
         (list r1 r2)))))
+
+(define-test-case filesys-tests create-directory* 
+  ((description "create-directory*")
+   (setup
+    (assert-clear-stage))
+   (teardown
+    (for-each delete-test-file '((("foo" "bar" "baz"))
+                                 (("foo" "bar"))
+                                 "foo"
+                                 (())))))
+  (let ((dir (test-file '(("foo" "bar" "baz")))))
+    (test-eqv #f (file-exists? dir))
+    (create-directory* dir)
+    (test-eqv #t (file-exists? dir))
+    (test-eqv #t (file-directory? dir))))
 
 (define-test-case filesys-tests find-file ()
   (test-equal #f (find-file ".abracadabra.khgafd" (library-search-paths)))

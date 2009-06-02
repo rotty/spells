@@ -281,7 +281,7 @@
                    (or (pathname-directory pathname) directory)
                    (or (pathname-file pathname) file))))
 
-;; Return a pathname by merging PATHNAME with DEFAULTS-PATHNAME.
+;;@ Return a pathname by merging @1 with @2.
 (define (merge-pathnames pathname defaults-pathname)
   (let* ((pathname (x->pathname pathname))
          (defaults-pathname (x->pathname defaults-pathname))
@@ -291,13 +291,13 @@
          (directory-default (pathname-directory defaults-pathname))
          (file (merge-files (pathname-file pathname)
                             (pathname-file defaults-pathname))))
-    (if origin
-        (make-pathname origin directory file)
+    (if (null? origin)
         (make-pathname origin-default
-                       (cond ((not directory) directory-default)
-                             ((not directory-default) directory)
+                       (cond ((null? directory) directory-default)
+                             ((null? directory-default) directory)
                              (else (append directory-default directory)))
-                       file))))
+                       file)
+        (make-pathname origin directory file))))
 
 ;;@ Return a file by merging @1 with @2.
 (define (merge-files file defaults-file)

@@ -57,6 +57,10 @@
   (test-pn= (x->pathname '(("foo" "bar" "baz")))
     (pathname-as-directory '(("foo" "bar") "baz"))))
 
+(define-test-case pathname-tests.ops merge ()
+  (test-pn= (x->pathname '(/ ("foo" "bar" "baz") #f))
+    (merge-pathnames '(("baz")) '(/ ("foo" "bar") #f))))
+
 (define-test-case pathname-tests.ops join ()
   (test-pn= (x->pathname '(("foo" "bar") "baz"))
     (pathname-join '(("foo" "bar") "file") '(() "baz")))
