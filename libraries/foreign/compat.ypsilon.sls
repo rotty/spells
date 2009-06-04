@@ -157,6 +157,8 @@
         ((uint)    'unsigned-int)
         ((long)    'long)
         ((ulong)   'unsigned-long)
+        ((llong)   'int64_t)
+        ((ullong)  'uint64_t)
         ((float)   'float)
         ((double)  'double)
         ((pointer) 'void*)
