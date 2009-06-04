@@ -131,7 +131,7 @@
         ((long) 'signed-long)
         ((ulong) 'unsigned-long)
         ((llong) 'signed-long-long)
-        ((ulong) 'unsigned-long-long)
+        ((ullong) 'unsigned-long-long)
         ((float) 'float)
         ((double) 'double)
         ((pointer) 'pointer)
