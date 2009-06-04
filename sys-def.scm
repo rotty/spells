@@ -4,7 +4,6 @@
 (define-system spells
 
   (r6rs-libs "libraries")
-  (extra-dist "configure")
 
   (conjure
    (import (rnrs)
