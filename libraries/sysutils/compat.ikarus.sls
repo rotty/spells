@@ -1,9 +1,8 @@
 ;;@ Miscellaneous procedures providing access to various bits of
 ;; information regarding the host running the scheme implementation.
-(library (spells sysutils)
+(library (spells sysutils compat)
   (export lookup-environment-variable
           current-process-environment
-          extend-process-environment
           find-exec-path
           host-info)
   (import (rnrs base)
@@ -13,16 +12,14 @@
           (only (srfi :13 strings) string-tokenize string-index)
           (only (srfi :14 char-sets) char-set-complement char-set)
           (prefix  (only (ikarus)
-                         getenv host-info)
+                         environ
+                         getenv
+                         host-info)
                    ik:))
 
   (define lookup-environment-variable ik:getenv)
 
-  (define (extend-process-environment alist)
-    (error 'extend-process-environment "not implemented on ikarus"))
-
-  (define (current-process-environment)
-    (error 'current-process-environment "not implemented on ikarus"))
+  (define current-process-environment ik:environ)
 
   (define (find-exec-path prog)
     (let ((paths (string-split (ik:getenv "PATH") #\:)))

@@ -5,12 +5,14 @@
           current-process-environment
           extend-process-environment
           find-exec-path
-          os-name
-          os-node-name
-          os-release-name
-          os-version-name
-          machine-name)
-  (import (rnrs base))
+          host-info)
+  (import (rnrs base)
+          (rnrs lists)
+          (spells sysutils compat))
 
-  ;; copy this template to sysutils.<implementation>.sls and fill it out
+  (define (extend-process-environment env)
+    (let ((current-env (remp (lambda (x) (assoc (car x) env))
+                             (current-process-environment))))
+      (append env current-env)))
+
   )

@@ -1,5 +1,5 @@
-;; Copyright (C) 2005, 2007 Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2005, 2007 Jose Antonio Ortega Ruiz <jao@gnu.org>
 
 ;; Authors: Andreas Rottmann <a.rottmann@gmx.at>
 ;;          Jose Antonio Ortega Ruiz <jao@gnu.or>
@@ -15,7 +15,7 @@
 ;;; Code:
 #!r6rs
 
-(library (spells sysutils)
+(library (spells sysutils compat)
   (export lookup-environment-variable
           current-process-environment
           extend-process-environment
@@ -30,9 +30,6 @@
           (only (mzscheme) getenv system-type find-executable-path))
 
   (define lookup-environment-variable getenv)
-
-  (define (extend-process-environment alist)
-    (error "EXTEND-PROCESS-ENVIRONMENT not implemented on mzscheme"))
 
   (define (current-process-environment)
     (error "CURRENT-PROCESS-ENVIRONMENT not implemented on mzscheme"))

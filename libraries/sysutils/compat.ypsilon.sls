@@ -23,10 +23,9 @@
 ;;; Code:
 #!r6rs
 
-(library (spells sysutils)
+(library (spells sysutils compat)
   (export lookup-environment-variable
           current-process-environment
-          extend-process-environment
           find-exec-path
           host-info)
   (import (rnrs base)
@@ -51,8 +50,6 @@
   (define lookup-environment-variable getenv)
 
   (define current-process-environment process-environment->alist)
-
-  (define extend-process-environment (todo-proc 'extend-process-environment))
 
   (define (host-info)
     (let ((os (architecture-feature 'operating-system)))
