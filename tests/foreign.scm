@@ -18,7 +18,7 @@
 ;;; Code:
 
 ;; You will probably have to tweak this on a non-GNU/Linux system.
-(define *libc-path* "/lib/libc.so.6")
+(define *libc-path* "libc.so.6")
 
 (define N 1000)
 
@@ -77,14 +77,14 @@
       (test-equal #t (pointer? mem))
       (free mem))))
 
-;; (define-test-case foreign-tests.callouts strtoll ()
-;;   (let* ((libc (dlopen *libc-path*))
-;;          (strtoll ((make-c-callout 'llong '(pointer pointer int))
-;;                    (dlsym libc "stroll")))
-;;          (num-utf8z-ptr (string->utf8z-ptr "-8223372036854775807")))
-;;     (test-equal -8223372036854775807
-;;       (strtoll num-utf8z-ptr (null-pointer) 10))
-;;     (free num-utf8z-ptr)))
+(define-test-case foreign-tests.callouts strtoll ()
+  (let* ((libc (dlopen *libc-path*))
+         (strtoll ((make-c-callout 'llong '(pointer pointer int))
+                   (dlsym libc "strtoll")))
+         (num-utf8z-ptr (string->utf8z-ptr "-8223372036854775807")))
+    (test-equal -8223372036854775807
+      (strtoll num-utf8z-ptr (null-pointer) 10))
+    (free num-utf8z-ptr)))
 
 (define-test-case foreign-tests callback ()
   (let ((bsearch

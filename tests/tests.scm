@@ -48,4 +48,4 @@
   ("logging.scm" spells.logging rnrs.lists)
   ("process.scm" spells.process srfi.:8.receive srfi.:13.strings rnrs.io.ports)
   ;;("sysutils.scm" spells.sysutils srfi.:1.lists rnrs.lists)
-  ("foreign.scm" spells.foreign)))
+  ("foreign.scm" spells.foreign spells.misc spells.filesys)))
