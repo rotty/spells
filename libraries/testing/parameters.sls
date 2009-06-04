@@ -29,9 +29,9 @@
     test-debug-errors?  with-test-debug-errors? set-test-debug-errors?!
     )
   (import (rnrs)
+          (srfi :39 parameters)
           (spells cells)
           (spells condition)
-          (srfi :39 parameters)
           (spells ports)
           (spells testing restart))
 
@@ -231,7 +231,7 @@
 
   (define (handle-test-failure index condition propagate)
     (if (or (test-failure? condition)
-            (and (error? condition)
+            (and (serious-condition? condition)
                  (not (test-debug-errors?))))
         (begin
           (report-test-failure index condition)

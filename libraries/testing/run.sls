@@ -31,6 +31,7 @@
           (srfi :8 receive)
           (spells misc)
           (srfi :39 parameters)
+          (spells match)
           (spells filesys)
           (spells pathname)
           (spells condition)
@@ -111,8 +112,8 @@
   ;;
   ;; <test spec> -> (<clause> ...)
   ;; <clause> -> (files (<file spec> <required library>) ...)
-  ;; <code> -> <filename>
-  ;;           (code <scheme expr> ...) <filename>
+  ;; <file spec> -> <filename>
+  ;;                (code <scheme expr> ...) <filename>
   (define (eval-test-spec pathname test-spec tests)
     (for-each
      (lambda (spec)
@@ -120,30 +121,31 @@
          ((files)
           (for-each
            (lambda (clause)
-             (cond
-              ((or (null? tests) (member (car clause) tests))
-               ;; FIXME: This is a mess. Use a pattern matcher.
-               (let* ((head (car clause))
-                      (code-there? (and (list? head) (eq? 'code (car head))))
-                      (code (if code-there? (cdr head) '()))
-                      (fpath (if code-there? (cadr clause) head))
-                      (pkgs (map package-name->import-spec
-                                 ((if code-there? cddr cdr) clause)))
-                      (env (construct-test-environment pkgs)))
-                 (when env
-                   (parameterize ((test-environment env))
-                     (guard (c (#t (display "Uncaught exception during tests:\n")
-                                   (display-condition c)))
-                       (with-test-verbosity 'quiet
-                         (lambda ()
-                           (unless (null? code)
-                             (eval `(let () ,@code) env))
-                           (run-tests
-                            (list (pathname-with-file pathname fpath))
-                            env))))))))))
+             (eval-test-clause clause pathname tests))
            (cdr spec)))))
      test-spec))
 
+
+  (define (eval-test-clause clause pathname tests)
+    (define (run-test code filename pkgs)
+      (when (or (null? tests) (member filename tests))
+        (let ((env (construct-test-environment
+                    (map package-name->import-spec pkgs))))
+          (when env
+            (parameterize ((test-environment env))
+              (with-test-verbosity 'quiet
+                (lambda ()
+                  (unless (null? code)
+                    (eval `(let () ,@code) env))
+                  (run-tests
+                   (list (pathname-with-file pathname filename))
+                   env))))))))
+    (match clause
+      ((('code . code) filename . pkgs)
+       (run-test code filename pkgs))
+      ((filename . pkgs)
+       (run-test '() filename pkgs))))
+  
   (define (main args)
     (for-each (lambda (tests-file)
                 (call-with-input-file tests-file
@@ -154,3 +156,7 @@
                           ((this-directory (directory-namestring pathname)))
                         (eval-test-spec pathname test-spec '()))))))
               (cdr args))))
+
+;; Local Variables:
+;; scheme-indent-styles: ((match 1) (parameterize 1))
+;; End:
