@@ -23,7 +23,9 @@
   ("lazy.scm"
    (spells lazy)
    (rnrs io ports))
-  
+  ("record-types.scm"
+   (spells record-types)
+   (srfi :8 receive))
   ;;("file-attr.scm" spells.file spells.misc spells.namestring)
   ("pathname.scm" spells.pathname spells.misc)
   ("filesys.scm"

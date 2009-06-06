@@ -12,13 +12,6 @@
 
 ;;; Commentary:
 
-;; This file is a kludge, as it uses define-macro, but that's way
-;; easier than rewriting Riastradh's define-record-type* expander
-;; (which is implemented as an explicit-renaming macro) to use
-;; syntax-case. In practice, the unhygiene should not be much of
-;; problem as define-record-type* will probably only be used at the
-;; top-level.
-
 ;;; Code:
 #!r6rs
 
@@ -36,31 +29,11 @@
           (spells define-values)
           (for (spells record-types expand-drt) expand))
 
-  (define-syntax define-macro
-    (lambda (stx)
-      (syntax-case stx ()
-        ((_ (macro . args) . body)
-         (syntax (define-macro macro (lambda args . body))))
-        ((_ macro transformer)
-         (syntax
-          (define-syntax macro
-            (lambda (stx2)
-              (let ((v (syntax->datum stx2)))
-                (datum->syntax
-                 ;; we need the *identifier* of the macro call
-                 ;; (there is probably a smarter way of extracting that ...)
-                 (syntax-case stx2 () ((name . more) (syntax name)))
-                 (apply transformer (cdr v)))))))))))
+  (define-syntax define-record-type*
+    expand-define-record-type*)
 
-  (define-macro (define-record-type* . forms)
-    (expand-define-record-type* (cons 'define-record-type* forms)
-                                (lambda (x) x)
-                                eq?))
-
-  (define-macro (define-functional-fields . forms)
-    (expand-define-functional-fields (cons 'define-record-type* forms)
-                                     (lambda (x) x)
-                                     eq?))
+  (define-syntax define-functional-fields
+    expand-define-functional-fields)
 
   ;; How to implement this?
   (define-syntax define-record-discloser

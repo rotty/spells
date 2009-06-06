@@ -1,47 +1,61 @@
+;;; expand-drt.sls --- Macro expanders for `define-record-type*'
+
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+
+;; R6RS syntax-case port of Taylor Campbell's Public
+;; Domain `define-record-type*' macro expander.
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
 #!r6rs
 
 (library (spells record-types expand-drt)
   (export expand-define-record-type*
           expand-define-functional-fields)
-  (import (rnrs)
+  (import (rnrs base)
+          (rnrs syntax-case)
           (only (srfi :1 lists) append-map)
           (srfi :8 receive)
-          (srfi :39 parameters))
+          (srfi :9 records)
+          (srfi :39 parameters)
+          (spells syntax-utils))
 
-;;;;;; Alternative record type definition macro
-
-;;; This code is written by Taylor Campbell and placed in the Public
-;;; Domain.  All warranties are disclaimed.
-
-(define (expand-define-record-type* form rename compare)
+(define (expand-define-record-type* stx)
   ((call-with-current-continuation
     (lambda (lose)
       (lambda ()
         (parameterize (($lose (lambda (message subform)
                                 (lose
                                  (lambda ()
-                                   (syntax-violation message form subform))))))
-          (let ((type-name (cadr form))
-                (conser-name (caaddr form))
-                (conser-args (cdaddr form))
-                (other-fields (cadddr form)))
-            (receive (needs-conser-layer? arg-tags vars inits)
-                (compute-vars+inits conser-args other-fields)
-              (let ((real-conser
-                     (if needs-conser-layer?
-                         (rename (symbol-append '% conser-name))
-                         conser-name)))
-                `(,(rename 'begin)
-                  (,(rename 'define-record-type) ,type-name
-                   (,real-conser ,@arg-tags)
-                   ,(symbol-append type-name '?)
-                   ,@(generate-field-specs conser-args
-                                           other-fields
-                                           type-name))
-                  ,@(if needs-conser-layer?
-                        `((,(rename 'define) (,conser-name ,@vars)
-                           (,real-conser ,@inits)))
-                        '())))))))))))
+                                   (syntax-violation message stx subform))))))
+          (syntax-case stx ()
+            ((k type-name (conser-name conser-args ...) (other-fields ...))
+             (receive (needs-conser-layer? arg-tags vars inits)
+                      (compute-vars+inits #'(conser-args ...)
+                                          #'(other-fields ...))
+               (with-syntax ((real-conser
+                              (if needs-conser-layer?
+                                  (identifier-append #'k '% #'conser-name)
+                                  #'conser-name)))
+                 #`(begin
+                     (define-record-type type-name
+                       (real-conser #,@arg-tags)
+                       #,(identifier-append #'k #'type-name '?)
+                       #,@(generate-field-specs #'k
+                                                #'(conser-args ...)
+                                                #'(other-fields ...)
+                                                #'type-name))
+                     #,@(if needs-conser-layer?
+                            #`((define (conser-name #,@vars)
+                                 (real-conser #,@inits)))
+                            #'()))))))))))))
 
 (define $lose (make-parameter #f))
 (define (lose msg subform) (($lose) msg subform))
@@ -49,12 +63,10 @@
 (define (compute-vars+inits conser-args other-fields)
   (let ((vars (reverse-map
                (lambda (x)
-                 (cond ((symbol? x) x)
-                       ((and (pair? x)
-                             (symbol? (car x))
-                             (null? (cdr x)))
-                        (car x))
-                       (else (lose "invalid maker argument specifier" x))))
+                 (syntax-case x ()
+                   ((var) (identifier? #'var) #'var)
+                   (var (identifier? #'var) #'var)
+                   (_ (lose "invalid maker argument specifier" x))))
                conser-args)))
     (let loop ((fields other-fields)
                (needs-conser-layer? #f)
@@ -66,21 +78,21 @@
                   (reverse vars)
                   (reverse inits))
           (let ((field (car fields)))
-            (cond ((symbol? field)
-                   (loop (cdr fields)
-                         needs-conser-layer?
-                         arg-tags
-                         inits))
-                  ((and (pair? field)
-                        (symbol? (car field))
-                        (pair? (cdr field))
-                        (null? (cddr field)))
-                   (loop (cdr fields)
+            (syntax-case field ()
+              (id
+               (identifier? #'id)
+               (loop (cdr fields)
+                     needs-conser-layer?
+                     arg-tags
+                     inits))
+              ((id init)
+               (identifier? #'id)
+               (loop (cdr fields)
                          #t
-                         (cons (car field) arg-tags)
-                         (cons (cadr field) inits)))
-                  (else
-                   (lose "invalid field specifier" field))))))))
+                         (cons #'id arg-tags)
+                         (cons #'init inits)))
+              (_
+               (lose "invalid field specifier" field))))))))
 
 (define (reverse-map proc list)
   (let loop ((list list) (tail '()))
@@ -88,72 +100,77 @@
         tail
         (loop (cdr list) (cons (proc (car list)) tail)))))
 
-(define (generate-field-specs conser-args other-fields type-name)
+(define (generate-field-specs k conser-args other-fields type-name)
   (append (map (lambda (x)
                  (receive (tag set?)
-                          (if (pair? x)
-                              (values (car x) #t)
-                              (values x #f))
-                   `(,tag ,(make-field-accessor type-name
-                                                tag)
-                          ,@(if set?
-                                (list (make-field-setter
-                                       type-name
-                                       tag))
-                                '()))))
+                          (syntax-case x ()
+                            ((tag init) (values #'tag #t))
+                            (tag        (values #'tag #f)))
+                   (with-syntax ((tag tag))
+                     #`(tag #,(make-field-accessor k
+                                                   type-name
+                                                   #'tag)
+                            #,@(if set?
+                                   (list (make-field-setter
+                                          k
+                                          type-name
+                                          #'tag))
+                                   '())))))
                conser-args)
           (map (lambda (x)
-                 (let ((tag (if (pair? x) (car x) x)))
-                   `(,tag ,(make-field-accessor type-name tag)
-                          ,(make-field-setter   type-name tag))))
+                 (with-syntax ((tag (syntax-case x ()
+                                      ((tag init) #'tag)
+                                      (tag        #'tag))))
+                   #`(tag #,(make-field-accessor k type-name #'tag)
+                          #,(make-field-setter   k type-name #'tag))))
                other-fields)))
 
-(define (make-field-accessor type-name tag)
-  (symbol-append type-name '- tag))
+(define (make-field-accessor k type-name tag)
+  (identifier-append k type-name '- tag))
 
-(define (make-field-setter type-name tag)
-  (symbol-append 'set- type-name '- tag '!))
+(define (make-field-setter k type-name tag)
+  (identifier-append k 'set- type-name '- tag '!))
 
-(define (make-field-modifier type-name tag)
-  (symbol-append type-name "-modify-" tag))
+(define (make-field-modifier k type-name tag)
+  (identifier-append k type-name "-modify-" tag))
 
-(define (make-field-replacer type-name tag)
-  (symbol-append type-name "-with-" tag))
+(define (make-field-replacer k type-name tag)
+  (identifier-append k type-name "-with-" tag))
 
-(define (make-field-default type-name tag)
-  (symbol-append type-name "-default-" tag))
+(define (make-field-default k type-name tag)
+  (identifier-append k type-name "-default-" tag))
 
-(define (symbol-append . symbols)
-  (string->symbol (apply string-append
-                         (map (lambda (x)
-                                (cond ((string? x) x)
-                                      (else (symbol->string x))))
-                              symbols))))
-
-(define (expand-define-functional-fields form r compare)
-  (let ((type-name (cadr form))
-        (fields (cddr form)))
-    (let ((obj (r 'obj))
-          (value (r 'value))
-          (modifier (r 'modifier))
-          (unconser (symbol-append type-name "-components"))
-          (conser (symbol-append "make-" type-name)))
-      `(,(r 'begin)
-        (,(r 'define) (,unconser ,obj)
-         (,(r 'values) ,@(map (lambda (f)
-                                `(,(make-field-accessor type-name f) ,obj))
-                              fields)))
-        ,@(append-map
-           (lambda (field)
-             `((,(r 'define) (,(make-field-replacer type-name field) ,obj ,value)
-                (,(r 'receive) ,fields (,unconser ,obj)
-                 (,conser ,@(map (lambda (f) (if (eq? f field) value f)) fields))))
-               (,(r 'define) (,(make-field-modifier type-name field) ,obj ,modifier)
-                (,(make-field-replacer type-name field)
-                 ,obj (,modifier (,(make-field-accessor type-name field) ,obj))))
-               (,(r 'define) (,(make-field-default type-name field) ,obj ,value)
-                (,(make-field-modifier type-name field) ,obj (,(r 'lambda) (v)
-                                                              (,(r 'or) v ,value))))))
-           fields)))))
+(define (expand-define-functional-fields stx)
+  (syntax-case stx ()
+    ((k type-name fields ...)
+     (with-syntax ((unconser (identifier-append #'k #'type-name "-components"))
+                   (conser (identifier-append #'k "make-" #'type-name)))
+       #`(begin
+           (define (unconser obj)
+             (values #,@(map (lambda (f)
+                               #`(#,(make-field-accessor #'k #'type-name f) obj))
+                             #'(fields ...))))
+           #,@(append-map
+               (lambda (field)
+                 (list
+                  #`(define (#,(make-field-replacer #'k #'type-name field)
+                             obj value)
+                      (receive (fields ...) (unconser obj)
+                        (conser #,@(map (lambda (f)
+                                          (if (free-identifier=? f field)
+                                              #'value
+                                              f))
+                                        #'(fields ...)))))
+                  #`(define (#,(make-field-modifier #'k #'type-name field)
+                             obj modifier)
+                      (#,(make-field-replacer #'k #'type-name field)
+                       obj (modifier (#,(make-field-accessor #'k #'type-name field)
+                                      obj))))
+                  #`(define (#,(make-field-default #'k #'type-name field)
+                             obj value)
+                      (#,(make-field-modifier #'k #'type-name field)
+                       obj (lambda (v)
+                             (or v value))))))
+               #'(fields ...)))))))
 
 )
