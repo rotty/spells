@@ -66,7 +66,8 @@
     (yp:create-hard-link (x->f old-pathname) (x->f new-pathname)))
 
   (define (delete-file pathname)
-    (rnrs:delete-file (x->f pathname)))
+    (if (file-exists? pathname)
+        (yp:delete-file (x->f pathname))))
 
   (define (rename-file source-pathname target-pathname)
     (yp:rename-file (x->f source-pathname) (x->f target-pathname)))
