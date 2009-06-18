@@ -17,11 +17,16 @@
 ;;@ Converts an ASCII code (integer) into the corresponding
 ;;  character.
 (define (ascii->char n)
+  (unless (< -1 n ascii-limit)
+    (error 'ascii->char "number outside of ASCII range" n))
   (integer->char n))
 
 ;;@ Converts the character @1 into the corresponding ASCII code.
 (define (char->ascii c)
-  (char->integer c))
+  (let ((n (char->integer c)))
+    (unless (< -1 n ascii-limit)
+      (error 'char->ascii "non-ASCII character" c))
+    n))
 
 (define ascii-limit 128)
 

@@ -7,6 +7,7 @@
           ascii-upper? ascii-lower?
           ascii-uppercase ascii-lowercase)
   (import (rnrs base)
+          (rnrs control)
           (spells include))
 
   (include-file ((spells scheme) ascii)))
