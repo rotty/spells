@@ -13,7 +13,7 @@
 ;;; Commentary:
 
 ;; This file is intended to be processed by conjure's configure
-;; mechanism, substituting the #!@(...) placeholders.
+;; mechanism, substituting the placeholders.
 
 ;;; Code:
 #!r6rs
