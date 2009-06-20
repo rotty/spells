@@ -40,6 +40,8 @@
           library-search-paths)
   (import (rnrs base)
           (rnrs conditions)
+          (rnrs exceptions)
+          (rnrs io ports)
           (srfi :8 receive)
           (spells pathname)
           (spells time-lib)
@@ -54,10 +56,11 @@
   (ik:make-directory (x->f pathname)))
 
 (define (delete-file pathname)
-  (if (file-exists? pathname)
-      (if (file-directory? pathname)
-          (ik:delete-directory (x->f pathname))
-          (ik:delete-file (x->f pathname)))))
+  (let ((fname (x->f pathname)))
+    (if (ik:file-exists? fname)
+        (if (ik:file-directory? fname)
+            (ik:delete-directory fname)
+            (ik:delete-file fname)))))
 
 (define (rename-file source-pathname target-pathname)
   (ik:rename-file (x->f source-pathname) (x->f target-pathname)))
@@ -77,12 +80,24 @@
 (define (file-directory? pathname)
   (ik:file-directory? (x->f pathname)))
 
-(define (file-readable? pathname)
-  (ik:file-readable? (x->f pathname)))
-(define (file-writable? pathname)
-  (ik:file-writable? (x->f pathname)))
-(define (file-executable? pathname)
-  (ik:file-executable? (x->f pathname)))
+(define (make-file-check pred who)
+  (lambda (pathname)
+    (let ((fname (x->f pathname)))
+      (if (ik:file-exists? fname)
+          (pred fname)
+          (raise (condition
+                  (make-error)
+                  (make-who-condition who)
+                  (make-i/o-file-does-not-exist-error fname)))))))
+
+(define-syntax define-file-check
+  (syntax-rules ()
+    ((_ id pred)
+     (define id (make-file-check pred 'id)))))
+
+(define-file-check file-readable? ik:file-readable?)
+(define-file-check file-writable? ik:file-writable?)
+(define-file-check file-executable? ik:file-executable?)
 
 (define (file-modification-time pathname)
   (let ((nsecs (ik:file-mtime (x->f pathname))))

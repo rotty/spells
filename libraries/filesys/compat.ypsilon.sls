@@ -40,6 +40,9 @@
 
           library-search-paths)
   (import (rnrs base)
+          (rnrs conditions)
+          (rnrs exceptions)
+          (rnrs io ports)
           (prefix (rnrs files) rnrs:)
           (srfi :8 receive)
           (spells pathname)
@@ -48,10 +51,6 @@
           (prefix (core primitives) yp:))
 
   (define x->f x->namestring)
-
-  (define (todo-proc who)
-    (lambda args
-      (error who "please implement me!")))
 
   (define (file-exists? pathname)
     (rnrs:file-exists? (x->f pathname)))
@@ -66,8 +65,9 @@
     (yp:create-hard-link (x->f old-pathname) (x->f new-pathname)))
 
   (define (delete-file pathname)
-    (if (file-exists? pathname)
-        (yp:delete-file (x->f pathname))))
+    (let ((fname (x->f pathname)))
+      (if (rnrs:file-exists? fname)
+          (yp:delete-file fname))))
 
   (define (rename-file source-pathname target-pathname)
     (yp:rename-file (x->f source-pathname) (x->f target-pathname)))
@@ -79,14 +79,24 @@
   (define (file-symbolic-link? pathname)
     (yp:file-symbolic-link? (x->f pathname)))
 
-  (define (file-readable? pathname)
-    (yp:file-readable? (x->f pathname)))
+  (define (make-file-check pred who)
+    (lambda (pathname)
+      (let ((fname (x->f pathname)))
+        (if (rnrs:file-exists? fname)
+            (pred fname)
+            (raise (condition
+                    (make-error)
+                    (make-who-condition who)
+                    (make-i/o-file-does-not-exist-error fname)))))))
 
-  (define (file-writable? pathname)
-    (yp:file-writable? (x->f pathname)))
-
-  (define (file-executable? pathname)
-    (yp:file-executable? (x->f pathname)))
+  (define-syntax define-file-check
+    (syntax-rules ()
+      ((_ id pred)
+       (define id (make-file-check pred 'id)))))
+  
+  (define-file-check file-readable? yp:file-readable?)
+  (define-file-check file-writable? yp:file-writable?)
+  (define-file-check file-executable? yp:file-executable?)
 
   (define (file-modification-time pathname)
     (let ((nsecs (yp:file-stat-mtime (x->f pathname))))

@@ -19,6 +19,10 @@
   (when (file-exists? test-dir)
     (test-failure "working stage not clear"  test-dir)))
 
+(define (with-i/o-condition-symbols thunk)
+  (guard (c ((i/o-file-does-not-exist-error? c) 'file-does-not-exist))
+    (thunk)))
+
 (define-test-suite filesys-tests
   "Filesystem interface")
 
@@ -59,6 +63,48 @@
              (r2 (call-with-input-file outfile-name read)))
         (list r1 r2)))))
 
+(define-test-case filesys-tests delete
+  ((setup
+    (assert-clear-stage)
+    (create-directory test-dir))
+   (teardown
+    (delete-file test-dir)))
+  
+  (test-eqv #t
+    (begin
+      (delete-file (test-file "not-there"))
+      #t)))
+
+(define-test-case filesys-tests file-checks
+  ((setup
+    (assert-clear-stage)
+    (create-directory test-dir)
+    (for-each create-test-file '("a")))
+   (teardown
+    (for-each delete-test-file '("a"))
+    (delete-file test-dir)))
+
+  (test-eqv #t (file-exists? (test-file "a")))
+  (test-eqv #f (file-exists? (test-file "b")))
+  (test-eqv #t (file-regular? (test-file "a")))
+  (test-eqv #f (file-regular? test-dir))
+
+  (for-each
+   (lambda (pred)
+     (test-eqv #f (pred (test-file "not-there"))))
+   (list file-regular?
+         file-directory?
+         file-symbolic-link?))
+  
+  (for-each
+   (lambda (pred)
+     (test-eq 'file-does-not-exist
+       (with-i/o-condition-symbols
+         (lambda () (pred (test-file "not-there"))))))
+   (list file-readable?
+         file-writable?
+         file-executable?)))
+
 (define-test-case filesys-tests create-directory* 
   ((description "create-directory*")
    (setup
@@ -81,3 +127,7 @@
                        (else #f))))
 
 (run-test-suite filesys-tests)
+
+;; Local Variables:
+;; scheme-indent-styles: (trc-testing)
+;; End:
