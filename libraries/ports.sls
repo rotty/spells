@@ -16,29 +16,35 @@
           (srfi :9 records)
           (srfi :13 strings))
 
-  (define (copy-port in-port out-port)
-    (cond ((and (binary-port? in-port)
-                (binary-port? out-port))
-           (let* ((buf-size 4000)
-                  (buffer (make-bytevector buf-size 0)))
-             (let loop ()
-               (let ((n (get-bytevector-n! in-port buffer 0 buf-size)))
-                 (cond ((not (eof-object? n))
-                        (put-bytevector out-port buffer 0 n)
-                        (loop)))))))
-          ((and (textual-port? in-port)
-                (textual-port? out-port))
-           (let* ((buf-size 4000)
-                  (buffer (make-string buf-size)))
-             (let loop ()
-               (let ((n (get-string-n! in-port buffer 0 buf-size)))
-                 (cond ((not (eof-object? n))
-                        (put-string out-port buffer 0 n)
-                        (loop)))))))
-          (else
-           (error 'copy-port
-                  "provided ports must be both binary or both textual"
-                  in-port out-port))))
+  (define copy-port
+    (case-lambda
+      ((in-port out-port buffer-size thunk)
+       (cond ((and (binary-port? in-port)
+                   (binary-port? out-port))
+              (let ((buffer (make-bytevector buffer-size 0)))
+                (let loop ()
+                  (let ((n (get-bytevector-n! in-port buffer 0 buffer-size)))
+                    (cond ((not (eof-object? n))
+                           (put-bytevector out-port buffer 0 n)
+                           (thunk)
+                           (loop)))))))
+             ((and (textual-port? in-port)
+                   (textual-port? out-port))
+              (let ((buffer (make-string buffer-size)))
+                (let loop ()
+                  (let ((n (get-string-n! in-port buffer 0 buffer-size)))
+                    (cond ((not (eof-object? n))
+                           (put-string out-port buffer 0 n)
+                           (thunk)
+                           (loop)))))))
+             (else
+              (error 'copy-port
+                     "provided ports must be both binary or both textual"
+                     in-port out-port))))
+      ((in-port out-port buffer-size)
+       (copy-port in-port out-port buffer-size (lambda () #f)))
+      ((in-port out-port)
+       (copy-port in-port out-port 4000 (lambda () #f)))))
 
   (define (port->sexps port)
     (unfold eof-object? values (lambda (seed) (get-datum port)) (get-datum port)))
