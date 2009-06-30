@@ -25,6 +25,8 @@
           make-c-callout
           make-c-callback
 
+          errno
+
           malloc free memcpy memset
           
           dlopen dlsym dlclose dlerror)
@@ -234,6 +236,9 @@
     (lookup-shared-object lib str))
   
   (define dlclose (todo-proc 'dlclose))
+
+  (define (errno)
+    (shared-object-errno))
   
   (define (dlerror)
     *dlerror*)

@@ -28,6 +28,8 @@
 
           malloc free memset
 
+          errno
+
           dlopen dlsym dlclose dlerror)
   (import (rnrs base)
           (rnrs control)

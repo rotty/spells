@@ -33,6 +33,8 @@
 
           malloc free memcpy memset
 
+          errno
+
           dlopen dlsym dlclose dlerror
 
           pointer-short-ref
