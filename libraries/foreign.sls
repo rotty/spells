@@ -28,6 +28,7 @@
           null-pointer?
           pointer=?
           pointer+
+          let*-pointers
 
           make-c-callout make-c-callback
 
@@ -78,7 +79,12 @@
           (rnrs control)
           (rnrs arithmetic bitwise)
           (rnrs bytevectors)
+          (rnrs syntax-case)
+          (for (srfi :8 receive) run expand)
+          (for (only (srfi :1) append-reverse) expand)
+          (for (spells foof-loop) expand)
           (spells foreign compat)
+          (spells foreign frozen-bytes)
           (spells foreign config))
 
   ;; TODO: callout compression (i.e. reusing callouts with the same
@@ -191,4 +197,68 @@
                                  (bitwise-and val mask)
                                  bit-offset)))))))
                (else
-                (lambda (pointer val) (ptr-set pointer offset val)))))))))
+                (lambda (pointer val) (ptr-set pointer offset val))))))))
+
+  ;;@defspec let*-pointers (binding ...) body ...
+  ;;
+  ;; Establish pointer bindings for callouts. Each @var{binding} can
+  ;; be one of the following forms:
+  ;;
+  ;; @table @samp
+  ;;
+  ;; @item ((<id> <= <bv-expr> [<start> [<end>]]))
+  ;;
+  ;; Binds @var{<id>} to a pointer into @var{<bv-expr>}, which must
+  ;; evaluate to a bytevector. The memory area pointed to by
+  ;; @var{<id>} starts at offset @var{<start>} within the bytevecor and ends
+  ;; at @var{<end>}. @var{<start>} and @var{<end>} default to 0 and the length
+  ;; of the bytevector, respectively.
+  ;;
+  ;; @item ((<id> => <bv-expr> [<start> [<end>]]))
+  ;;
+  ;; @item ((<id> <cleanup-proc> <ptr-expr>))
+  ;;
+  ;; @end defspec
+  (define-syntax let*-pointers
+    (lambda (stx)
+      (define (process-bindings bindings)
+        (loop continue ((with bds '())
+                        (with cleanup-actions '())
+                        (for binding (in-list bindings)))
+          => (values (reverse bds)
+                     cleanup-actions)
+          (define (frozen-bytes direction id expr args)
+            (with-syntax (((fbytes) (generate-temporaries '(frozen-bytes))))
+              (continue (=> bds
+                            (append-reverse
+                             (list #`(fbytes
+                                      (freeze-bytes '#,direction #,expr #,@args))
+                                   #`(#,id (frozen-bytes-pointer fbytes)))
+                             bds))
+                        (=> cleanup-actions
+                            (cons #'(unfreeze-bytes fbytes)
+                                  cleanup-actions)))))
+          (syntax-case binding (=> <=)
+            ;; input data
+            ((id <= expr arg ...)
+             (frozen-bytes #'in #'id #'expr #'(arg ...)))
+            ((id => expr arg ...)
+             (frozen-bytes #'out #'id #'expr #'(arg ...)))
+            ((id free expr)
+             (continue (=> bds (cons #'(id expr) bds))
+                       (=> cleanup-actions
+                           (cons #'(free expr) cleanup-actions)))))))
+      (syntax-case stx ()
+        ((_ (binding ...) body0 body ...)
+         (receive (bds cleanup-actions)
+                  (process-bindings #'(binding ...))
+           #`(let* #,bds
+               (receive results (begin body0 body ...)
+                 #,@cleanup-actions
+                 (apply values results))))))))
+
+)
+
+;; Local Variables:
+;; scheme-indent-styles: (foof-loop)
+;; End:
