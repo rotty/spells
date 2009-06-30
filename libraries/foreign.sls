@@ -35,11 +35,25 @@
 
           dlopen dlsym dlclose dlerror
 
+          pointer-short-ref
+          pointer-short-set!
+          pointer-ushort-ref
+          pointer-ushort-set!
+          pointer-int-ref
+          pointer-int-set!
+          pointer-long-ref
+          pointer-long-set!
+          pointer-ulong-ref
+          pointer-ulong-set!
+          pointer-llong-set!
+          pointer-llong-ref
+          pointer-ullong-set!
+          pointer-ullong-ref
+
           pointer-int8-ref
           pointer-int8-set!
           pointer-uint8-ref
           pointer-uint8-set!
-
           pointer-uint16-ref
           pointer-uint16-set!
           pointer-uint32-ref
@@ -105,8 +119,25 @@
           #f
           (utf8z-ptr->string utf8z-ptr))))
 
-  (define pointer-int8-ref   (make-pointer-c-getter 'int8))
-  (define pointer-int8-set!  (make-pointer-c-setter 'int8))
+  (define pointer-short-ref   (make-pointer-c-getter 'short))
+  (define pointer-short-set!  (make-pointer-c-setter 'short))
+  (define pointer-ushort-ref  (make-pointer-c-getter 'ushort))
+  (define pointer-ushort-set! (make-pointer-c-setter 'ushort))
+  (define pointer-int-ref     (make-pointer-c-getter 'int))
+  (define pointer-int-set!    (make-pointer-c-setter 'int))
+  (define pointer-uint-ref    (make-pointer-c-getter 'uint))
+  (define pointer-uint-set!   (make-pointer-c-setter 'uint))
+  (define pointer-long-ref    (make-pointer-c-getter 'long))
+  (define pointer-long-set!   (make-pointer-c-setter 'long))
+  (define pointer-ulong-ref   (make-pointer-c-getter 'ulong))
+  (define pointer-ulong-set!  (make-pointer-c-setter 'ulong))
+  (define pointer-llong-ref   (make-pointer-c-getter 'llong))
+  (define pointer-llong-set!  (make-pointer-c-setter 'llong))
+  (define pointer-ullong-ref  (make-pointer-c-getter 'ullong))
+  (define pointer-ullong-set! (make-pointer-c-setter 'ullong))
+  
+  (define pointer-int8-ref    (make-pointer-c-getter 'int8))
+  (define pointer-int8-set!   (make-pointer-c-setter 'int8))
   (define pointer-uint8-ref   (make-pointer-c-getter 'uint8))
   (define pointer-uint8-set!  (make-pointer-c-setter 'uint8))
   (define pointer-uint16-ref  (make-pointer-c-getter 'uint16))
