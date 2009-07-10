@@ -7,4 +7,4 @@
           (rnrs io simple)
           (spells include))
 
-  (include-file ((spells scheme) assert)))
+  (include-file ((spells private) assert)))

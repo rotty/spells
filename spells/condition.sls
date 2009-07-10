@@ -36,4 +36,4 @@
   (import (rnrs)
           (spells include))
   
-  (include-file ((spells scheme) condition)))
+  (include-file ((spells private) condition)))

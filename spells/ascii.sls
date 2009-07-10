@@ -10,4 +10,4 @@
           (rnrs control)
           (spells include))
 
-  (include-file ((spells scheme) ascii)))
+  (include-file ((spells private) ascii)))

@@ -46,4 +46,4 @@
           (spells process compat)
           (spells include))
   
-  (include-file ((spells scheme) process)))
+  (include-file ((spells private) process)))

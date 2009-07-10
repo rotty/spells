@@ -35,4 +35,4 @@
           (spells include)
           (spells misc compat))
 
-  (include-file ((spells scheme) misc)))
+  (include-file ((spells private) misc)))

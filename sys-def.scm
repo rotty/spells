@@ -3,7 +3,7 @@
 ;; Scheme implementations.
 (define-system spells
 
-  (r6rs-libs "libraries")
+  (r6rs-libraries "spells")
 
   (conjure
    (import (rnrs)
@@ -15,7 +15,7 @@
    
    (task (configure
           (produce '((("spells" "foreign") "config.sls")
-                     <= (("libraries" "foreign") "config.sls.in")))
+                     <= (("spells" "foreign") "config.sls.in")))
           (fetchers (cc-fetcher 'cc)
                     (hostinfo-fetcher))))))
 

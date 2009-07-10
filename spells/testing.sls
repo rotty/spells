@@ -53,6 +53,6 @@
 
   (define error (make-error-signaller "trc-testing"))
 
-  (include-file ((spells scheme) trc-testing))
+  (include-file ((spells private) trc-testing))
 
   )

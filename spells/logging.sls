@@ -38,4 +38,4 @@
           (spells record-types)
           (spells include))
   
-  (include-file ((spells scheme) logging)))
+  (include-file ((spells private) logging)))

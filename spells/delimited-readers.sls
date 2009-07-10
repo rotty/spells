@@ -30,5 +30,5 @@
           (spells opt-args)
           (spells include))
 
-  (include-file ((spells scheme) delimited-readers))
-  (include-file ((spells scheme) skip-char-set)))
+  (include-file ((spells private) delimited-readers))
+  (include-file ((spells private) skip-char-set)))

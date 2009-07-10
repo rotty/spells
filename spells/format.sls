@@ -31,4 +31,4 @@
   (define char->ascii char->integer)
   (define ascii->char integer->char)
   
-  (include-file ((spells scheme) format)))
+  (include-file ((spells private) format)))

@@ -1,5 +1,4 @@
-;;; cut.sls --- Alias library for SRFI 26 (Notation for Specializing
-;;; Parameters without Currying)
+;;; alist.sls --- R6RS library providing alist utilities.
 
 ;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -15,10 +14,12 @@
 
 ;;; Code:
 #!r6rs
-(library (spells cut)
-  (export cut cute)
 
+;;@ Association list utilities.
+(library (spells alist)
+  (export acons assq-ref assv-ref assoc-ref)
   (import (rnrs base)
+          (rnrs lists)
           (spells include))
   
-  (include-file ((spells scheme) cut)))
+  (include-file ((spells private) alist)))
