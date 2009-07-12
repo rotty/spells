@@ -217,8 +217,9 @@
   ;; @item ((<id> => <bv-expr> [<start> [<end>]]))
   ;;
   ;; @item ((<id> <cleanup-proc> <ptr-expr>))
+  ;; @end table
   ;;
-  ;; @end defspec
+  ;;@end defspec
   (define-syntax let*-pointers
     (lambda (stx)
       (define (process-bindings bindings)
