@@ -28,7 +28,8 @@
           (srfi :8 receive)
           (srfi :13 strings)
           (srfi :14 char-sets)
-          (srfi :26 cut))
+          (srfi :26 cut)
+          (spells alist))
 
 
   ;; -- procedure+: string-split STRING CHARSET
@@ -187,13 +188,16 @@
 
   (define (subst-one template open-pos close-pos vals lose)
     (let* ((placeholder (substring/shared template (+ open-pos 1) close-pos))
-           (i (string->number placeholder))
-           (val (cond ((vector? vals)
+           (i (or (string->number placeholder)
+                  (string->symbol placeholder)))
+           (val (cond ((and (vector? vals) (integer? i))
                        (vector-ref vals i))
-                      ((list? vals)
+                      ((and (integer? i) (list? vals))
                        (list-ref vals i))
+                      ((symbol? i)
+                       (assq-ref vals i))
                       (else
-                       (lose "Invalid type for replacements" vals)))))
+                       (lose "Invalid type for replacements" vals i)))))
       (cond ((string? val) val)
             ((number? val) (number->string val))
             ((char? val)   (string val))
