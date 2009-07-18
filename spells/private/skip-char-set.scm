@@ -15,7 +15,7 @@
 ;;; Code:
 
 (define (skip-char-set skip-chars . maybe-port)
-  (let* ((port (*optional maybe-port (current-input-port)))
+  (let* ((port (:optional maybe-port (current-input-port)))
          (cset (->char-set skip-chars)))
 
     (if (not (input-port? port))

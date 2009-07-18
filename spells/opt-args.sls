@@ -6,7 +6,7 @@
           define/optional-args
           let-optionals
           let-optionals*
-          *optional
+          :optional
           opt-lambda)
   (import (rnrs base)
           (rnrs lists))
@@ -69,7 +69,7 @@
      (if (null? arg) (let () body ...)
 	 (error "Too many arguments in let-opt" arg)))))
 
-;;; (*optional rest-arg default-exp [test-pred])
+;;; (:optional rest-arg default-exp [test-pred])
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; This form is for evaluating optional arguments and their defaults
 ;;; in simple procedures that take a *single* optional argument. It is
@@ -84,16 +84,16 @@
 ;;; If there is an TEST-PRED form, it is a predicate that is used to test
 ;;; a non-default value. If the predicate returns false, an error is raised.
 
-(define-syntax *optional
+(define-syntax :optional
   (syntax-rules ()
-    ((*optional rest default-exp)
+    ((:optional rest default-exp)
      (let ((maybe-arg rest))
        (if (pair? maybe-arg)
 	   (if (null? (cdr maybe-arg)) (car maybe-arg)
 	       (error "too many optional arguments" maybe-arg))
 	   default-exp)))
 
-    ((*optional rest default-exp arg-test)
+    ((:optional rest default-exp arg-test)
      (let ((maybe-arg rest))
        (if (pair? maybe-arg)
 	   (if (null? (cdr maybe-arg))
