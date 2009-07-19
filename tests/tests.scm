@@ -52,4 +52,12 @@
    spells.sysutils
    (only (srfi :1 lists) count)
    rnrs.lists)
-  ("foreign.scm" spells.foreign spells.misc spells.filesys)))
+  ("foreign.scm" spells.foreign spells.misc spells.filesys)
+  ("awk.scm"
+   (spells awk)
+   (spells ascii)
+   (spells delimited-readers)
+   (rnrs io ports)
+   (rnrs lists)
+   (only (srfi :1) make-list iota)
+   (only (srfi :13) string-join))))
