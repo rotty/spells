@@ -1,5 +1,4 @@
 ;; misc.scm -- Unit tests for (spells misc)
-;; arch-tag: 4822bd68-4e16-4bbd-bca4-42277a933717
 
 ;; Copyright (C) 2005, 2008, 2009 by Jose Antonio Ortega Ruiz <jao@gnu.org>
 

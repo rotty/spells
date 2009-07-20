@@ -1,3 +1,18 @@
+;;; match.scm --- Unit tests for Alex Shinn's match macro
+
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009 Alex Shinn
+
+
+;;; Commentary:
+
+;; Based on the code fetched from
+;; http://synthcode.com/scheme/match-test.scm, presumably
+;; BSD-licensed.
+
+;;; Code:
+
+
 (define-test-suite match-tests
   "Alex Shinn's hygienic pattern matcher macro")
 
@@ -162,4 +177,3 @@
               #t))
 
 (run-test-suite match-tests)
-

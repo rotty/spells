@@ -1,3 +1,21 @@
+;;; filesys.scm --- Unit tests for the filesystem interface
+
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
+
+;; Helper functions
+
 (define test-dir (x->pathname '((",filesys-test.tmp"))))
 (define test-data '(foo bar baz 42))
 
@@ -22,6 +40,9 @@
 (define (with-i/o-condition-symbols thunk)
   (guard (c ((i/o-file-does-not-exist-error? c) 'file-does-not-exist))
     (thunk)))
+
+
+;; Tests
 
 (define-test-suite filesys-tests
   "Filesystem interface")

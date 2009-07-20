@@ -3,7 +3,8 @@
 ;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; R6RS syntax-case port of Taylor Campbell's Public
-;; Domain `define-record-type*' macro expander.
+;; Domain `define-record-type*' macro expander:
+;; <http://mumble.net/~campbell/scheme/defrectype*.scm>
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.

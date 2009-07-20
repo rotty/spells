@@ -17,8 +17,6 @@
 
 ((systems spells)
  (files
-  ;;("assert.scm" spells.assert)
-  ;;("condition.scm" spells.condition)
   ("cut.scm" spells.cut)
   ("lazy.scm"
    (spells lazy)
@@ -26,7 +24,6 @@
   ("record-types.scm"
    (spells record-types)
    (srfi :8 receive))
-  ;;("file-attr.scm" spells.file spells.misc spells.namestring)
   ("pathname.scm" spells.pathname spells.misc)
   ("filesys.scm"
    spells.filesys spells.pathname
@@ -36,9 +33,9 @@
   ("format.scm" spells.format)
   ("misc.scm" spells.misc rnrs.lists)
   ("match.scm" spells.match)
-  ;;("opt-args.scm" spells.opt-args) ;; temporarily disabled (can't eval definitions in R6RS)
-  ;;("table.scm" spells.table) ;; superceded by R6RS
-  ;;("blobs.scm" spells.blobs) ;; superceded by R6RS
+  ;; these are temporarily disabled; need to port to trc-testing
+  #;("opt-args.scm" spells.opt-args)
+  #;("table.scm" spells.table)
   ("delimited-readers.scm"
    spells.delimited-readers
    spells.misc

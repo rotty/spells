@@ -1,5 +1,4 @@
 ;; delimited-readers.scm -- unit tests for delimited-readers.scm
-;; arch-tag: 9eded783-24d0-4fac-8044-b1bd464815de
 
 ;; Copyright (C) 2005, 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
 

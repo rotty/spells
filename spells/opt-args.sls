@@ -1,3 +1,16 @@
+;;; opt-args.sls --- Optional arguments
+
+;; Copyright (C) 2001-2009, several authors -- see below.
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
+
+;;; Code:
 #!r6rs
 
 ;;@ Optional and named arguments.
@@ -104,7 +117,7 @@
 	       (error "too many optional arguments" maybe-arg))
 	   default-exp)))))
 
-;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
+;; Copyright (c) Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sat Oct 23, 2004 00:27
 
 ;; auxiliar syntax

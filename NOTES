@@ -22,11 +22,10 @@ it interacts with implementation-specific files.
 
 *** TODO Finishing up the R6RS adaption of Riastradh's testing framework
 
-This is nearly done, however, I still need to add an option to reduce
-the verbosity.
+This is nearly done.
 
-Also, the test suite itself needs a bit of coverage, especially the
-restarts part of it (which should be reviewed, and moved into seperate
+The test suite itself needs a bit of coverage, especially the restarts
+part of it (which should be reviewed, and moved into seperate
 library).
 
 *** TODO Review libraries
@@ -52,13 +51,9 @@ library).
 There's a bug in the streams.scm tests on Ypsilon. Probably a Ypsilon
 bug.
 
-*** TODO Get rid of =attic
-
-Ensure there's nothing of real value in there.
-
 * Things to think about
 
-- spells.opt-args
+- (spells opt-args)
 
    Do we really need to have so many optional argument macros (except
    to support legacy code?). Actually, inside spells, I think I'll

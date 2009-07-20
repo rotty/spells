@@ -31,4 +31,3 @@
 
 (run-test-suite format-tests)
 
-;;; format.scm ends here

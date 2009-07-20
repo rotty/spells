@@ -1,12 +1,9 @@
 ;; process.scm -- unit tests for process.scm
-;; arch-tag: 1a073af6-85ae-4ca1-86f1-03a7bbaae8f4
 
 ;; Copyright (C) 2005-2009 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann
 ;; Start date: Fri May 20, 2005 23:22
-
-;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.

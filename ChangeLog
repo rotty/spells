@@ -1,3 +1,12 @@
-;; -*- Mode: fundamental; -*-
+;; -*- text -*-
 
-No ChangeLog yet -- use `darcs changes' in the meantime.
+spells doesn't have GNU-style ChangeLog, but you can use git to obtain
+change logs:
+
+    % git clone git://github.com/rotty/spells.git
+    % cd spells
+    % git whatchanged
+
+You can also browse the changes via a web interface at
+<http://github.com/rotty/spells/commits/master>.
+

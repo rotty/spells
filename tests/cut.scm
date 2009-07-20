@@ -1,22 +1,33 @@
-; CONFIDENCE TEST FOR IMPLEMENTATION OF SRFI-26
-; =============================================
-;
-; Sebastian.Egner@philips.com, 3-Jun-2002.
-;
-; This file checks a few assertions about the implementation.
-; If you run it and no error message is issued, the implementation
-; is correct on the cases that have been tested.
-;
-; compliance:
-;   Scheme R5RS with
-;     SRFI-23: error
-;
-; loading this file into Scheme 48 0.57 after 'cut.scm' has been loaded:
-;   ,open srfi-23
-;   ,load check.scm
+;;; cut.scm --- Confidence tests for SRFI-26
 
-; (check expr)
-;    evals expr and issues an error if it is not #t.
+;; Copyright (C) Sebastian Egner (2002). All Rights Reserved.
+
+;; Permission is hereby granted, free of charge, to any person
+;; obtaining a copy of this software and associated documentation
+;; files (the "Software"), to deal in the Software without
+;; restriction, including without limitation the rights to use, copy,
+;; modify, merge, publish, distribute, sublicense, and/or sell copies
+;; of the Software, and to permit persons to whom the Software is
+;; furnished to do so, subject to the following conditions:
+
+;; The above copyright notice and this permission notice shall be
+;; included in all copies or substantial portions of the Software.
+
+;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+;; EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+;; BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+;; ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+;; CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+;; SOFTWARE
+
+;;; Commentary:
+
+;; Adapted by Andreas Rottmann for inclusion in spells.
+
+;;; Code:
+
 (define-test-suite srfi-26-tests
   "SRFI 26 confidence tests")
 

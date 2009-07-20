@@ -2,56 +2,84 @@
 
 Project Maintainer:  Andreas Rottmann <a.rottmann@gmx.at>
 
-In the following, all top-level libraries included in spells are
-listed grouped by their authors. All the R6RS library wrappers were
-written by Andreas Rottmann; I do not note this explicitly below, just
-considering actual code, not the interface provided by the .sls files.
+In the following, the files of the spells project are listed, grouped
+by copyright holders and licenses; roughly following the DEP-5
+proposed syntax (http://dep.debian.net/deps/dep5/).
 
-For more information (including licenses), please refer to the
-corresponding files.
+
+# Library
 
-Andreas Rottmann <a.rottmann@gmx.at>
+Copyright: 2005-2009, Andreas Rottmann <a.rottmann@gmx.at>
+Files: *
+License: BSD
 
- - alist
- - ascii
- - cells
- - condition
- - define-values
- - error
- - filesys
- - find-file
- - foreign
- - include
- - logging
- - misc
- - operations
- - pathname
- - procedure-annotations
- - process
- - string-substitute
- - sysutils
- - table
- - weak
+Copyright: 2007, Alex Shinn
+Files: spells/fmt.sls, spells/fmt/*.sls, spells/private/fmt/*.scm,
+       spells/private/irrgex-*.scm
+License: BSD
 
-Jose Antonio Ortega Ruiz <jao@gnu.org>
+Copyright: 2003, André van Tonder
+Files: spells/lazy.sls
+License: MIT
 
- - opt-args
- - sysutils
- - table
+Copyright: 1993-2003, Richard Kelsey and Jonathan Rees
+           1994-2003, Olin Shivers and Brian D. Carlstrom
+           1999-2003, Martin Gasbichler
+           2001-2003, Michael Sperber
+Files: spells/field-readers.sls,
+       spells/awk/helpers.sls,
+       spells/opt-args.sls,
+       spells/private/delimited-readers.scm
+License: BSD
 
-Richard Kelsey, Jonathan Rees, Olin Shivers, Brian D. Carlstrom, 
-Martin Gasbichler (SCSH):
+Copyright: Copyright, 1993-2008 Richard Kelsey and Jonathan Rees
+Files: spells/private/condition.scm
+License: BSD
 
- - delimited-readers :: http://ftp.scsh.net/pub/scsh/0.6/scsh-0.6.7.tar.gz
+Copyright: 2007-2009, Taylor R. Campbell
+Files: spells/testing/parameters.sls, spells/record-types/expand-drt.scm
+License: BSD
 
-Kenneth A Dickey
- 
- - format :: http://srfi.schemers.org/srfi-48/srfi-48.html
+Copyright: 2007, 2009, Taylor R. Campbell
+Files: spells/private/trc-testing.scm
+License: LGPL-3+
 
-Olin Shivers
- 
- - opt-args :: http://ftp.scsh.net/pub/scsh/0.6/scsh-0.6.7.tar.gz
+Copyright: 2009, Derick Eddington
+Files: spells/irregex.sls
+License: MIT
 
-Taylor Campbell
+Copyright: 2002, Anthony Carrico
+Files: spells/args-fold.sls
+License: BSD
 
- - record-types :: http://mumble.net/~campbell/scheme/defrectype*.scm
+Copyright: 2005-2007, Jose Antonio Ortega Ruiz <jao@gnu.org>
+Files: spells/opt-args.sls, spells/sysutils/compat.mzscheme.sls
+License: BSD
+
+Copyright: 2003, Kenneth A Dickey. All Rights Reserved.
+Files: spells/private/format.scm
+License: MIT
+
+
+# Test suite
+
+Copyright: 2005-2009, Andreas Rottmann
+Files: tests/*
+License: BSD
+
+Copyright: 2002, Sebastian Egner
+           Al Petrofky
+Files: spells/private/cut.scm
+License: PD
+
+Copyright: 2002, Sebastian Egner
+Files: tests/cut.scm
+License: MIT
+
+Copyright: Alex Shinn
+Files: test/match.scm
+License: TODO
+
+Copyright: Taylor R. Campbell
+Files: tests/test-foof-loop.scm
+License: PD

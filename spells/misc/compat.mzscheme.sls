@@ -1,37 +1,25 @@
-;; util.misc.scm -- Misc utilites for MzScheme
-;; arch-tag: b27f4a34-4209-44ab-8586-49fd8c1b8322
+;;; compat.mzscheme.sls --- Misc functions, mzscheme compatibility
 
-;; Copyright (C) 2005, 2007, 2008, 2009 by Free Software Foundation, Inc.
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
-;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
-;; Start date: Sun Jun 12, 2005 22:16
+;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU Lesser General Public License as published by
-;; the Free Software Foundation; either version 2.1 of the License, or
-;; (at your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU Lesser General Public License for more details.
-;;
-;; You should have received a copy of the GNU Lesser General Public License
-;; along with this program; if not, write to the Free Software
-;; Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
-;; 02110-1301, USA.
-#!r6rs
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+;;; Commentary:
 
 ;;; Code:
+#!r6rs
 
 (library (spells misc compat)
-  (export sleep-seconds thunk? exit scheme-implementation)
+  (export sleep-seconds exit scheme-implementation)
   (import (rnrs base)
           (only (mzscheme)
-                sleep procedure-arity-includes? exit))
+                sleep exit))
 
   (define sleep-seconds sleep)
-  (define (thunk? p) (and (procedure? p) (procedure-arity-includes? p 0)))
   (define (scheme-implementation) 'mzscheme))
-
-;;; misc.scm ends here

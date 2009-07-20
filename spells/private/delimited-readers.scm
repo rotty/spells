@@ -1,11 +1,7 @@
 ;;; delimited-readers.scm --- Read delimited strings.
 
-;; Code taken from scsh:
-
-;; Copyright (c) 1993-2003 Richard Kelsey and Jonathan Rees
-;; Copyright (c) 1994-2003 by Olin Shivers and Brian D. Carlstrom.
-;; Copyright (c) 1999-2003 by Martin Gasbichler.
-;; Copyright (c) 2001-2003 by Michael Sperber.
+;; Based on code snarfed from scsh, see the file AUTHORS for copyright
+;; information.
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -17,17 +13,6 @@
 
 ;;; Code:
 
-
-;;; Delimited readers
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; These procedures ran their inner I/O loop in a C primitive in
-;;; earlier versions of scsh. In a multi-threaded environment this
-;;; causes lots of trouble in case the operation would
-;;; block. Therefore the current implementation runs in Scheme but
-;;; operates directly on the buffer of the port for speed. This also
-;;; allows us to implement the push-back behaviour without a peek/read
-;;; pair.
-;;;
 
 ;;@args delims [port delim-action]
 ;; Read a delimited string.

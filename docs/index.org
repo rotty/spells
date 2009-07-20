@@ -1,0 +1,90 @@
+#+SETUPFILE: ~/.emacs.d/org-templates/level-2.org
+#+TITLE: spells
+
+* About
+
+Spells[fn:1] is a collection of R6RS libraries intended to provide
+access to common (but non-standardized) features of Scheme
+implementations in a uniform way, hence easing the task of writing
+useful programs and libraries that work across several
+implementations[fn:2].
+
+While you can use Spells "on its own" on a supported implementation,
+by creating appropriate symlinks so your implementation can find the
+library files, there is a companion project, called SPE, which makes
+this a bit easier[fn:3]. It's basically a shell script and a bit of
+Scheme code that handles the symlinking and environment-variable
+tweaking for you.
+
+* Status
+
+Spells has been tested on Ikarus and Ypsilon. It currently provides
+the following libraries, beyond ones that implement features readily
+coded using only R6RS functionality:
+
+- (spells filesys) :: File system interface
+- (spells foreign) :: Foreign function interface -- call C functions
+     directly from Scheme, using an Ikarus-style, but
+     implementation-independent FFI.
+- (spells process) :: Operating-System processes
+
+* Prerequistes
+
+Spells works with Ikarus (from bzr) and Ypsilon (from SVN).
+
+# <<ikarus-notes>>
+- Ikarus Notes :: Unfortunatly, there is still a tweak to Ikarus
+                  (needed by spells' process interface) which has not
+                  yet made it into Ikarus' mainline, so you need to
+                  patch the source:
+
+: bzr checkout --lightweight http://ikarus-scheme.org/ikarus.dev ikarus
+: cd ikarus
+: wget -O - http://launchpadlibrarian.net/27410321/0002-t_process-creation.diff \
+:     | patch -p1
+
+                  You should build Ikarus using the following flags;
+                  see [[http://bugzilla.gnome.org/show_bug.cgi?id=563464#c3][this bug on gobject-introspection]] why using
+                  ~-lpthread~ is a good idea.
+
+: ./configure --enable-libffi LDFLAGS="-lpthread"
+: make
+: make install
+
+- Ypsilon Notes :: The latest SVN checkout of Ypsilon should work
+                   out-of-the box.
+
+You'll need the ~git~ and ~bzr~ revision control systems, as ~spells~
+itself is managed with git, and depends on the [[https://code.launchpad.net/~scheme-libraries-team/scheme-libraries/srfi][SRFI collection]], which
+is using ~bzr~.
+
+Additionally, if you want to use the ~(spells foreign)~ library,
+you'll need a the ~gcc~ C compiler, which is used during the build to
+figure out the size of the C types on your platform.
+
+* Installation
+
+The recommended way to use spells is with [[http://rotty.yi.org/software/spe][SPE]]. Download SPE, and run
+the ~fetch-systems~ script, which will fetch spells and the SRFI
+collection, and then run the test suite (subsitute ~ypsilon~ below for
+your implementation):
+
+#+BEGIN_SRC sh
+git clone git://github.com/rotty/spe.git
+cd spe
+./scripts/fetch-systems ypsilon
+./scripts/launch ypsilon test spells
+#+END_SRC
+
+If you do get errors, please [[mailto:a.rottmann@gmx.at%3Fsubject%3D%5Bspells%20bug%5D][drop me a mail]].
+
+* Footnotes
+
+[fn:1] "spells" can by read as an acronym: Spell's a Portability
+Environment Library for Lots of Schemes
+
+[fn:2] Note that the R6RS version of Spells is a recent reincarnation,
+the old (R5RS) Spells has been abandoned.
+
+[fn:3] Again, the old (R5RS) SPE, which created modules for the target
+implementations module system, has been abandoned

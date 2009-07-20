@@ -2,9 +2,6 @@
 ;; Copyright (C) 2005, 2006-2007, 2009 by Jose Antonio Ortega 
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>  
-;; sysutils.scm -- Unit tests for spells.sysutils
-
-;; Copyright (C) 2005 by Free Software Foundation, Inc.
 ;; Start date: Wed Dec 28, 2005 02:08 
 
 ;; This program is free software, you can redistribute it and/or
@@ -16,7 +13,6 @@
 ;;; Commentary:
 
 ;;; Code:
-
 
 (define-test-suite sysutils-tests
   "System utilities")
@@ -41,5 +37,3 @@
            (equal? (assoc "PATH" new-env) `("PATH" . ,path))))))
 
 (run-test-suite sysutils-tests)
-
-;;; sysutils.scm ends here

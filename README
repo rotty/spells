@@ -2,88 +2,21 @@
 
 * Spells -- A Scheme portability library
 
-Spells stands for Spell's a Portability Environment Library for Lots
-of Schemes, which is a collection of R6RS libraries providing features
-not already provided by R6RS. See below for a list of libraries that
-are part of Spells. Note that the R6RS version of Spells is a recent
-reincarnation of it, the old (R5RS) Spells has been abandoned.
+Spells stands for is a collection of R6RS libraries providing
+features beyond R6RS in a uniform way across supported
+implementations.
 
-While you can use Spells "on its own" on a supported implementation,
-by creating appropriate symlinks so your implementation can find the
-library files, there is a companion project, called SPE, which makes
-this a bit easier -- again, the old (R5RS) SPE, which created modules
-for the target implementations module system, has been abandoned. The
-R6RS incarnation of SPE is much more lightweight, basically a shell
-script and a bit of Scheme code that handles the symlinking and
-environment-variable tweaking for you.
+* Documentation
 
-* Status
+Please see docs/index.org for some documentation in Emacs org-mode
+(i.e. basically plain-text) format. You can also view this
+documentation in HTML form at http://rotty.yi.org/software/spells/.
 
-Spells has been tested on Ikarus, Ypsilon and PLT Scheme. It currently
-provides the following libraries, beyond ones that implement features
-readily coded using only R6RS functionality:
+* License
 
-- (spells filesys) :: File system interface
-- (spells foreign) :: Foreign function interface -- call C functions
-     directly from Scheme, using an Ikarus-style, but
-     implementation-independent FFI.
-- (spells process) :: Operating-System processes
-
-See the file NOTES for additional information.
-
-* Installation
-
-** With SPE
-
-The recommended way to use spells is with SPE. Download SPE, and run
-the ~fetch-systems~ script, which will fetch spells and the xitomatl
-SRFIs, and then run the test suite (subsitute ~ikarus~ below for your
-implementation):
-
-#+BEGIN_SRC sh
-darcs get --set-scripts-executable http://download.gna.org/spells/darcs/r6rs/spe
-./fetch-systems
-./launch ikarus test spells
-#+END_SRC
-
-The testsuite should work without error on Ikarus (from bzr) and PLT
-(from SVN).
-
-** Manual
-
-The following instructions assume you have a directory that is in your
-implementations' library search path, and set the environment variable
-~$DIR~ to that directory.
-
-You first have to get the xitomatl SRFI libraries, as spells depends
-on them:
-
-#+BEGIN_SRC sh
-cd $DIR
-mkdir xitomatl
-cd xitomatl
-bzr checkout --lightweight \
-    lp:~ikarus-libraries-team/ikarus-libraries/srfi systems/xitomatl/srfi
-#+END_SRC
-
-Then get spells into a directory different from ~$DIR~, and setup
-appropriate symlinks:
-
-#+BEGIN_SRC sh
-darcs get http://download.gna.org/spells/darcs/r6rs/spells/
-ln -s `pwd`/spells/libraries $DIR/spells
-ln -s `pwd`/spells/scheme $DIR/spells/scheme
-#+END_SRC
-
-Now fire up your implementations' REPL, and try to import some spells
-library:
-
-#+BEGIN_SRC scheme
-(import (rnrs) (spells operations))
-#+END_SRC
-
-If you get error on import, check if the library search path really
-includes all the libraries files at the right relative position.
+Spells includes code written by various authors, mostly licensed under
+the BSD and other free-software, non-copyleft licenses. See the file
+AUTHORS for a summary.
 
 --
-Andreas Rottmann <a.rottmann@gmx.at>, 2009-01-10
+Andreas Rottmann <a.rottmann@gmx.at>, 2009-07-15

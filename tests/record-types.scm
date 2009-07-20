@@ -14,6 +14,11 @@
 
 ;;; Code:
 
+
+;;; Commentary:
+
+;;; Code:
+
 (define-test-suite record-types-tests
   "Record types")
 

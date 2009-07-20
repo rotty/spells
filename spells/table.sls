@@ -13,8 +13,6 @@
 ;;; Commentary:
 
 ;;; Code:
-
-
 #!r6rs
 
 ;;@ Simple hash tables.

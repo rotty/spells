@@ -1,6 +1,6 @@
 ;;; logging.scm --- Unit tests for (spells logging)
 
-;; Copyright (C) 2006, 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -14,6 +14,7 @@
 
 ;;; Code:
 
+;; Utility procedures
 
 (define (expand-handlers note-taker config)
   (map (lambda (entry)
@@ -51,6 +52,8 @@
                (cons 'failed (reverse failures))
                (cons 'passed (reverse passes))))
          procs)))
+
+;; Test suite
 
 (define-test-suite logging-tests
   "Testing logging library")
