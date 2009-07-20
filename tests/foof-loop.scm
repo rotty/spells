@@ -6,14 +6,6 @@
 ;;; This code is written by Taylor R. Campbell and placed in the Public
 ;;; Domain.  All warranties are disclaimed.
 
-(import (rnrs base)
-        (rnrs io simple)
-        (rnrs io ports)
-        (rnrs mutable-strings)
-        (rnrs r5rs)
-        (spells foof-loop)
-        (spells testing))
-
 (define open-input-string open-string-input-port)
 (define (identity-procedure x) x)
 

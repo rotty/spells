@@ -53,6 +53,13 @@
    (only (srfi :1 lists) count)
    rnrs.lists)
   ("foreign.scm" spells.foreign spells.misc spells.filesys)
+  ("foof-loop.scm"
+   (spells foof-loop)
+   (rnrs base)
+   (rnrs io simple)
+   (rnrs io ports)
+   (rnrs mutable-strings)
+   (rnrs r5rs))
   ("awk.scm"
    (spells awk)
    (spells ascii)
