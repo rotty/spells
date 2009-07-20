@@ -16,7 +16,8 @@
 #!r6rs
 
 (library (spells syntax-utils)
-  (export identifier-append)
+  (export identifier-append
+          symbolic-identifier=?)
   (import (rnrs))
 
   (define (identifier-append k . parts)
@@ -29,5 +30,9 @@
                                           (symbol->string (syntax->datum x)))
                                          (else (symbol->string x))))
                                  parts)))))
+
+  (define (symbolic-identifier=? x y)
+    (eq? (if (identifier? x) (syntax->datum x) x)
+         (if (identifier? y) (syntax->datum y) y)))
   
   )
