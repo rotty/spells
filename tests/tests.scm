@@ -24,6 +24,8 @@
   ("record-types.scm"
    (spells record-types)
    (srfi :8 receive))
+  ("algebraic-types.scm"
+   (spells algebraic-types))
   ("pathname.scm" spells.pathname spells.misc)
   ("filesys.scm"
    spells.filesys spells.pathname
