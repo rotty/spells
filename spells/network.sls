@@ -27,7 +27,8 @@
           close-listener
           
           listener-accept-loop
-          
+
+          open-tcp-connection
           open-tcp-listener)
   (import (rnrs)
           (srfi :8 receive)

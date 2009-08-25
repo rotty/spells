@@ -25,7 +25,8 @@
           listener-accept
           listener-address
           close-listener
-          
+
+          open-tcp-connection
           open-tcp-listener)
   (import (rnrs)
           (srfi :8 receive)
@@ -53,6 +54,15 @@
 (define (listener-address listener)
   ;; Ypsilon doesn't support this yet
   #f)
+
+(define (open-tcp-connection address service)
+  (make-connection (yp:make-client-socket address
+                                          (cond ((integer? service)
+                                                 (number->string service))
+                                                ((symbol? service)
+                                                 (symbol->string service))
+                                                (else
+                                                 service)))))
 
 (define (open-tcp-listener . maybe-options)
   (let-options* (if (null? maybe-options) '() (car maybe-options))

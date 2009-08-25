@@ -25,7 +25,8 @@
           listener-accept
           listener-address
           close-listener
-          
+
+          open-tcp-connection
           open-tcp-listener)
   (import (rnrs)
           (srfi :8 receive)
@@ -33,7 +34,8 @@
           (prefix (only (ikarus)
                         tcp-server-socket
                         accept-connection
-                        close-tcp-server-socket)
+                        close-tcp-server-socket
+                        tcp-connect)
                   ik:))
 
 (define-record-type connection
@@ -64,6 +66,16 @@
       (raise-impl-restriction 'open-tcp-listener
                               "ephemeral ports not supported"))
     (make-listener (ik:tcp-server-socket service))))
+
+(define (open-tcp-connection address service)
+  (receive (in-port out-port)
+           (ik:tcp-connect address (cond ((integer? service)
+                                          (number->string service))
+                                         ((symbol? service)
+                                          (symbol->string service))
+                                         (else
+                                          service)))
+    (make-connection in-port out-port)))
 
 )
 
