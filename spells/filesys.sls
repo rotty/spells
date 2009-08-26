@@ -139,7 +139,7 @@
 (define find-file
   (case-lambda
     ((pathname dir-list pred)
-     (let ((pathname (x->pathname pathname)))
+     (let ((pathname (->pathname pathname)))
        (cond ((null? (pathname-origin pathname))
               (let loop ((lst dir-list))
                 (if (null? lst)
@@ -166,7 +166,7 @@
   (copy-file src dest))
 
 (define (copy-file src-pathname dst-pathname)
-  (call-with-port (open-file-input-port (x->namestring src-pathname))
+  (call-with-port (open-file-input-port (->namestring src-pathname))
     (lambda (in-port)
       (call-with-output-file/atomic dst-pathname 'block #f
         (lambda (out-port)
@@ -175,7 +175,7 @@
 ;;@ Call @2, with the a file input port corresponding to @1, with a
 ;; working directory as specified by the directory part of @1.
 (define (call-with-input-file-and-directory pathname proc)
-  (let ((pathname (x->pathname pathname)))
+  (let ((pathname (->pathname pathname)))
     (with-working-directory (directory-namestring pathname)
       (lambda ()
         (call-with-input-file (file-namestring pathname) proc)))))
@@ -204,7 +204,7 @@
   (let ((count 1))
     (case-lambda
       ((pathname buffer-mode transcoder)
-       (let* ((pathname (x->pathname pathname))
+       (let* ((pathname (->pathname pathname))
               (types (file-types (pathname-file pathname)))
               (fname (file-name (pathname-file pathname))))
          (let loop ((i count))
@@ -214,7 +214,7 @@
                                        (cons "tmp" types)))))
              (guard (c ((i/o-file-already-exists-error? c)
                         (loop (+ i 1))))
-               (let ((port (open-file-output-port (x->namestring pathname)
+               (let ((port (open-file-output-port (->namestring pathname)
                                                   (file-options)
                                                   buffer-mode
                                                   transcoder)))

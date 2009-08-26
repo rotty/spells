@@ -26,11 +26,11 @@
           file-type
           file-types
           file-version
-          x->file
+          ->file
 
           make-pathname
           pathname?
-          x->pathname
+          ->pathname
           pathname=?
           pathname<?
           pathname>?
@@ -53,10 +53,15 @@
           directory-namestring
           file-namestring
           origin-namestring
-          x->namestring
+          ->namestring
 
           parse-unix-file-types
-          local-file-system-type)
+          local-file-system-type
+
+          ;; Deprecated R5RS-compatible aliases
+          (rename (->file x->file)
+                  (->pathname x->pathname)
+                  (->namestring x->namestring)))
   (import (rnrs base)
           (only (rnrs hashtables) string-hash symbol-hash)
           (rnrs arithmetic fixnums)
@@ -168,10 +173,10 @@
 ;; return it.  In any other case, signal an error.
 ;;
 ;; @emph{FIXME}: Document how pairs are parsed.
-(define/optional-args (x->pathname object (optional
-                                           (fs-type (local-file-system-type))))
+(define/optional-args (->pathname object (optional
+                                          (fs-type (local-file-system-type))))
   (define (lose)
-    (error 'x->pathname "cannot coerce to a pathname" object))
+    (error '->pathname "cannot coerce to a pathname" object))
   (cond ((symbol?    object) (make-pathname #f '() object))
         ((string?    object) (parse-namestring object fs-type))
         ((os-string? object) (parse-namestring (os-string->string object)))
@@ -194,14 +199,14 @@
 ;; Parse @1, which may be a string or a symbol, as file component,
 ;; according to the optional file system type @2, which defaults to
 ;; the local file system type.
-(define/optional-args (x->file object (optional
+(define/optional-args (->file object (optional
                                        (fs-type (local-file-system-type))))
   (fs-type/parse-file-namestring
    fs-type
    (cond ((symbol? object) (symbol->string object))
          ((string? object) object)
          (else
-          (error 'x->file "cannot coerce to file" object)))))
+          (error '->file "cannot coerce to file" object)))))
 
 
 ;;;; Files
@@ -247,21 +252,21 @@
 
 ;;@ Return a pathname like @1 with an origin of @2.
 (define (pathname-with-origin pathname origin)
-  (let ((pathname (x->pathname pathname)))
+  (let ((pathname (->pathname pathname)))
     (make-pathname origin
                    (pathname-directory pathname)
                    (pathname-file pathname))))
 
 ;;@ Return a pathname like @1 with a directory of @2.
 (define (pathname-with-directory pathname directory)
-  (let ((pathname (x->pathname pathname)))
+  (let ((pathname (->pathname pathname)))
     (make-pathname (pathname-origin pathname)
                    directory
                    (pathname-file pathname))))
 
 ;;@ Return a pathname like @1 with a file of @2.
 (define (pathname-with-file pathname file)
-  (let ((pathname (x->pathname pathname)))
+  (let ((pathname (->pathname pathname)))
     (make-pathname (pathname-origin pathname)
                    (pathname-directory pathname)
                    file)))
@@ -276,15 +281,15 @@
 ;; Any null components of @1 are filled with the supplied
 ;; arguments, @1, @2 and @3.
 (define (pathname-default pathname origin directory file)
-  (let ((pathname (x->pathname pathname)))
+  (let ((pathname (->pathname pathname)))
     (make-pathname (or (pathname-origin pathname) origin)
                    (or (pathname-directory pathname) directory)
                    (or (pathname-file pathname) file))))
 
 ;;@ Return a pathname by merging @1 with @2.
 (define (merge-pathnames pathname defaults-pathname)
-  (let* ((pathname (x->pathname pathname))
-         (defaults-pathname (x->pathname defaults-pathname))
+  (let* ((pathname (->pathname pathname))
+         (defaults-pathname (->pathname defaults-pathname))
          (origin (pathname-origin pathname))
          (origin-default (pathname-origin defaults-pathname))
          (directory (pathname-directory pathname))
@@ -327,7 +332,7 @@
 ;;@ Returns @code{#t} if @1 has directory components but no file,
 ;; and @code{#f} if otherwise."
 (define (directory-pathname? pathname)
-  (let ((pathname (x->pathname pathname)))
+  (let ((pathname (->pathname pathname)))
     (and (pathname-directory pathname)  ;++ nil/false pun
          (not (pathname-file pathname)))))
 
@@ -336,7 +341,7 @@
 ;; directory components, and the resultant pathname has no file.
 ;; Otherwise, return @1.
 (define (pathname-as-directory pathname)
-  (let* ((pathname (x->pathname pathname))
+  (let* ((pathname (->pathname pathname))
          (file (pathname-file pathname)))
     (if file
         (make-pathname (pathname-origin pathname)
@@ -349,7 +354,7 @@
 
 ;;@ Return a pathname of the directory that contains @1.
 (define (pathname-container pathname)
-  (let loop ((pathname (x->pathname pathname)))
+  (let loop ((pathname (->pathname pathname)))
     (let ((origin (pathname-origin pathname))
           (directory (pathname-directory pathname))
           (file (pathname-file pathname)))
@@ -369,7 +374,7 @@
 ;; relative to the origin and directory of @1, with the last element
 ;; of @2 specifying the file component of the result.
 (define (pathname-join base . steps)
-  (let ((base (x->pathname base)))
+  (let ((base (->pathname base)))
     (if (null? steps)
         base
         (let loop ((steps steps)
@@ -380,7 +385,7 @@
                    (file #f))
           (if (null? steps)
               (make-pathname (if o-parts (reverse o-parts) o) (reverse dir) file)
-              (let* ((step (x->pathname (car steps)))
+              (let* ((step (->pathname (car steps)))
                      (step-o (or (pathname-origin step) '())))
                 (define (iterate o o-parts dir)
                   (if (null? (cdr steps))
@@ -506,7 +511,7 @@
 ;; If @1 is a pathname, convert it according to @2.
 ;; Otherwise, signal an error.
 ;; If @2 is not supplied, it defaults to the local file system type."
-(define/optional-args (x->namestring object (optional
+(define/optional-args (->namestring object (optional
                                              (fs-type (local-file-system-type))))
   ;++ What if it's a symbol?  Use (MAKE-PATHNAME NIL NIL object)?
   (cond ((string? object)
@@ -514,8 +519,8 @@
         ((pathname? object)
          (pathname->namestring object fs-type))
         ((pair? object)
-         (pathname->namestring (x->pathname object) fs-type))
-        (else (error 'x->namestring "Unable to coerce to a namestring: %S" object))))
+         (pathname->namestring (->pathname object) fs-type))
+        (else (error '->namestring "Unable to coerce to a namestring: %S" object))))
 
 (define (pathname->namestring pathname fs-type)
   (fs-type/pathname->namestring fs-type pathname))
@@ -524,19 +529,19 @@
 ;; If @2 is not supplied, it defaults to the local file system type.
 (define/optional-args (origin-namestring pathname
                                          (optional (fs-type (local-file-system-type))))
-  (fs-type/origin-namestring fs-type (x->pathname pathname)))
+  (fs-type/origin-namestring fs-type (->pathname pathname)))
 
 ;; Return a string for @1's directory according to @2.
 ;; If @2 is not supplied, it defaults to the local file system type.
 (define/optional-args (directory-namestring
                        pathname (optional (fs-type (local-file-system-type))))
-  (fs-type/directory-namestring fs-type (x->pathname pathname)))
+  (fs-type/directory-namestring fs-type (->pathname pathname)))
 
 ;; Return a string for @1's file according to @2.
 ;; If @2 is not supplied, it defaults to the local file system type.
 (define/optional-args (file-namestring pathname (optional
                                                  (fs-type (local-file-system-type))))
-  (fs-type/file-namestring fs-type (x->pathname pathname)))
+  (fs-type/file-namestring fs-type (->pathname pathname)))
 
 ;; Return a string naming @1 relative to RELATIVE,
 ;; according to @2.
@@ -544,18 +549,19 @@
 (define/optional-args (enough-namestring pathname relative
                                          (optional (fs-type (local-file-system-type))))
   (fs-type/enough-namestring fs-type
-                             (pathname (x->pathname pathname))
-                             (x->pathname relative)))
+                             (->pathname pathname)
+                             (->pathname relative)))
+
 
 ;;;; File System Types
 
 (define-operation (fs-type/parse-namestring fs-type namestring))
 
 (define-operation (fs-type/enough-namestring fs-type pathname relative)
-  (x->namestring (enough-pathname pathname relative) fs-type))
+  (->namestring (enough-pathname pathname relative) fs-type))
 
 (define-operation (fs-type/canonicalize-namestring fs-type object)
-  (pathname->namestring (x->pathname object) fs-type))
+  (pathname->namestring (->pathname object) fs-type))
 
 (define-operation (fs-type/origin-namestring fs-type pathname))
 (define-operation (fs-type/directory-namestring fs-type pathname))

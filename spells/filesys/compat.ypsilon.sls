@@ -50,38 +50,38 @@
           (prefix (core files) yp:)
           (prefix (core primitives) yp:))
 
-  (define x->f x->namestring)
+  (define ->fn ->namestring)
 
   (define (file-exists? pathname)
-    (rnrs:file-exists? (x->f pathname)))
+    (rnrs:file-exists? (->fn pathname)))
 
   (define (create-directory pathname)
-    (yp:create-directory (x->f pathname)))
+    (yp:create-directory (->fn pathname)))
 
   (define (create-symbolic-link old-pathname new-pathname)
-    (yp:create-symbolic-link (x->f old-pathname) (x->f new-pathname)))
+    (yp:create-symbolic-link (->fn old-pathname) (->fn new-pathname)))
 
   (define (create-hard-link old-pathname new-pathname)
-    (yp:create-hard-link (x->f old-pathname) (x->f new-pathname)))
+    (yp:create-hard-link (->fn old-pathname) (->fn new-pathname)))
 
   (define (delete-file pathname)
-    (let ((fname (x->f pathname)))
+    (let ((fname (->fn pathname)))
       (if (rnrs:file-exists? fname)
           (yp:delete-file fname))))
 
   (define (rename-file source-pathname target-pathname)
-    (yp:rename-file (x->f source-pathname) (x->f target-pathname)))
+    (yp:rename-file (->fn source-pathname) (->fn target-pathname)))
 
   (define (file-regular? pathname)
-    (yp:file-regular? (x->f pathname)))
+    (yp:file-regular? (->fn pathname)))
   (define (file-directory? pathname)
-    (yp:file-directory? (x->f pathname)))
+    (yp:file-directory? (->fn pathname)))
   (define (file-symbolic-link? pathname)
-    (yp:file-symbolic-link? (x->f pathname)))
+    (yp:file-symbolic-link? (->fn pathname)))
 
   (define (make-file-check pred who)
     (lambda (pathname)
-      (let ((fname (x->f pathname)))
+      (let ((fname (->fn pathname)))
         (if (rnrs:file-exists? fname)
             (pred fname)
             (raise (condition
@@ -99,19 +99,19 @@
   (define-file-check file-executable? yp:file-executable?)
 
   (define (file-modification-time pathname)
-    (let ((nsecs (yp:file-stat-mtime (x->f pathname))))
+    (let ((nsecs (yp:file-stat-mtime (->fn pathname))))
       (posix-timestamp->time-utc (div nsecs #e1e9) (mod nsecs #e1e9))))
 
   (define (file-size-in-bytes pathname)
-    (yp:file-size-in-bytes (x->f pathname)))
+    (yp:file-size-in-bytes (->fn pathname)))
 
   (define (dot-or-dotdot? f)
     (or (string=? "." f) (string=? ".." f)))
 
   (define (directory-fold* pathname combiner . seeds)
     (define (full-pathname entry)
-      (pathname-with-file pathname (pathname-file (x->pathname entry))))
-    (let loop ((entries (yp:directory-list (x->f pathname))) (seeds seeds))
+      (pathname-with-file pathname (pathname-file (->pathname entry))))
+    (let loop ((entries (yp:directory-list (->fn pathname))) (seeds seeds))
       (if (null? entries)
           (apply values seeds)
           (let ((entry (car entries)))
@@ -132,7 +132,7 @@
     (let ((wd (yp:current-directory)))
       (dynamic-wind
         (lambda () (yp:current-directory
-                    (x->f (pathname-as-directory (x->pathname dir)))))
+                    (->fn (pathname-as-directory (->pathname dir)))))
         thunk
         (lambda () (yp:current-directory wd)))))
 

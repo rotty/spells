@@ -62,14 +62,14 @@
                        (map (lambda (x)
                               (pathname-with-file dir (cond ((string? x) x)
                                                             (else (car x)))))
-                            (with-input-from-file (x->namestring listing) read))
+                            (with-input-from-file (->namestring listing) read))
                        (directory-fold dir cons '()))))
         (for-each (lambda (f)
                     (run-tests-in-file f env))
                   files))))
 
   (define (run-tests-in-file file env)
-    (let ((filename (x->namestring file)))
+    (let ((filename (->namestring file)))
       (display "\n;")
       (display (list "Loading " filename "... "))
       (newline)
@@ -151,7 +151,7 @@
                 (call-with-input-file tests-file
                   (lambda (port)
                     (let ((test-spec (read port))
-                          (pathname (x->pathname tests-file)))
+                          (pathname (->pathname tests-file)))
                       (parameterize
                           ((this-directory (directory-namestring pathname)))
                         (eval-test-spec pathname test-spec '()))))))

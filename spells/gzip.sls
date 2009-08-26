@@ -149,8 +149,8 @@
     (raise-zlib-error 'open-gz-file-input-port
                       status
                       message
-                      (make-i/o-filename-error (x->namestring pathname))))
-  (let ((gzfile (zlib-gzopen (x->namestring pathname) "rb")))
+                      (make-i/o-filename-error (->namestring pathname))))
+  (let ((gzfile (zlib-gzopen (->namestring pathname) "rb")))
     (when (null-pointer? gzfile)
       (if (= (errno) 0)
           (lose (zlib-status mem-error) "out of memory")

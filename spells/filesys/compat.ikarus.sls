@@ -47,48 +47,51 @@
           (spells time-lib)
           (prefix (ikarus) ik:))
 
-(define x->f x->namestring)
+(define ->fn ->namestring)
 
 (define (file-exists? pathname)
-  (ik:file-exists? (x->f pathname)))
+  (ik:file-exists? (->fn pathname)))
 
 (define (create-directory pathname)
-  (ik:make-directory (x->f pathname)))
+  (ik:make-directory (->fn pathname)))
 
 (define (delete-file pathname)
-  (let ((fname (x->f pathname)))
+  (let ((fname (->fn pathname)))
     (if (ik:file-exists? fname)
         (if (ik:file-directory? fname)
             (ik:delete-directory fname)
             (ik:delete-file fname)))))
 
 (define (rename-file source-pathname target-pathname)
-  (ik:rename-file (x->f source-pathname) (x->f target-pathname)))
+  (ik:rename-file (->fn source-pathname) (->fn target-pathname)))
 
 (define (create-hard-link old-pathname new-pathname)
-  (ik:make-hard-link (x->f old-pathname) (x->f new-pathname)))
+  (ik:make-hard-link (->fn old-pathname) (->fn new-pathname)))
 
 (define (create-symbolic-link old-pathname new-pathname)
-  (ik:make-symbolic-link (x->f old-pathname) (x->f new-pathname)))
+  (ik:make-symbolic-link (->fn old-pathname) (->fn new-pathname)))
 
 (define (file-regular? pathname)
-  (ik:file-regular? (x->f pathname)))
+  (ik:file-regular? (->fn pathname)))
 
 (define (file-symbolic-link? pathname)
-  (ik:file-symbolic-link? (x->f pathname)))
+  (ik:file-symbolic-link? (->fn pathname)))
 
 (define (file-directory? pathname)
-  (ik:file-directory? (x->f pathname)))
+  (ik:file-directory? (->fn pathname)))
 
 (define (make-file-check pred who)
   (lambda (pathname)
-    (let ((fname (x->f pathname)))
-      (if (ik:file-exists? fname)
-          (pred fname)
-          (raise (condition
-                  (make-error)
-                  (make-who-condition who)
-                  (make-i/o-file-does-not-exist-error fname)))))))
+    (let ((fname (->fn pathname)))
+      ;; This re-raising is there to produce an exception a more
+      ;; specific type; see
+      ;; <https://bugs.launchpad.net/ikarus/+bug/405944>.
+      (guard (c ((i/o-filename-error? c)
+                 (raise (condition
+                         (make-error)
+                         (make-who-condition who)
+                         (make-i/o-file-does-not-exist-error fname)))))
+        (pred fname)))))
 
 (define-syntax define-file-check
   (syntax-rules ()
@@ -100,11 +103,11 @@
 (define-file-check file-executable? ik:file-executable?)
 
 (define (file-modification-time pathname)
-  (let ((nsecs (ik:file-mtime (x->f pathname))))
+  (let ((nsecs (ik:file-mtime (->fn pathname))))
     (posix-timestamp->time-utc (div nsecs #e1e9) (mod nsecs #e1e9))))
 
 (define (file-size-in-bytes pathname)
-  (ik:file-size (x->f pathname)))
+  (ik:file-size (->fn pathname)))
 
 (define (dot-or-dotdot? f)
   (or (string=? "." f) (string=? ".." f)))
@@ -112,8 +115,8 @@
 (define (directory-fold* pathname combiner . seeds)
   (let ((dirname (pathname-as-directory pathname)))
     (define (full-pathname entry)
-      (pathname-with-file dirname (pathname-file (x->pathname entry))))
-    (let loop ((entries (ik:directory-list (x->f dirname))) (seeds seeds))
+      (pathname-with-file dirname (pathname-file (->pathname entry))))
+    (let loop ((entries (ik:directory-list (->fn dirname))) (seeds seeds))
       (if (null? entries)
           (apply values seeds)
           (let ((entry (car entries)))
@@ -127,13 +130,13 @@
                          (apply values new-seeds))))))))))
 
 (define (working-directory)
-  (x->pathname (ik:current-directory)))
+  (->pathname (ik:current-directory)))
 
 (define (with-working-directory dir thunk)
   (let ((wd (ik:current-directory)))
     (dynamic-wind
       (lambda () (ik:current-directory
-                  (x->f (pathname-as-directory (x->pathname dir)))))
+                  (->fn (pathname-as-directory (->pathname dir)))))
       thunk
       (lambda () (ik:current-directory wd)))))
 

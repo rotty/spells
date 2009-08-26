@@ -47,10 +47,10 @@
                               delete-file)
                   la:))
 
-(define x->f x->namestring)
+(define ->fn ->namestring)
 
 (define (file-exists? pathname)
-  (la:file-exists? (x->f pathname)))
+  (la:file-exists? (->fn pathname)))
 
 (define (create-directory pathname)
   (error 'directory-fold* "please implement me for larceny"))
@@ -58,7 +58,7 @@
 (define (delete-file pathname)
   ;; FIXME: doesn't work for directories
   (if (file-exists? pathname)
-      (la:delete-file (x->f pathname))))
+      (la:delete-file (->fn pathname))))
 
 (define (rename-file source-pathname target-pathname)
   (error 'rename-file "please implement me for larceny"))
@@ -89,11 +89,11 @@
   (error 'directory-fold* "please implement me for larceny"))
 
 (define (working-directory)
-  (x->pathname (la:current-directory)))
+  (->pathname (la:current-directory)))
 
 (define (with-working-directory dir thunk)
   (parameterize ((la:current-directory
-                  (x->f (pathname-as-directory (x->pathname dir)))))
+                  (->fn (pathname-as-directory (->pathname dir)))))
     (thunk)))
 
 (define (copy-file old-file new-file)

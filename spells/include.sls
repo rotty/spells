@@ -20,7 +20,7 @@
   (import (rnrs)
           (for (only (spells filesys) find-file library-search-paths)
                expand)
-          (for (only (spells pathname) x->namestring)
+          (for (only (spells pathname) ->namestring)
                expand))
 
   (define-syntax include/lexical-context
@@ -84,4 +84,4 @@
                (error 'include-file "cannot find file in search paths"
                       relpath
                       (library-search-paths)))
-           #`(include/lexical-context k #,(x->namestring pathname))))))))
+           #`(include/lexical-context k #,(->namestring pathname))))))))

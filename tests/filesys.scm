@@ -16,11 +16,11 @@
 
 ;; Helper functions
 
-(define test-dir (x->pathname '((",filesys-test.tmp"))))
+(define test-dir (->pathname '((",filesys-test.tmp"))))
 (define test-data '(foo bar baz 42))
 
 (define (create-test-file pathname)
-  (call-with-output-file (x->namestring (test-file pathname))
+  (call-with-output-file (->namestring (test-file pathname))
     (lambda (port)
       (write test-data port))))
 
@@ -68,7 +68,7 @@
       (begin
         (copy-file (test-file "a") (test-file "out-file"))
         (file-size-in-bytes (test-file "out-file")))))
-  (let ((outfile-name (x->namestring (test-file "out-file"))))
+  (let ((outfile-name (->namestring (test-file "out-file"))))
     (test-equal test-data
       (begin
         (call-with-output-file/atomic outfile-name

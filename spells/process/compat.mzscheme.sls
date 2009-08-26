@@ -51,7 +51,7 @@
   (define (x->strlist lst)
     (map (lambda (s)
            (cond ((string? s)   s)
-                 ((pathname? s) (x->namestring s))
+                 ((pathname? s) (->namestring s))
                  (else
                   (error "cannot coerce to string list" lst))))
          lst))

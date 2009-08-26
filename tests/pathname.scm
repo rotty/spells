@@ -33,47 +33,47 @@
   "S-Expression parsing")
 
 (define-test-case pathname-tests.s-expr string ()
-  (test-pn= (x->pathname "foo")
+  (test-pn= (->pathname "foo")
     (make-pathname #f '() "foo")))
 
 (define-test-case pathname-tests.s-expr dirlist-w/o-filename ()
-  (test-pn= (x->pathname '(("foo" "bar")))
+  (test-pn= (->pathname '(("foo" "bar")))
     (make-pathname #f '("foo" "bar") #f)))
 
 (define-test-case pathname-tests.s-expr dirlist-nonempty ()
-  (test-pn= (x->pathname '(("foo" "bar") "baz"))
+  (test-pn= (->pathname '(("foo" "bar") "baz"))
     (make-pathname #f '("foo" "bar") "baz")))
 
 (define-test-case pathname-tests.s-expr dirlist-empty ()
-  (test-pn= (x->pathname '(() "baz"))
+  (test-pn= (->pathname '(() "baz"))
    (make-pathname #f '() "baz")))
 
 (define-test-suite (pathname-tests.ops pathname-tests)
   "Pathname operations")
 
 (define-test-case pathname-tests.ops as-directory ()
-  (test-pn= (x->pathname '(("foo")))
+  (test-pn= (->pathname '(("foo")))
     (pathname-as-directory '(("foo"))))
-  (test-pn= (x->pathname '(("foo" "bar" "baz")))
+  (test-pn= (->pathname '(("foo" "bar" "baz")))
     (pathname-as-directory '(("foo" "bar") "baz"))))
 
 (define-test-case pathname-tests.ops merge ()
-  (test-pn= (x->pathname '(/ ("foo" "bar" "baz") #f))
+  (test-pn= (->pathname '(/ ("foo" "bar" "baz") #f))
     (merge-pathnames '(("baz")) '(/ ("foo" "bar") #f))))
 
 (define-test-case pathname-tests.ops join ()
-  (test-pn= (x->pathname '(("foo" "bar") "baz"))
+  (test-pn= (->pathname '(("foo" "bar") "baz"))
     (pathname-join '(("foo" "bar") "file") '(() "baz")))
-  (test-pn= (x->pathname '(("foo" "bar" "baz") "file2"))
+  (test-pn= (->pathname '(("foo" "bar" "baz") "file2"))
     (pathname-join '(("foo" "bar") "file1") '(("baz") "file2")))
-  (test-pn= (x->pathname '(("foo" "bar" "baz" "f2" "qux") "f3"))
+  (test-pn= (->pathname '(("foo" "bar" "baz" "f2" "qux") "f3"))
     (pathname-join '(("foo" "bar") "f1")
                    '(("baz") "f2")
                    '(("qux") "f3")))
-  (test-pn= (x->pathname '((back back) ("some") "file2"))
+  (test-pn= (->pathname '((back back) ("some") "file2"))
     (pathname-join '((back back) ("some" "dir") "file1")
                    '((back) () "file2")))
-  (test-pn= (x->pathname '(/ ("another" "dir2") "file"))
+  (test-pn= (->pathname '(/ ("another" "dir2") "file"))
     (pathname-join '(("ignore") "me")
                    '(/ ("another" "dir") #f)
                    '((back) ("dir2") "file"))))
@@ -84,18 +84,18 @@
 
 (define-test-case pathname-tests.conversion relative ()
   (test-equal "foo/bar/baz"
-    (x->namestring (make-pathname #f '("foo" "bar") "baz"))))
+    (->namestring (make-pathname #f '("foo" "bar") "baz"))))
 
 (define-test-case pathname-tests.conversion absolute ()
   (test-equal "/foo/bar"
-    (x->namestring (make-pathname '/ '("foo") "bar"))))
+    (->namestring (make-pathname '/ '("foo") "bar"))))
 
 (define-test-case pathname-tests.conversion empty ()
   (test-equal "."
-    (x->namestring (make-pathname #f '() #f))))
+    (->namestring (make-pathname #f '() #f))))
 
 (define-test-case pathname-tests.conversion dir ()
-  (test-equal (x->namestring (make-pathname #f '("foo") #f))
+  (test-equal (->namestring (make-pathname #f '("foo") #f))
     "foo/"))
 
 
@@ -104,38 +104,38 @@
 
 (define-test-case pathname-tests.parsing types ()
   (test-pn= (make-pathname #f '() (make-file "foo" "scm"))
-    (x->pathname "foo.scm"))
+    (->pathname "foo.scm"))
   (test-pn= (make-pathname #f '() (make-file "foo" '("scm" "in")))
-    (x->pathname "foo.scm.in")))
+    (->pathname "foo.scm.in")))
 
 (define-test-case pathname-tests.parsing absolute ()
   (test-pn= (make-pathname '/ '("foo") "bar")
-    (x->pathname "/foo/bar")))
+    (->pathname "/foo/bar")))
 
 (define-test-case pathname-tests.parsing dot ()
   (test-pn= (make-pathname #f '("some" "dir" "somewhere") #f)
-    (x->pathname "./some/dir/./somewhere/")))
+    (->pathname "./some/dir/./somewhere/")))
 
 (define-test-case pathname-tests.parsing dotdot ()
   (test-pn= (make-pathname #f '("some") "foo")
-    (x->pathname "some/dir/../foo"))
+    (->pathname "some/dir/../foo"))
   (test-pn= (make-pathname #f '() #f)
-    (x->pathname "some/dir/../.."))
+    (->pathname "some/dir/../.."))
   (test-pn= (make-pathname '(back back) '("some" "dir") "file")
-    (x->pathname "ignore/this/../../../../some/dir/file")))
+    (->pathname "ignore/this/../../../../some/dir/file")))
 
 (define-test-suite (pathname-tests.to-ns pathname-tests)
   "Namestring serialization")
 
 (define-test-case pathname-tests.to-ns types ()
   (test-equal "foo.scm"
-    (x->namestring (make-pathname #f '() (make-file "foo" "scm"))))
+    (->namestring (make-pathname #f '() (make-file "foo" "scm"))))
   (test-equal "foo.scm.in"
-    (x->namestring (make-pathname #f '() (make-file "foo" '("scm" "in"))))))
+    (->namestring (make-pathname #f '() (make-file "foo" '("scm" "in"))))))
 
 (define-test-case pathname-tests.to-ns dotdot ()
   (test-equal "../../some/dir/foo.scm"
-    (x->namestring (make-pathname '(back back)
+    (->namestring (make-pathname '(back back)
                                   '("some" "dir")
                                   (make-file "foo" "scm")))))
 

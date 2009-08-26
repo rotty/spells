@@ -66,15 +66,15 @@
                   mz:)
           (only (scheme mpair) list->mlist))
 
-(define x->f x->namestring)
+(define ->fn ->namestring)
 
 (define (file-exists? pathname)
-  (let ((f (x->f pathname)))
+  (let ((f (->fn pathname)))
     (or (mz:file-exists? f) (mz:directory-exists? f)
         (mz:link-exists? f))))
 
 (define (create-directory pathname)
-  (mz:make-directory (x->f pathname)))
+  (mz:make-directory (->fn pathname)))
 
 (define (create-symbolic-link link-pathname linked-pathname)
   (error 'create-symbolic-link "not implemented on mzscheme"))
@@ -85,46 +85,46 @@
 (define (delete-file pathname)
   (if (file-exists? pathname)
       (if (file-directory? pathname)
-          (mz:delete-directory (x->f pathname))
-          (mz:delete-file (x->f pathname)))))
+          (mz:delete-directory (->fn pathname))
+          (mz:delete-file (->fn pathname)))))
 
 (define (rename-file source-pathname target-pathname)
-  (mz:rename-file-or-directory (x->f source-pathname) (x->f target-pathname) #t))
+  (mz:rename-file-or-directory (->fn source-pathname) (->fn target-pathname) #t))
 
 (define (file-regular? pathname)
-  (mz:file-exists? (x->f pathname)))
+  (mz:file-exists? (->fn pathname)))
 
 (define (file-symbolic-link? pathname)
-  (mz:link-exists? (x->f pathname)))
+  (mz:link-exists? (->fn pathname)))
 
 (define (file-directory? pathname)
-  (mz:directory-exists? (x->f pathname)))
+  (mz:directory-exists? (->fn pathname)))
 
 (define (file-test-p f p)
   (and (file-exists? f)
        (if (mz:memq p (mz:file-or-directory-permissions f)) #t #f)))
 
 (define (file-readable? pathname)
-  (file-test-p (x->f pathname) 'read))
+  (file-test-p (->fn pathname) 'read))
 (define (file-writable? pathname)
-  (file-test-p (x->f pathname) 'write))
+  (file-test-p (->fn pathname) 'write))
 (define (file-executable? pathname)
-  (file-test-p (x->f pathname) 'execute))
+  (file-test-p (->fn pathname) 'execute))
 
 (define (file-modification-time pathname)
   (posix-timestamp->time-utc
-   (mz:file-or-directory-modify-seconds (x->f pathname))))
+   (mz:file-or-directory-modify-seconds (->fn pathname))))
 
 (define (file-size-in-bytes pathname)
-  (mz:file-size (x->f pathname)))
+  (mz:file-size (->fn pathname)))
 
 (define (dot-or-dotdot? f)
   (or (string=? "." f) (string=? ".." f)))
 
 (define (directory-fold* pathname combiner . seeds)
   (define (full-pathname entry)
-    (pathname-with-file pathname (pathname-file (x->pathname entry))))
-  (let loop ((entries (mz:directory-list (x->f pathname))) (seeds seeds))
+    (pathname-with-file pathname (pathname-file (->pathname entry))))
+  (let loop ((entries (mz:directory-list (->fn pathname))) (seeds seeds))
     (if (null? entries)
         (apply values seeds)
         (let ((entry (mz:path->string (mz:car entries))))
@@ -138,13 +138,13 @@
                        (apply values new-seeds)))))))))
 
 (define (working-directory)
-  (x->pathname (mz:current-directory)))
+  (->pathname (mz:current-directory)))
 
 (define (with-working-directory dir thunk)
   (let ((wd (mz:current-directory)))
     (dynamic-wind
       (lambda () (mz:current-directory
-                  (x->f (pathname-as-directory (x->pathname dir)))))
+                  (->fn (pathname-as-directory (->pathname dir)))))
       thunk
       (lambda () (mz:current-directory wd)))))
 
