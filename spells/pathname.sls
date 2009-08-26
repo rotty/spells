@@ -94,14 +94,13 @@
 ;;      is a relative pathname.
 ;; @item
 ;;      The @emph{directory} is a list of directory names from the
-;;      origin leading up to the file.  Each directory name is a string
-;;      or a symbol.
+;;      origin leading up to the file.  Each directory name is a string.
 ;; @item
 ;;      The @emph{filename} is the name of the file itself along with
-;;      the type and version.  The name is a string or a symbol.  There
-;;      may be zero or more types, each of which is also a string or a
-;;      symbol.  The version is either a non-negative integer or the
-;;      symbol `newest'.
+;;      the type and version.  The name is a string.  There may be
+;;      zero or more types, each of which is also a string.  The
+;;      version is either a non-negative integer or the symbol
+;;      @code{newest}.
 ;; @end itemize
 
 ;;@stop
@@ -120,12 +119,6 @@
 
 ;;; This section must come first so that ENFORCE is defined before
 ;;; compiling the functions in the file that use it.
-
-;;@
-;; Return t if @1 is a string or a symbol and nil if not."
-(define (string-or-symbol? object)
-  (or (string? object)
-      (symbol? object)))
 
 (define (substring-split s sep start)
   (if (= 0 start)
@@ -150,7 +143,9 @@
 (define (make-pathname origin directory file)
   (really-make-pathname
    (or origin '())
-   directory
+   (->strlist directory
+              (lambda ()
+                (error 'make-pathname "invalid directory part" directory)))
    (cond ((list? file)
           (case (length file)
             ((0) (error 'make-pathname "empty list not allowed for file part"))
@@ -229,11 +224,21 @@
 
 ;;@stop
 
+(define (->strlist lst lose)
+  (map (lambda (item)
+         (cond ((string? item) item)
+               ((symbol? item) (symbol->string item))
+               (else           (lose))))
+       lst))
+
 (define (make-file/type type)
-  (cond ((not type) '())
-        ((string-or-symbol? type) (list type))
-        ((and (list? type) (every string-or-symbol? type)) type)
-        (else (error 'make-file "Invalid file type specifier: %S" type))))
+  (define (lose)
+    (error 'make-file "Invalid file type specifier" type))
+  (cond ((not type)     '())
+        ((string? type)  (list type))
+        ((symbol? type)  (list (symbol->string type)))
+        ((list? type)    (->strlist type lose))
+        (else            (lose))))
 
 ;;@ Return the type of @1.
 ;; Return the last type if there is more than one.
@@ -427,15 +432,12 @@
         null-hash
         lst))
 
-(define (str/sym-hash x)
-  (string-hash (if (symbol? x) (symbol->string x) x)))
-
 (define null-hash 0)
 
 (define (file-hash file)
   (if file
-      (hash-combine (str/sym-hash (file-name file))
-                    (hash-fold str/sym-hash (file-types file)))
+      (hash-combine (string-hash (file-name file))
+                    (hash-fold string-hash (file-types file)))
       null-hash))
 
 (define (pathname-hash pathname)
@@ -444,7 +446,7 @@
                         ((symbol? origin) (symbol-hash origin))
                         ((string? origin) (string-hash origin))
                         (else             null-hash))
-                  (hash-combine (hash-fold str/sym-hash dir)
+                  (hash-combine (hash-fold string-hash dir)
                                 (file-hash file)))))
 
 
@@ -472,11 +474,6 @@
                 (equal? (file-types (pathname-file x))
                         (file-types (pathname-file y)))))))
 
-(define (%->string obj)
-  (cond ((string? obj) obj)
-        ((symbol? obj) (symbol->string obj))
-        (else (error 'pathname-compare "cannot coerce to string" obj))))
-
 (define (make-pathname-file-comp pred)
   (lambda (x y)
     (let ((file-x (pathname-file x))
@@ -486,9 +483,9 @@
                   file-y (file-name file-y)
                   (equal? (pathname-origin x)
                           (pathname-origin y))
-                  (equal? (map %->string (pathname-directory x))
-                          (map %->string (pathname-directory y))))
-             (pred (%->string (file-name file-x)) (%->string (file-name file-y))))
+                  (equal? (pathname-directory x)
+                          (pathname-directory y)))
+             (pred (file-name file-x) (file-name file-y)))
             (else
              #f)))))
 ;;@stop
@@ -599,7 +596,7 @@
      (let ((dir (pathname-directory pathname)))
        (if (null? dir)
            "."
-           (string-append (string-join (map %->string dir) "/") "/"))))
+           (string-append (string-join dir "/") "/"))))
 
     ((fs-type/pathname->namestring self pathname)
      
