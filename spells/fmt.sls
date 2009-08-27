@@ -42,7 +42,7 @@
           (rnrs mutable-pairs)
           (rnrs r5rs)
           (srfi :6 basic-string-ports)
-          (spells hash-tables)
+          (srfi :69 basic-hash-tables)
           (srfi :1 lists)
           (spells opt-args)
           (except (srfi :13 strings) string-hash)
