@@ -32,6 +32,7 @@
           pathname?
           ->pathname
           pathname=?
+          pathname-compare
           pathname<?
           pathname>?
           pathname-hash
@@ -99,8 +100,8 @@
 ;;      The @emph{filename} is the name of the file itself along with
 ;;      the type and version.  The name is a string.  There may be
 ;;      zero or more types, each of which is also a string.  The
-;;      version is either a non-negative integer or the symbol
-;;      @code{newest}.
+;;      version is either a non-negative integer or @code{#f},
+;;      implying the newest version.
 ;; @end itemize
 
 ;;@stop
@@ -250,7 +251,6 @@
 ;;@ Return @code{#t} if @1 is a valid file version and code{#f} if not.
 (define (file-version? object)
   (or (not object)                     ; No version.
-      (eq? object 'newest)
       (and (integer? object) (>= object 0))))
 
 ;;;; Pathname Component Substitution & Merging
@@ -458,40 +458,73 @@
   ;;(error 'expand-pathname "Unimplemented: %S" `(expand-pathname ',pathname))
   pathname)
 
+
+;;; Pathname comparison
+
 ;;@ Compare the pathnames @1 and @2 and return @code{#t} if they refer
 ;; to the same filesystem entity.
-;;
-;; FIXME: doesn't deal with versions.
 (define (pathname=? x y)
   (and (equal? (pathname-origin x) (pathname-origin y))
-       (equal? (pathname-directory x) (pathname-directory y))
-       (or (and (eqv? (pathname-file x) #f)
-                (eqv? (pathname-file y) #f)
-                #t)
-           (and (pathname-file x) (pathname-file y)
-                (equal? (file-name (pathname-file x))
-                        (file-name (pathname-file y)))
-                (equal? (file-types (pathname-file x))
-                        (file-types (pathname-file y)))))))
+       (= (pathname-compare x y) 0)))
 
-(define (make-pathname-file-comp pred)
-  (lambda (x y)
-    (let ((file-x (pathname-file x))
-          (file-y (pathname-file y)))
-      (cond ((pathname=? x y) #f)
-            ((and file-x (file-name file-x)
-                  file-y (file-name file-y)
-                  (equal? (pathname-origin x)
-                          (pathname-origin y))
-                  (equal? (pathname-directory x)
-                          (pathname-directory y)))
-             (pred (file-name file-x) (file-name file-y)))
-            (else
-             #f)))))
 ;;@stop
 
-(define pathname<? (make-pathname-file-comp string<?))
-(define pathname>? (make-pathname-file-comp string>?))
+(define (string-cmp x y)
+  (string-compare x y (lambda (i) -1) (lambda (i) 0) (lambda (i) 1)))
+
+(define (strlist-compare x y)
+  (let loop ((x x) (y y))
+    (cond ((and (null? x) (null? y))
+           0)
+          ((null? x)
+           -1)
+          ((null? y)
+           1)
+          (else
+           (let ((elt-cmp (string-cmp (car x) (car y))))
+             (if (= 0 elt-cmp)
+                 (loop (cdr x) (cdr y))
+                 elt-cmp))))))
+
+(define (version-compare x y)
+  (if (and (eqv? x #f) (eqv? y #f))
+      0
+      (let ((delta (- x y)))
+        (cond ((< delta 0) -1)
+              ((= delta 0)  0)
+              (else         1)))))
+
+(define (file-compare x y)
+  (cond ((and (eqv? x #f) (eqv? y #f))
+         0)
+        ((eqv? x #f)
+         -1)
+        ((eqv? y #f)
+         1)
+        (else
+         (let ((name-cmp (string-cmp (file-name x) (file-name y))))
+           (if (= 0 name-cmp)
+               (let ((types-cmp (strlist-compare (file-types x)
+                                                 (file-types y))))
+                 (if (= 0 types-cmp)
+                     (version-compare (file-version x) (file-version y))))
+               name-cmp)))))
+
+;;@ Compare the pathnames @1 and @2, without considering the
+;; origin. Returns 0 on equality, -1 when @1 is considered less than
+;; @2, and 1 if it is considered greater.
+(define (pathname-compare x y)
+  (let ((dir-cmp (strlist-compare (pathname-directory x)
+                                  (pathname-directory y))))
+    (if (= dir-cmp 0)
+        (file-compare (pathname-file x) (pathname-file y))
+        dir-cmp)))
+
+(define (pathname<? x y)
+  (< (pathname-compare x y) 0))
+
+(define (pathname>? x y)
+  (> (pathname-compare x y) 0))
 
 
 ;;;; Namestrings

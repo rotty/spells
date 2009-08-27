@@ -26,7 +26,7 @@
    (srfi :8 receive))
   ("algebraic-types.scm"
    (spells algebraic-types))
-  ("pathname.scm" spells.pathname spells.misc)
+  ("pathname.scm" spells.pathname spells.misc rnrs.lists rnrs.sorting)
   ("filesys.scm"
    spells.filesys spells.pathname
    (except (srfi :1 lists) for-each map)

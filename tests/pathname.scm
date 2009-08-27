@@ -20,14 +20,38 @@
     ((test-pn= expected actual)
      (test-compare pathname=? expected actual))))
 
+(define-syntax test-pns=
+  (syntax-rules ()
+    ((test-pns= expected actual)
+     (test-compare (lambda (x y) (for-all pathname=? x y))
+         expected
+       actual))))
+
+
 (define-test-suite pathname-tests
   "Spells pathname library")
 
 (define-test-case pathname-tests comparison ()
   (test-pn= (make-pathname #f '() #f) (make-pathname #f '() #f))
   (test-compare (compose not pathname=?)
-                (make-pathname #f '() #f)
-                (make-pathname #f '() "foo")))
+      (make-pathname #f '() #f)
+    (make-pathname #f '() "foo"))
+  (test-pns= (map ->pathname '((())
+                               (() "x")
+                               (() "y")
+                               (("bar"))
+                               (("foo"))
+                               (("foo") "file1")
+                               (("foo") "file2")
+                               (("foo" "bar"))))
+    (list-sort pathname<? (map ->pathname '((("foo" "bar"))
+                                            (("foo"))
+                                            (("foo") "file1")
+                                            (())
+                                            (() "y")
+                                            (("foo") "file2")
+                                            (("bar"))
+                                            (() "x"))))))
 
 (define-test-suite (pathname-tests.s-expr pathname-tests)
   "S-Expression parsing")
@@ -142,5 +166,5 @@
 (run-test-suite pathname-tests)
 
 ;; Local Variables:
-;; scheme-indent-styles: (trc-testing (test-pn= 1))
+;; scheme-indent-styles: (trc-testing (test-pn= 1) (test-pns= 1))
 ;; End:
