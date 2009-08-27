@@ -84,15 +84,15 @@
 ;;
 ;; @emph{Pathnames} are platform-independent representations of
 ;; locations of objects on file systems.  A pathname consists of three
-;; components, each of which is optional:
+;; components:
 ;;
 ;; @itemize @bullet
 ;; @item
 ;;      The @emph{origin} is the place from which the path begins.  It
 ;;      might be the Unix root directory, a user's home directory, a
 ;;      DOS device/drive, an Apollo logical name, a Unix environment
-;;      variable, a VMS host, &c.  A pathname with a @code{#f} origin
-;;      is a relative pathname.
+;;      variable, a VMS host, &c.  A pathname with the empty list as
+;;      origin is a relative pathname.
 ;; @item
 ;;      The @emph{directory} is a list of directory names from the
 ;;      origin leading up to the file.  Each directory name is a string.
@@ -106,20 +106,14 @@
 
 ;;@stop
 
-;++ Still missing:
-;++
-;++   - non-Unix file system types
-;++       There should be separate pathname-unix.el, pathname-mac.el,
-;++       and pathname-dos.el files at least.
-;++   - file merging (see losing definition of MERGE-FILES)
-;++   - enough pathnames
-;++   - pathname expansion
-;++   - truename operation
+;;++ Still missing:
+;;++
+;;++   - non-Unix file system types
+;;++   - enough pathnames
+;;++   - pathname expansion
+;;++   - truename operation
 
 ;;;; Utilities
-
-;;; This section must come first so that ENFORCE is defined before
-;;; compiling the functions in the file that use it.
 
 (define (substring-split s sep start)
   (if (= 0 start)

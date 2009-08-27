@@ -71,8 +71,6 @@
     (status->values (yp:process-wait (process-pid process) #f)))
 
   (define (run-shell-command cmd)
-    ;; This is a hack, but works (at least) on Linux. See
-    ;; <http://code.google.com/p/ypsilon/issues/detail?id=88>.
     (status->values (yp:system cmd)))
 
 )
