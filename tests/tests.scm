@@ -67,4 +67,6 @@
    (rnrs io ports)
    (rnrs lists)
    (only (srfi :1) make-list iota)
-   (only (srfi :13) string-join))))
+   (only (srfi :13) string-join))
+  ("delimited-control.scm"
+   (spells delimited-control))))
