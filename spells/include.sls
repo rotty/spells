@@ -16,72 +16,30 @@
 #!r6rs
 
 (library (spells include)
-  (export include-file)
+  (export include-file
+          include-file/downcase)
   (import (rnrs)
-          (for (only (spells filesys) find-file library-search-paths)
-               expand)
-          (for (only (spells pathname) ->namestring)
-               expand))
-
-  (define-syntax include/lexical-context
-    (lambda (stx)
-      (define (error/conditions who msg irrts . cndts)
-        (raise
-         (apply condition
-                (make-error)
-                (make-who-condition who)
-                (make-message-condition msg)
-                (make-irritants-condition irrts)
-                cndts)))
-      (syntax-case stx ()
-        ((_ ctxt filename)
-         (and (identifier? #'ctxt)
-              (or (let ((path (syntax->datum #'filename)))
-                    (and (string? path)
-                         (positive? (string-length path))))
-                  (syntax-violation #f "not a path" stx #'filename)))
-         (let ((fn (syntax->datum #'filename)))
-           (with-exception-handler
-             (lambda (ex)
-               (error/conditions 'include/lexical-context
-                 "error while trying to include" (list fn)
-                 (if (condition? ex) ex (make-irritants-condition (list ex)))))
-             (lambda ()
-               (call-with-input-file fn
-                 (lambda (fip)
-                   (let loop ((x (read fip)) (a '()))
-                     (if (eof-object? x)
-                       (datum->syntax #'ctxt `(begin . ,(reverse a)))
-                       (loop (read fip) (cons x a)))))))))))))
+          (for (spells tracing) expand)
+          (for (spells include aux) expand))
 
   (define-syntax include-file
     (lambda (stx)
-      (define (string-join lst sep)
-        (if (null? lst)
-            ""
-            (let loop ((result '()) (lst lst))
-              (if (null? lst)
-                  (apply string-append (cdr (reverse result)))
-                  (loop (cons (car lst) (cons sep result))
-                        (cdr lst))))))
-      (define (filespec->path name)
-        (cond ((string? name) name)
-              ((symbol? name) (string-append (symbol->string name) ".scm"))
-              ((pair? name) (string-append
-                             (if (pair? (car name))
-                                 (string-join (map symbol->string (car name)) "/")
-                                 (symbol->string (car name)))
-                             "/"
-                             (symbol->string (cadr name))
-                             ".scm"))
-              (else name)))
-
       (syntax-case stx ()
         ((k <path>)
-         (let* ((relpath (filespec->path (syntax->datum #'<path>)))
-                (pathname (find-file relpath (library-search-paths))))
-           (unless pathname
-               (error 'include-file "cannot find file in search paths"
-                      relpath
-                      (library-search-paths)))
-           #`(include/lexical-context k #,(->namestring pathname))))))))
+         (include-file/aux 'include-file #'k (syntax->datum #'<path>) values)))))
+
+  (define-syntax include-file/downcase
+    (lambda (stx)
+      (define (downcase form)
+        (cond ((symbol? form)
+               (string->symbol (string-downcase (symbol->string form))))
+              ((pair? form)
+               (cons (downcase (car form))
+                     (downcase (cdr form))))
+              (else
+               form)))
+      (syntax-case stx ()
+        ((k <path>)
+         (include-file/aux 'include-file #'k (syntax->datum #'<path>) downcase)))))
+  
+)
