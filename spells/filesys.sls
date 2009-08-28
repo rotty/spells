@@ -40,6 +40,12 @@
           file-modification-time
           file-size-in-bytes
 
+          directory-stream?
+          open-directory-stream
+          close-directory-stream
+          read-directory-stream
+          in-directory-stream
+          
           directory-fold*
           directory-fold
           directory-fold-tree*
@@ -71,6 +77,19 @@
           (spells filesys compat))
 
 
+;;@ Foof-loop iterator for directory streams.
+(define-syntax in-directory-stream
+  (syntax-rules ()
+    ((_ (elt-var) (stream-expr) cont . env)
+     (cont
+      (((stream) stream-expr))         ;Outer bindings
+      ()                               ;Loop variables
+      (((elt-var) (read-directory-stream stream))) ;Entry bindings
+      ((not elt-var))                  ;Termination conditions
+      ()                               ;Body bindings
+      ()                               ;Final bindings
+      . env))))
+
 ;;@ Fold @2 over the contents of the directory @1.
 ;;
 ;; If the directory @1 has the contents @var{f1}, @var{f2},
@@ -87,7 +106,22 @@
        (apply values #t new-seeds)))
    seeds))
 
-;; Naive implementation in terms of DIRECTORY-FOLD
+(define (directory-fold* pathname combiner . seeds)
+  (let* ((dirname (pathname-as-directory pathname))
+         (stream (open-directory-stream dirname)))
+    (define (full-pathname entry)
+      (pathname-with-file dirname (pathname-file (->pathname entry))))
+    (let loop ((seeds seeds))
+      (let ((entry (read-directory-stream stream)))
+        (if (not entry)
+            (apply values seeds)
+            (receive (continue? . new-seeds)
+                     (apply combiner (full-pathname entry) seeds)
+              (if continue?
+                  (loop new-seeds)
+                  (apply values new-seeds))))))))
+
+;; Naive implementation in terms of DIRECTORY-FOLD*
 (define (directory-fold-tree* pathname file-combiner dir-combiner . seeds)
   (apply directory-fold* pathname
          (lambda (pathname . seeds)

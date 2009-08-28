@@ -33,13 +33,17 @@
           file-modification-time
           file-size-in-bytes
 
-          directory-fold*
-
+          directory-stream?
+          open-directory-stream
+          close-directory-stream
+          read-directory-stream
+          
           working-directory
           with-working-directory
 
           library-search-paths)
   (import (rnrs base)
+          (rnrs records syntactic)
           (rnrs conditions)
           (rnrs exceptions)
           (rnrs io ports)
@@ -105,26 +109,29 @@
   (define (file-size-in-bytes pathname)
     (yp:file-size-in-bytes (->fn pathname)))
 
-  (define (dot-or-dotdot? f)
-    (or (string=? "." f) (string=? ".." f)))
+  ;; Emulate the stream with a list, until
+  ;; <http://code.google.com/p/ypsilon/issues/detail?id=124> is
+  ;; resolved.
+  (define-record-type directory-stream
+    (fields (mutable entries)))
 
-  (define (directory-fold* pathname combiner . seeds)
-    (define (full-pathname entry)
-      (pathname-with-file pathname (pathname-file (->pathname entry))))
-    (let loop ((entries (yp:directory-list (->fn pathname))) (seeds seeds))
+  (define (open-directory-stream pathname)
+    (make-directory-stream (yp:directory-list (->fn pathname))))
+  
+  (define (close-directory-stream stream)
+    (directory-stream-entries-set! stream #f))
+
+  (define (read-directory-stream stream)
+    (let ((entries (directory-stream-entries stream)))
       (if (null? entries)
-          (apply values seeds)
-          (let ((entry (car entries)))
-            (cond ((dot-or-dotdot? entry)
-                   (loop (cdr entries) seeds))
-                  (else
-                   (receive (continue? . new-seeds)
-                            (apply combiner (full-pathname entry) seeds)
-                     (if continue?
-                         (loop (cdr entries) new-seeds)
-                         (apply values new-seeds)))))))))
-
-
+          #f
+          (let ((filename (car entries)))
+            (directory-stream-entries-set! stream (cdr entries))
+            (if (or (string=? "." filename)
+                    (string=? ".." filename))
+                (read-directory-stream stream)
+                filename)))))
+  
   (define (working-directory)
     (yp:current-directory))
 
