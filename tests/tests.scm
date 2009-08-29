@@ -69,4 +69,6 @@
    (only (srfi :1) make-list iota)
    (only (srfi :13) string-join))
   ("delimited-control.scm"
-   (spells delimited-control))))
+   (spells delimited-control))
+  ("zipper-tree.scm"
+   (spells zipper-tree))))
