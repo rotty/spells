@@ -33,26 +33,11 @@ coded using only R6RS functionality:
 Spells works with Ikarus (from bzr) and Ypsilon (from SVN).
 
 # <<ikarus-notes>>
-- Ikarus Notes :: Unfortunatly, there is still a tweak to Ikarus
-                  (needed by spells' process interface) which has not
-                  yet made it into Ikarus' mainline, so you need to
-                  patch the source:
-
-: bzr checkout --lightweight http://ikarus-scheme.org/ikarus.dev ikarus
-: cd ikarus
-: wget -O - http://launchpadlibrarian.net/27410321/0002-t_process-creation.diff \
-:     | patch -p1
-
-                  You should build Ikarus using the following flags;
-                  see [[http://bugzilla.gnome.org/show_bug.cgi?id=563464#c3][this bug on gobject-introspection]] why using
-                  ~-lpthread~ is a good idea.
-
-: ./configure --enable-libffi LDFLAGS="-lpthread"
-: make
-: make install
+- Ikarus Notes :: A recent bzr checkout (>= 1854) should work out of
+                  the box.
 
 - Ypsilon Notes :: The latest SVN checkout of Ypsilon should work
-                   out-of-the box.
+                   out of the box.
 
 You'll need the ~git~ and ~bzr~ revision control systems, as ~spells~
 itself is managed with git, and depends on the [[https://code.launchpad.net/~scheme-libraries-team/scheme-libraries/srfi][SRFI collection]], which
@@ -87,4 +72,4 @@ Environment Library for Lots of Schemes
 the old (R5RS) Spells has been abandoned.
 
 [fn:3] Again, the old (R5RS) SPE, which created modules for the target
-implementations module system, has been abandoned
+implementations module system, has been abandoned.
