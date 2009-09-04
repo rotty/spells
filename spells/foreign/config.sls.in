@@ -43,20 +43,25 @@
       (or size
           (error 'c-type-sizeof "size of type unknown" sym))))
 
-  (define c-type-alignof
-    (let ((target '("#!@(host-info os)"
-                    "#!@(host-info cpu)")))
-      (cond
-       ((member target '(("linux-gnu" "x86_64")))
-        c-type-sizeof)
-       ((member target '(("linux-gnu" "i686")))
-        (lambda (type)
-          (let ((size (c-type-sizeof type)))
-            (if (= size 8)
-                4
-                size))))
-       (else
-        (error 'c-type-alignof "unknown target" target))))))
+  (define (c-type-alignof sym)
+    (let ((alignment
+           (case sym
+             ((char uchar int8 uint8)     #!@(c-alignof char))
+             ((int16 uint16)              #!@(c-alignof int16_t "stdint.h"))
+             ((int32 uint32)              #!@(c-alignof int32_t "stdint.h"))
+             ((int64 uint64)              #!@(c-alignof int64_t "stdint.h"))
+             ((short ushort)   #!@(c-alignof short))
+             ((int uint)       #!@(c-alignof int))
+             ((long ulong)     #!@(c-alignof long))
+             ((llong ullong)   #!@(c-alignof (long long)))
+             ((pointer)        #!@(c-alignof (void *)))
+             ((float)          #!@(c-alignof float))
+             ((double)         #!@(c-alignof double))
+             ((size_t ssize_t) #!@(c-alignof size_t "stddef.h"))
+             ((time_t)         #!@(c-alignof time_t "time.h"))
+             (else #f))))
+      (or alignment
+          (error 'c-type-alignof "alignment of type unknown" sym)))))
 
 ;; Local Variables:
 ;; mode: scheme
