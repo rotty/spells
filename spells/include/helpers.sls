@@ -15,7 +15,7 @@
 ;;; Code:
 #!r6rs
 
-(library (spells include aux)
+(library (spells include helpers)
   (export include-file/aux)
   (import (rnrs)
           (spells tracing)

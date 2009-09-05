@@ -20,7 +20,7 @@
           include-file/downcase)
   (import (rnrs)
           (for (spells tracing) expand)
-          (for (spells include aux) expand))
+          (for (spells include helpers) expand))
 
   (define-syntax include-file
     (lambda (stx)
