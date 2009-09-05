@@ -24,7 +24,9 @@
           stream->list
           list->stream
           string->stream
-          stream-difference)
+          stream-append
+          stream-difference
+          in-stream)
   (import (rnrs base)
           (spells lazy))
 
@@ -73,4 +75,34 @@
             (stream-cons (stream-car earlier)
                          (stream-difference (stream-cdr earlier)
                                             later)))))
+
+(define (stream-append . streams)
+  (let outer-recur ((streams streams))
+    (if (pair? streams)
+        (let ((stream (car streams))
+              (streams (cdr streams)))
+          (let inner-recur ((stream stream))
+            (lazy (if (stream-pair? stream)
+                      (stream-cons (stream-car stream)
+                                   (lazy (inner-recur (stream-cdr stream))))
+                      (outer-recur streams)))))
+        stream-nil)))
+
+;; foof-loop iterator
+(define-syntax in-stream
+  (syntax-rules ()
+    ((_ (elt-var stream-var) (stream-expr) cont . env)
+     (cont
+      ()                                    ;Outer bindings
+      ((stream-var stream-expr              ;Loop variables
+                   (stream-cdr stream-var)))
+      ()                                    ;Entry bindings
+      ((stream-null? stream-var))           ;Termination conditions
+      (((elt-var) (stream-car stream-var))) ;Body bindings
+      ()                                    ;Final bindings
+      . env))
+    ;; Optional stream variable
+    ((_ (elt-var) (stream-expr) cont . env)
+     (in-stream (elt-var stream) (stream-expr) cont . env))))
+  
 )
