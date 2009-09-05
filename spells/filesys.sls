@@ -45,6 +45,7 @@
           close-directory-stream
           read-directory-stream
           in-directory-stream
+          in-directory
           
           directory-fold*
           directory-fold
@@ -88,6 +89,23 @@
       ((not elt-var))                  ;Termination conditions
       ()                               ;Body bindings
       ()                               ;Final bindings
+      . env))))
+
+;;@ Foof-loop iterator for directories.
+(define-syntax in-directory
+  (syntax-rules ()
+    ((_ (elt-var) (pathname-expr) cont . env)
+     (cont
+      (((stream)                       ;Outer bindings
+        (open-directory-stream (->namestring pathname-expr))))
+      ()                               ;Loop variables
+      (((elt-var)                      ;Entry bindings
+        (read-directory-stream stream)))
+      ((not elt-var))                  ;Termination conditions
+      ()                               ;Body bindings
+      ((()                            ;Final bindings
+        (begin (close-directory-stream stream)
+               (values))))
       . env))))
 
 ;;@ Fold @2 over the contents of the directory @1.
