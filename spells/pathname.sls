@@ -138,15 +138,16 @@
 (define (make-pathname origin directory file)
   (really-make-pathname
    (or origin '())
-   (->strlist directory
-              (lambda ()
-                (error 'make-pathname "invalid directory part" directory)))
+   (%->strlist directory
+               (lambda ()
+                 (error 'make-pathname "invalid directory part" directory)))
    (cond ((list? file)
           (case (length file)
             ((0) (error 'make-pathname "empty list not allowed for file part"))
             ((1) (make-file (car file) #f))
             (else (make-file (car file) (cdr file)))))
-         ((string? file)
+         ((or (string? file)
+              (symbol? file))
           (make-file file #f))
          ((or (file? file)
               (eqv? #f file))
@@ -193,10 +194,8 @@
                                        (fs-type (local-file-system-type))))
   (fs-type/parse-file-namestring
    fs-type
-   (cond ((symbol? object) (symbol->string object))
-         ((string? object) object)
-         (else
-          (error '->file "cannot coerce to file" object)))))
+   (%->string object (lambda ()
+                       (error '->file "cannot coerce to file" object)))))
 
 
 ;;;; Files
@@ -215,16 +214,21 @@
 ;; file's version, or the symbol @code{newest} representing the most
 ;; recent version of the file.
 (define/optional-args (make-file name type (optional (version #f)))
-  (really-make-file name (make-file/type type) version))
+  (define (lose)
+    (assertion-violation 'make-file "Invalid file name specifier" name))
+  (really-make-file (%->string name lose) (make-file/type type) version))
 
 ;;@stop
 
-(define (->strlist lst lose)
+(define (%->strlist lst lose)
   (map (lambda (item)
-         (cond ((string? item) item)
-               ((symbol? item) (symbol->string item))
-               (else           (lose))))
+         (%->string item lose))
        lst))
+
+(define (%->string thing lose)
+  (cond ((string? thing) thing)
+        ((symbol? thing) (symbol->string thing))
+        (else           (lose))))
 
 (define (make-file/type type)
   (define (lose)
@@ -232,7 +236,7 @@
   (cond ((not type)     '())
         ((string? type)  (list type))
         ((symbol? type)  (list (symbol->string type)))
-        ((list? type)    (->strlist type lose))
+        ((list? type)    (%->strlist type lose))
         (else            (lose))))
 
 ;;@ Return the type of @1.
