@@ -40,8 +40,8 @@
                (set! failures (cons name failures))))))
     
     (for-each (lambda (entry)
-                (configure-logger (car entry)
-                                  (expand-handlers note-taker (cdr entry))))
+                (set-logger-properties! (car entry)
+                                        (expand-handlers note-taker (cdr entry))))
               configs)
     
     (map (lambda (proc)
@@ -53,6 +53,8 @@
                (cons 'passed (reverse passes))))
          procs)))
 
+(define test-logger (make-logger root-logger 'test))
+
 ;; Test suite
 
 (define-test-suite logging-tests
@@ -60,22 +62,27 @@
 
 (define-test-case logging-tests handler-invocation ()
   (test-equal '((passed root))
-    (tester '((() (handlers (root)))) (list (make-log '() 'info)))))
+    (tester `((,root-logger (handlers (root))))
+            (list (make-log root-logger 'info)))))
 
 (define-test-case logging-tests propagation ()
   (test-equal
       '((passed root) (passed test root))
-    (tester '((() (handlers (root)))
-                ((test) (handlers (test))))
-              (list (make-log '() 'info)
-                    (make-log '(test) 'info)))))
+    (tester `((,root-logger (handlers (root)))
+              (,test-logger (handlers (test))))
+              (list (make-log root-logger 'info)
+                    (make-log test-logger 'info)))))
 
 (define-test-case logging-tests threshold ()
   (test-equal
       '((passed test) (passed test root))
-    (tester '((() (handlers (root error)))
-                ((test) (handlers (test))))
-              (list (make-log '(test) 'info)
-                    (make-log '(test) 'error)))))
+    (tester `((,root-logger (handlers (root error)))
+              (,test-logger (handlers (test))))
+              (list (make-log test-logger 'info)
+                    (make-log test-logger 'error)))))
 
 (run-test-suite logging-tests)
+
+;; Local Variables:
+;; scheme-indent-styles: (trc-testing)
+;; End:

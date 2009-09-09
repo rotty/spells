@@ -36,7 +36,7 @@
 ;; @item Log entries
 ;; A log entry is an object encapsulating a reference to the logger
 ;; (see below) where it originated, a log level, the time when issued, and the
-;; item to be logged an application-defined object.
+;; item to be logged, an application-defined object.
 ;;
 ;; @item Log handlers
 ;;
@@ -72,7 +72,7 @@
 ;;; Data types
 
 (define-record-type* logger
-  (make-logger name parent)
+  (%make-logger parent name)
   ((threshold #f)
    (propagate? #t)
    (filters '())
@@ -133,13 +133,13 @@
     (set-cdr! (cdr node) (cons child (node-children node)))
     child))
 
-(define (get-logger name)
-  (cond ((not name)
-         *root-logger*)
-        ((symbol? name)
-         (get-logger (list name)))
-        ((list? name)
-         (let loop ((name-rest name) (node *logger-tree*))
+(define (get-logger name-or-logger)
+  (cond ((logger? name-or-logger)
+         name-or-logger)
+        ((symbol? name-or-logger)
+         (get-logger (list name-or-logger)))
+        ((list? name-or-logger)
+         (let loop ((name-rest name-or-logger) (node *logger-tree*))
            (if (null? name-rest)
                (node-logger node)
                (cond ((assq (car name-rest) (node-children node))
@@ -149,9 +149,10 @@
                       (loop (cdr name-rest)
                             (add-child! node
                                         (car name-rest)
-                                        (make-logger name (node-logger node)))))))))
+                                        (%make-logger (node-logger node)
+                                                      name-or-logger))))))))
         (else
-         (error 'get-logger "invalid logger name" name))))
+         (error 'get-logger "invalid logger name" name-or-logger))))
 
 ;;; Builtin handlers & formatters
 
@@ -188,14 +189,14 @@
 
 ;;; Global state
 
-(define *root-logger* (make-logger '(root) #f))
+(define root-logger (%make-logger #f '()))
 
-(define (*default-config*)
+(define (default-logger-properties)
   `((handlers (lambda (entry)
                 (default-log-formatter entry (current-output-port))))))
 
 ;; This is mutated, need to think about thread safety
-(define *logger-tree* (list 'root *root-logger*))
+(define *logger-tree* (list 'root root-logger))
 
 (define *builtin-levels* '((debug    . 10)
                            (info     . 20)
@@ -212,15 +213,20 @@
         (else
          (error 'numeric-level "invalid level" level))))
 
-(define (config-ref config key default)
+(define (property-ref config key default)
   (cond ((assq key config) => cdr)
         (else default)))
 
-(define (config-ref* config key default)
+(define (property-ref* config key default)
   (cond ((assq key config) => cadr)
         (else default)))
 
 ;;; Public interface
+
+;;@ Create a logger object.
+;;
+(define (make-logger parent name)
+  (%make-logger parent (append (logger-name parent) (list name))))
 
 ;;@ Create a logging procedure.
 ;;
@@ -253,8 +259,8 @@
                                         obj)))))))
 
 
-;;@ Configure the logger named by @1 according to the alist @2, which
-;; may contain the following keys:
+;;@ Set the properties of @1 according to the alist @2, which may
+;; contain the following keys:
 ;;
 ;; @multitable @code
 ;; @item handlers
@@ -279,7 +285,8 @@
 ;; from a configuration file for @2, and supply the necessary handlers
 ;; and filters (or their constructors) statically via @3.
 ;;
-;; If this key is not present, the empty list is used as default.
+;; If either of these keys is not present, the empty list is used as
+;; default.
 ;;
 ;; @item threshold
 ;; A logging level, or @code{#f}. All entries with levels below (using @code{<}
@@ -300,9 +307,10 @@
 ;; and filters, using @ref{default-log-formatter} to format the log
 ;; entry.
 ;;
-(define/optional-args (configure-logger name
-                                        (optional (config (*default-config*))
-                                                  (procedures '())))
+(define/optional-args
+  (set-logger-properties! logger
+                          (optional (properties (default-logger-properties))
+                                    (procedures '())))
   (define (proc-ref name)
     (or (assq-ref procedures name)
         (error 'configure-logger "invalid procedure reference" name)))
@@ -323,10 +331,15 @@
        (make-log-handler (make-proc proc)))
       ((? procedure? proc)
        (make-log-handler proc))))
-  (let ((logger (get-logger name)))
-    (set-logger-handlers! logger (map make-handler (config-ref config 'handlers '())))
-    (set-logger-threshold! logger (numeric-level (config-ref* config 'threshold #f)))
-    (set-logger-propagate?! logger (config-ref* config 'propagate? #t))))
+  (set-logger-handlers! logger (map make-handler
+                                    (property-ref properties 'handlers '())))
+  (set-logger-threshold! logger (numeric-level
+                                 (property-ref* properties 'threshold #f)))
+  (set-logger-propagate?! logger (property-ref* properties 'propagate? #t)))
+
+;; Deprectated
+(define (configure-logger name . args)
+  (apply set-logger-properties! (get-logger name) args))
 
 
 ;; Must go last, since it may expand into an expression

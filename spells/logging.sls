@@ -16,8 +16,10 @@
 #!r6rs
 
 (library (spells logging)
-  (export make-log
-
+  (export root-logger
+          make-logger
+          make-log
+          
           log-entry?
           log-entry-level
           log-entry-level-name
@@ -25,6 +27,7 @@
 
           default-log-formatter
 
+          set-logger-properties!
           configure-logger)
   (import (rnrs base)
           (rnrs control)
