@@ -19,8 +19,13 @@
   (export include-file/aux)
   (import (rnrs)
           (spells tracing)
-          (only (spells filesys) find-file library-search-paths)
-          (only (spells pathname) ->namestring))
+          (only (spells time-lib) time-utc->posix-timestamp)
+          (only (spells filesys)
+                find-file
+                file-modification-time
+                library-search-paths)
+          (only (spells pathname) ->namestring)
+          (spells include compat))
 
   (define (error/conditions who msg irrts . cndts)
     (raise
@@ -39,6 +44,9 @@
               (apply string-append (cdr (reverse result)))
               (loop (cons (car lst) (cons sep result))
                     (cdr lst))))))
+
+  (define (file-mtime filename)
+    (time-utc->posix-timestamp (file-modification-time filename)))
   
   (define (filespec->path name)
     (cond ((string? name) name)
@@ -71,9 +79,17 @@
           (lambda ()
             (call-with-input-file filename
               (lambda (port)
-                (let loop ((x (read port)) (forms '()))
+                (let loop ((x (read-annotated port)) (forms '()))
                   (if (eof-object? x)
-                      (cons #'begin (datum->syntax ctxt (reverse forms)))
-                      (loop (read port) (cons (transformer x) forms)))))))))))
+                      #`(stale-when (or (not (file-exists? #,filename))
+                                        (> (file-mtime #,filename)
+                                           #,(file-mtime filename)))
+                          #,@(datum->syntax ctxt (reverse forms)))
+                      (loop (read-annotated port)
+                            (cons (transformer x) forms)))))))))))
 
 )
+
+;; Local Variables:
+;; scheme-indent-styles: ((stale-when 1))
+;; End:
