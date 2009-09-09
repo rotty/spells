@@ -27,8 +27,7 @@
 
           default-log-formatter
 
-          set-logger-properties!
-          configure-logger)
+          set-logger-properties!)
   (import (rnrs base)
           (rnrs control)
           (rnrs mutable-pairs)

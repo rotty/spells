@@ -124,36 +124,6 @@
                (if (logger-propagate? logger)
                    (do-log parent entry)))))))
 
-;; The nodes in the logger tree
-(define node-name car)
-(define node-logger cadr)
-(define node-children cddr)
-(define (add-child! node name logger)
-  (let ((child (list name logger)))
-    (set-cdr! (cdr node) (cons child (node-children node)))
-    child))
-
-(define (get-logger name-or-logger)
-  (cond ((logger? name-or-logger)
-         name-or-logger)
-        ((symbol? name-or-logger)
-         (get-logger (list name-or-logger)))
-        ((list? name-or-logger)
-         (let loop ((name-rest name-or-logger) (node *logger-tree*))
-           (if (null? name-rest)
-               (node-logger node)
-               (cond ((assq (car name-rest) (node-children node))
-                      => (lambda (node)
-                           (loop (cdr name-rest) node)))
-                     (else
-                      (loop (cdr name-rest)
-                            (add-child! node
-                                        (car name-rest)
-                                        (%make-logger (node-logger node)
-                                                      name-or-logger))))))))
-        (else
-         (error 'get-logger "invalid logger name" name-or-logger))))
-
 ;;; Builtin handlers & formatters
 
 ;;@ A simple log formatter.
@@ -194,9 +164,6 @@
 (define (default-logger-properties)
   `((handlers (lambda (entry)
                 (default-log-formatter entry (current-output-port))))))
-
-;; This is mutated, need to think about thread safety
-(define *logger-tree* (list 'root root-logger))
 
 (define *builtin-levels* '((trace    .  5000)
                            (debug    . 10000)
@@ -246,18 +213,16 @@
 ;;
 (define make-log
   (case-lambda
-    ((name level)
-     (let ((level (numeric-level level))
-           (logger (get-logger name)))
+    ((logger level)
+     (let ((level (numeric-level level)))
        (lambda (obj)
          (do-log logger (make-log-entry logger level (current-time) obj)))))
-    ((name)
-     (let ((logger (get-logger name)))
-       (lambda (level obj)
-         (do-log logger (make-log-entry logger
-                                        (numeric-level level)
-                                        (current-time)
-                                        obj)))))))
+    ((logger)
+     (lambda (level obj)
+       (do-log logger (make-log-entry logger
+                                      (numeric-level level)
+                                      (current-time)
+                                      obj))))))
 
 
 ;;@ Set the properties of @1 according to the alist @2, which may
@@ -337,10 +302,6 @@
   (set-logger-threshold! logger (numeric-level
                                  (property-ref* properties 'threshold #f)))
   (set-logger-propagate?! logger (property-ref* properties 'propagate? #t)))
-
-;; Deprectated
-(define (configure-logger name . args)
-  (apply set-logger-properties! (get-logger name) args))
 
 
 ;; Must go last, since it may expand into an expression
