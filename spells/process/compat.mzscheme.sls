@@ -37,7 +37,7 @@
           (only (scheme system)
                 system/exit-code)
           (srfi :8 receive)
-          (spells record-types)
+          (srfi :9 records)
           (spells pathname))
 
   (define-record-type process

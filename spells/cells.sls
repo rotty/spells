@@ -21,7 +21,7 @@
 (library (spells cells)
   (export make-cell cell? cell-ref cell-set!)
   (import (rnrs base)
-          (spells record-types))
+          (srfi :9 records))
 
   ;;@defun make-cell value
   ;;  Create a cell containing @var{value}.

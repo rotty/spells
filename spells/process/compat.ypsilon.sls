@@ -30,7 +30,7 @@
           (rnrs io ports)
           (rnrs arithmetic bitwise)
           (srfi :8 receive)
-          (spells record-types)
+          (srfi :9 records)
           (spells pathname)
           (prefix (only (core primitives)
                         process-spawn
