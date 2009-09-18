@@ -27,7 +27,12 @@
 #!r6rs
 
 (library (spells args-fold)
-  (export option args-fold*)
+  (export option
+          args-fold*
+          option-names
+          option-required-arg?
+          option-optional-arg?
+          option-processor)
   (import (rnrs base)
           (srfi :9 records)
           (spells include))
