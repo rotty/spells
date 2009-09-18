@@ -15,10 +15,6 @@
 ;;; Code:
 
 
-;;; Commentary:
-
-;;; Code:
-
 (define-test-suite record-types-tests
   "Record types")
 
@@ -32,6 +28,17 @@
   (let ((f (make-foo 3 2)))
     (test-equal '(3 2 1)
       (list (foo-a f) (foo-b f) (foo-c f)))))
+
+(define-test-case record-types-tests setters ()
+  (let ()
+    (define-record-type* bar
+      (make-bar (x) y)
+      ((z 1)))
+    (let ((b (make-bar 3 2)))
+      (test-equal '(3 2 1)
+        (list (bar-x b) (bar-y b) (bar-z b)))
+      (set-bar-x! b 5)
+      (test-eqv 5 (bar-x b)))))
 
 (define-test-case record-types-tests functional-fields ()
   (let ((f (make-foo 3 2)))

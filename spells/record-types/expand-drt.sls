@@ -105,7 +105,7 @@
   (append (map (lambda (x)
                  (receive (tag set?)
                           (syntax-case x ()
-                            ((tag init) (values #'tag #t))
+                            ((tag)      (values #'tag #t))
                             (tag        (values #'tag #f)))
                    (with-syntax ((tag tag))
                      #`(tag #,(make-field-accessor k
