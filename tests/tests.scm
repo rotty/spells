@@ -55,7 +55,6 @@
   ("foreign.scm" spells.foreign spells.misc spells.filesys)
   ("foof-loop.scm"
    (spells foof-loop)
-   (rnrs base)
    (rnrs io simple)
    (rnrs io ports)
    (rnrs mutable-strings)
@@ -71,4 +70,7 @@
   ("delimited-control.scm"
    (spells delimited-control))
   ("zipper-tree.scm"
-   (spells zipper-tree))))
+   (spells zipper-tree))
+  ("xvector.scm"
+   (spells xvector)
+   (rnrs control))))

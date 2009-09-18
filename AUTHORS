@@ -37,7 +37,8 @@ Files: spells/private/condition.scm
 License: BSD
 
 Copyright: 2007-2009, Taylor R. Campbell
-Files: spells/testing/parameters.sls, spells/record-types/expand-drt.scm
+Files: spells/testing/parameters.sls, spells/record-types/expand-drt.scm,
+       spells/private/xvector.scm, tests/xvector.scm
 License: BSD
 
 Copyright: 2007, 2009, Taylor R. Campbell
