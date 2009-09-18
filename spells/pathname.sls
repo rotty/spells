@@ -65,15 +65,15 @@
                   (->namestring x->namestring)))
   (import (rnrs base)
           (only (rnrs hashtables) string-hash symbol-hash)
-          (rnrs arithmetic fixnums)
+          (except (srfi :1 lists) map for-each)
           (srfi :8 receive)
           (except (srfi :13 strings)
                   string-hash string-copy string->list string-for-each)
-          (except (srfi :1 lists) map for-each)
           (srfi :14 char-sets)
+          (srfi :39 parameters)
+          (spells hash-utils)
           (spells record-types)
           (spells opt-args)
-          (srfi :39 parameters)
           (spells operations)
           (spells match)
           (spells tracing)
@@ -417,35 +417,22 @@
 
 ;;;; Pathname hashing
 
-(define hash-bits (- (fixnum-width) 1))
-(define hash-mask (fxnot (fxarithmetic-shift -1 hash-bits)))
-
-(define (hash-combine h1 h2)
-  (fxxor (fxrotate-bit-field (fxand h1 hash-mask) 0 hash-bits 7)
-         (fxrotate-bit-field (fxand h2 hash-mask) 0 hash-bits (- hash-bits 6))))
-
-(define (hash-fold hasher lst)
-  (fold (lambda (e hash)
-          (hash-combine hash (hasher e)))
-        null-hash
-        lst))
-
 (define null-hash 0)
 
 (define (file-hash file)
   (if file
-      (hash-combine (string-hash (file-name file))
-                    (hash-fold string-hash (file-types file)))
+      (hash-fold string-hash
+                 (string-hash (file-name file))
+                 (file-types file))
       null-hash))
 
 (define (pathname-hash pathname)
   (receive (origin dir file) (pathname-components pathname)
-    (hash-combine (cond ((pair? origin)  (hash-fold symbol-hash origin))
+    (hash-combine (cond ((pair? origin)  (hash-fold symbol-hash null-hash origin))
                         ((symbol? origin) (symbol-hash origin))
                         ((string? origin) (string-hash origin))
                         (else             null-hash))
-                  (hash-combine (hash-fold string-hash dir)
-                                (file-hash file)))))
+                  (hash-fold string-hash (file-hash file) dir))))
 
 
 ;;;; Pathname Expansion
