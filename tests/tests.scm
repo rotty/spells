@@ -17,7 +17,7 @@
 
 ((systems spells)
  (files
-  ("cut.scm" spells.cut)
+  ("cut.scm" (spells cut))
   ("lazy.scm"
    (spells lazy)
    (rnrs io ports))
@@ -26,33 +26,33 @@
    (srfi :8 receive))
   ("algebraic-types.scm"
    (spells algebraic-types))
-  ("pathname.scm" spells.pathname spells.misc rnrs.lists rnrs.sorting)
+  ("pathname.scm" (spells pathname) (spells misc) (rnrs lists) (rnrs sorting))
   ("filesys.scm"
-   spells.filesys spells.pathname
+   (spells filesys) (spells pathname)
    (except (srfi :1 lists) for-each map)
-   rnrs.control rnrs.exceptions)
-  ("string-utils.scm" spells.string-utils)
-  ("format.scm" spells.format)
-  ("misc.scm" spells.misc rnrs.lists)
-  ("match.scm" spells.match)
+   (rnrs control) (rnrs exceptions))
+  ("string-utils.scm" (spells string-utils))
+  ("format.scm" (spells format))
+  ("misc.scm" (spells misc) (rnrs lists))
+  ("match.scm" (spells match))
   ;; these are temporarily disabled; need to port to trc-testing
-  #;("opt-args.scm" spells.opt-args)
-  #;("table.scm" spells.table)
+  #;("opt-args.scm" (spells opt-args))
+  #;("table.scm" (spells table))
   ("delimited-readers.scm"
-   spells.delimited-readers
-   spells.misc
-   srfi.:8.receive
-   srfi.:13.strings
-   rnrs.io.ports)
-  ("operations.scm" spells.operations rnrs.lists)
-  ("ports.scm" spells.ports srfi.:8.receive rnrs.io.ports)
-  ("logging.scm" spells.logging rnrs.lists)
-  ("process.scm" spells.process srfi.:8.receive srfi.:13.strings rnrs.io.ports)
+   (spells delimited-readers)
+   (spells misc)
+   (srfi :8 receive)
+   (srfi :13 strings)
+   (rnrs io ports))
+  ("operations.scm" (spells operations) (rnrs lists))
+  ("ports.scm" (spells ports) (srfi :8 receive) (rnrs io ports))
+  ("logging.scm" (spells logging) (rnrs lists))
+  ("process.scm" (spells process) (srfi :8 receive) (srfi :13 strings) (rnrs io ports))
   ("sysutils.scm"
-   spells.sysutils
+   (spells sysutils)
    (only (srfi :1 lists) count)
-   rnrs.lists)
-  ("foreign.scm" spells.foreign spells.misc spells.filesys)
+   (rnrs lists))
+  ("foreign.scm" (spells foreign) (spells misc) (spells filesys))
   ("foof-loop.scm"
    (spells foof-loop)
    (rnrs io simple)
@@ -73,4 +73,5 @@
    (spells zipper-tree))
   ("xvector.scm"
    (spells xvector)
-   (rnrs control))))
+   (rnrs control))
+))

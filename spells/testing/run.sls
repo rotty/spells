@@ -26,8 +26,7 @@
           (rnrs lists)
           (rnrs exceptions)
           (rnrs programs)
-          (srfi :13 strings)
-          (srfi :14 char-sets)
+          (only (srfi :1 lists) span)
           (srfi :8 receive)
           (spells misc)
           (srfi :39 parameters)
@@ -86,14 +85,7 @@
         (newline)
         (apply values results))))
 
-  (define package-name->import-spec
-    (let ((all-but-dot (char-set-complement (char-set #\.))))
-      (lambda (spec)
-        (if (symbol? spec)
-            (map string->symbol (string-tokenize (symbol->string spec) all-but-dot))
-            spec))))
-
-  (define (construct-test-environment imports)
+  (define (construct-test-environment defaults? imports)
     (guard (c (#t (display ";#(Error constructing environment: ")
                   (newline)
                   (display-condition c)
@@ -102,10 +94,12 @@
                   #f))
       (apply environment
              (append
-              '((except (rnrs base) error string-copy string-for-each string->list)
-                (rnrs io simple)
-                (spells testing)
-                (spells testing run-env))
+              (if defaults?
+                  '((except (rnrs base) error string-copy string-for-each string->list)
+                    (rnrs io simple)
+                    (spells testing)
+                    (spells testing run-env))
+                  '())
               imports))))
 
   ;; test spec grammar:
@@ -126,25 +120,35 @@
      test-spec))
 
 
+  
+  (define (parse-options options+rest)
+    (receive (options rest)
+             (span (match-lambda
+                    (('quote option) #t)
+                    (_               #f))
+                   options+rest)
+      (values (map cadr options) rest)))
+  
   (define (eval-test-clause clause pathname tests)
-    (define (run-test code filename pkgs)
-      (when (or (null? tests) (member filename tests))
-        (let ((env (construct-test-environment
-                    (map package-name->import-spec pkgs))))
-          (when env
-            (parameterize ((test-environment env))
-              (with-test-verbosity 'quiet
-                (lambda ()
-                  (unless (null? code)
-                    (eval `(let () ,@code) env))
-                  (run-tests
-                   (list (pathname-with-file pathname filename))
-                   env))))))))
+    (define (run-test code filename options+imports)
+      (receive (options imports) (parse-options options+imports)
+        (let ((default-imports? (not (memq 'no-default-imports options))))
+          (when (or (null? tests) (member filename tests))
+            (let ((env (construct-test-environment default-imports? imports)))
+              (when env
+                (parameterize ((test-environment env))
+                  (with-test-verbosity 'quiet
+                    (lambda ()
+                      (unless (null? code)
+                        (eval `(let () ,@code) env))
+                      (run-tests
+                       (list (pathname-with-file pathname filename))
+                       env))))))))))
     (match clause
-      ((('code . code) filename . pkgs)
-       (run-test code filename pkgs))
-      ((filename . pkgs)
-       (run-test '() filename pkgs))))
+      ((('code . code) filename . options+imports)
+       (run-test code filename options+imports))
+      ((filename . options+imports)
+       (run-test '() filename options+imports))))
   
   (define (main args)
     (for-each (lambda (tests-file)
@@ -156,6 +160,7 @@
                           ((this-directory (directory-namestring pathname)))
                         (eval-test-spec pathname test-spec '()))))))
               (cdr args))))
+
 
 ;; Local Variables:
 ;; scheme-indent-styles: ((match 1) (parameterize 1))
