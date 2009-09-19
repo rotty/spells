@@ -16,7 +16,18 @@
                   expected
                   (lambda () expr)))
       )))
+ (srfi-64
+  (define-syntax test
+    (syntax-rules ()
+      ((test expected expr)
+       (test-equal expected expr)))))
  (else))
+
+(define-syntax test-pretty
+  (syntax-rules ()
+    ((test-pretty str)
+     (let ((sexp (call-with-string-input-port str read)))
+       (test str (fmt #f (pretty sexp)))))))
 
 (test-begin "fmt")
 
@@ -83,8 +94,8 @@
 (test "1.00" (fmt #f (fix 2 (num/fit 4 1))))
 (test "#.##" (fmt #f (fix 2 (num/fit 4 12.345))))
 
-(cond
- ((feature? 'full-numeric-tower)
+(cond-expand
+ (r6rs
   (test "1+2i" (fmt #f (string->number "1+2i")))
   (test "1+2i" (fmt #f (num (string->number "1+2i"))))
   (test "1.00+2.00i" (fmt #f (fix 2 (num (string->number "1+2i")))))
@@ -145,7 +156,7 @@
 (test "prefix: defgh" (fmt #f "prefix: " (fit/left 5 "abcdefgh")))
 (test "prefix: cdefg" (fmt #f "prefix: " (fit/both 5 "abcdefgh")))
 
-(test "abc\n123\n" (fmt #f (fmt-join/suffix (cut trim 3 <>) (string-split "abcdef\n123456\n" "\n") nl)))
+(test "abc\n123\n" (fmt #f (fmt-join (cut trim 3 <>) (string-split "abcdef\n123456\n" "\n") nl)))
 
 ;; utilities
 
@@ -185,10 +196,6 @@
               (let ((ones (list 1))) (set-cdr! ones ones) ones)))))
 
 ;; pretty printing
-
-(define-macro (test-pretty str)
-  (let ((sexp (with-input-from-string str read)))
-    `(test ,str (fmt #f (pretty ',sexp)))))
 
 (test-pretty "(foo bar)\n")
 
@@ -357,22 +364,24 @@ equivalent to REVERSE.
 
 ;; misc extras
 
+#;
 (define (string-hide-passwords str)
   (string-substitute (regexp "(pass(?:w(?:or)?d)?\\s?[:=>]\\s+)\\S+" #t)
                      "\\1******"
                      str
                      #t))
-
+#;
 (define hide-passwords
   (make-string-fmt-transformer string-hide-passwords))
 
+#;
 (define (string-mangle-email str)
   (string-substitute
    (regexp "\\b([-+.\\w]+)@((?:[-+\\w]+\\.)+[a-z]{2,4})\\b" #t)
    "\\1 _at_ \\2"
    str
    #t))
-
+#;
 (define mangle-email
   (make-string-fmt-transformer string-mangle-email))
 

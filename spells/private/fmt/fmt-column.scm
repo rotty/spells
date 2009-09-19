@@ -95,7 +95,6 @@
                         (prefix '())
                         (align 'left)
                         (infinite? #f))
-      (let ()
       (define (scale-width st)
         (max 1 (inexact->exact
                 (truncate (* width (- (fmt-width st) fixed-width))))))
@@ -131,7 +130,7 @@
            (lambda (st) ((with-width (scale-width st) gen) st))
            (with-width width gen))
        infinite?
-       ))))
+       )))
   (define (adjust-widths ls border-width)
     (let* ((fixed-ls
             (filter (lambda (x) (and (number? (car x)) (>= (car x) 1))) ls))
