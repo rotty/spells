@@ -7,7 +7,8 @@
           port-tracker-port
           port-tracker-column
           port-tracker-row
-          port-tracker-fresh-line)
+          port-tracker-fresh-line
+          port-tracker-flush)
   (import (except (rnrs base) string-copy string-for-each string->list)
           (rnrs control)
           (rnrs bytevectors)
@@ -49,6 +50,9 @@
   (define (port->sexps port)
     (unfold eof-object? values (lambda (seed) (get-datum port)) (get-datum port)))
 
+
+;;; Port tracker
+
   (define-record-type port-tracker
     (really-make-port-tracker %port %row %column)
     port-tracker?
@@ -67,6 +71,10 @@
   (define (port-tracker-row tracker)
     (%port-tracker-sync tracker)
     (%port-tracker-row tracker))
+
+  (define (port-tracker-flush tracker)
+    (flush-output-port (port-tracker-port tracker))
+    (flush-output-port (%port-tracker-port tracker)))
 
   (define make-port-tracker
     (case-lambda
