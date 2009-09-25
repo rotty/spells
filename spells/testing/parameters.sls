@@ -262,7 +262,7 @@
   
 ;;;; Nested Notification Utility
 
-  (define force-output flush-output-port)
+  (define force-output port-tracker-flush)
 
   (define notification-output-port-tracker
     (make-parameter (make-port-tracker (current-output-port))))
@@ -285,7 +285,7 @@
           (output-port (notification-output-port)))
       (start-notification-line tracker)
       (message-writer output-port)
-      (force-output output-port)))
+      (force-output tracker)))
 
   (define (with-notification message-writer thunk)
     (let ((output-port (notification-output-port))
@@ -299,7 +299,7 @@
         (dynamic-wind
           (lambda ()
             (start-notification "...")
-            (force-output output-port)
+            (force-output tracker)
             (set! row (port-tracker-row tracker))
             (set! column (port-tracker-column tracker)))
           (lambda ()
@@ -313,6 +313,6 @@
                 (start-notification " --"))
             (write-string " done" output-port)
             (newline output-port)
-            (force-output output-port))))))
+            (force-output tracker))))))
   
   )
