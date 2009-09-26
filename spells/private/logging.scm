@@ -198,11 +198,12 @@
 ;; This is mutated, need to think about thread safety
 (define *logger-tree* (list 'root root-logger))
 
-(define *builtin-levels* '((debug    . 10)
-                           (info     . 20)
-                           (warning  . 30)
-                           (error    . 40)
-                           (critical . 50)))
+(define *builtin-levels* '((trace    .  5000)
+                           (debug    . 10000)
+                           (info     . 20000)
+                           (warning  . 30000)
+                           (error    . 40000)
+                           (critical . 50000)))
 
 (define (numeric-level level)
   (cond ((and (symbol? level)
