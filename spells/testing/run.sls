@@ -34,7 +34,9 @@
           (spells filesys)
           (spells pathname)
           (spells condition)
-          (only (spells testing) with-test-verbosity)
+          (only (spells testing)
+                with-test-verbosity
+                with-test-debug-errors?)
           (spells testing run-env))
 
   ;;@ Run specified tests.
@@ -69,21 +71,35 @@
 
   (define (run-tests-in-file file env)
     (let ((filename (->namestring file)))
+      (define (evaluate-forms forms)
+        (cond (env
+               (eval `(let () ,@forms) env))
+              (else
+               (match forms
+                 ((('import . imports) . body)
+                  (and=> (construct-test-environment #f imports)
+                         (lambda (env)
+                           (parameterize ((test-environment env))
+                             (eval `(let () ,@body) env)))))
+                 (_
+                  (error 'run-tests-in-file
+                         "Invalid test file, expected leading import form"
+                         filename (car forms)))))))
       (display "\n;")
       (display (list "Loading " filename "... "))
       (newline)
-      (receive results
-               (call-with-input-file filename
-                 (lambda (port)
-                   (let loop ((forms '()))
-                     (let ((form (read port)))
-                       (if (eof-object? form)
-                           (eval `(let () ,@(reverse forms)) env)
-                           (loop (cons form forms)))))))
-        (display ";")
-        (display (list "..." filename "done"))
-        (newline)
-        (apply values results))))
+      (let ((forms (call-with-input-file filename
+                     (lambda (port)
+                       (let loop ((forms '()))
+                         (let ((form (read port)))
+                           (if (eof-object? form)
+                               (reverse forms)
+                               (loop (cons form forms)))))))))
+        (receive results (evaluate-forms forms)
+          (display ";")
+          (display (list "..." filename "done"))
+          (newline)
+          (apply values results)))))
 
   (define (construct-test-environment defaults? imports)
     (guard (c (#t (display ";#(Error constructing environment: ")
@@ -95,7 +111,8 @@
       (apply environment
              (append
               (if defaults?
-                  '((except (rnrs base) error string-copy string-for-each string->list)
+                  '((except (rnrs base)
+                            error string-copy string-for-each string->list)
                     (rnrs io simple)
                     (spells testing)
                     (spells testing run-env))
@@ -105,61 +122,76 @@
   ;; test spec grammar:
   ;;
   ;; <test spec> -> (<clause> ...)
-  ;; <clause> -> (files (<file spec> <required library>) ...)
+  ;; <clause> -> (files <file spec> ...)
   ;; <file spec> -> <filename>
-  ;;                (code <scheme expr> ...) <filename>
-  (define (eval-test-spec pathname test-spec tests)
+  ;;                (<filename> [<options+imports>])
+  ;;                ((code <scheme expr> ...) <filename> [<options+imports>])
+  ;; <options+imports> -> ['<option> ...] <library-name> ...
+  (define (eval-test-spec pathname test-spec verbosity debug-errors?)
     (for-each
      (lambda (spec)
        (case (car spec)
          ((files)
           (for-each
            (lambda (clause)
-             (eval-test-clause clause pathname tests))
+             (eval-test-clause clause pathname verbosity debug-errors?))
            (cdr spec)))))
      test-spec))
 
-
-  
   (define (parse-options options+rest)
     (receive (options rest)
              (span (match-lambda
                     (('quote option) #t)
                     (_               #f))
                    options+rest)
-      (values (map cadr options) rest)))
+      (values (map cadr options)
+              (if (null? rest) #f rest))))
+
+  (define (with-test-options verbosity debug-errors? thunk)
+    (with-test-verbosity verbosity
+      (lambda ()
+        (with-test-debug-errors? debug-errors?
+          thunk))))
   
-  (define (eval-test-clause clause pathname tests)
+  (define (eval-test-clause clause directory verbosity debug-errors?)
     (define (run-test code filename options+imports)
       (receive (options imports) (parse-options options+imports)
-        (let ((default-imports? (not (memq 'no-default-imports options))))
-          (when (or (null? tests) (member filename tests))
-            (let ((env (construct-test-environment default-imports? imports)))
-              (when env
-                (parameterize ((test-environment env))
-                  (with-test-verbosity 'quiet
-                    (lambda ()
-                      (unless (null? code)
-                        (eval `(let () ,@code) env))
-                      (run-tests
-                       (list (pathname-with-file pathname filename))
-                       env))))))))))
+        (let ((default-imports? (not (memq 'no-default-imports options)))
+              (test-pathnames (list (pathname-with-file directory filename))))
+          (with-test-options verbosity debug-errors?
+            (lambda ()
+              (cond (imports
+                     (and=> (construct-test-environment default-imports? imports)
+                            (lambda (env)
+                              (parameterize ((test-environment env))
+                                (when code
+                                  (eval `(let () ,@code) env))
+                                (run-tests test-pathnames env)))))
+                    (code
+                     (error 'eval-test-clause
+                            "Invalid clause; specifies code, but no imports given"
+                            clause))
+                    (else
+                     (run-tests test-pathnames #f))))))))
     (match clause
       ((('code . code) filename . options+imports)
        (run-test code filename options+imports))
       ((filename . options+imports)
-       (run-test '() filename options+imports))))
+       (run-test #f filename options+imports))
+      (filename
+       (run-test #f filename '()))))
   
   (define (main args)
-    (for-each (lambda (tests-file)
-                (call-with-input-file tests-file
-                  (lambda (port)
-                    (let ((test-spec (read port))
-                          (pathname (->pathname tests-file)))
-                      (parameterize
-                          ((this-directory (directory-namestring pathname)))
-                        (eval-test-spec pathname test-spec '()))))))
-              (cdr args))))
+    (for-each
+     (lambda (tests-file)
+       (call-with-input-file tests-file
+         (lambda (port)
+           (let* ((test-spec (read port))
+                  (pathname (->pathname tests-file))
+                  (directory (pathname-with-file pathname #f)))
+             (parameterize ((this-directory (->namestring directory)))
+               (eval-test-spec directory test-spec 'quiet #f))))))
+     (cdr args))))
 
 
 ;; Local Variables:
