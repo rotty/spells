@@ -17,7 +17,6 @@
 
 ((systems spells)
  (files
-  ("cut.scm" (spells cut))
   ("lazy.scm"
    (spells lazy)
    (rnrs io ports))
