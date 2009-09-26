@@ -33,6 +33,14 @@
 ;;; NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ;;; SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+(define (iota n)
+  (let loop ((i n) (list '()))
+    (if (zero? i)
+        list
+        (let ((i* (- i 1)))
+          (loop i* (cons i* list))))))
+
+
 (define-test-suite xvector-tests
   "Expanding vectors")
 
@@ -45,12 +53,7 @@
     (test-eqv 0 (xvector-length xv))))
 
 (define-test-case xvector-tests push-pop-list ()
-  (let ((list
-         (let loop ((i 1000) (list '()))
-           (if (zero? i)
-               list
-               (let ((i* (- i 1)))
-                 (loop i* (cons i* list))))))
+  (let ((list (iota 1000))
         (xv (make-xvector)))
     (let loop ((list list))
       (if (pair? list)
@@ -89,11 +92,14 @@
     (do ((i 0 (+ i 1)))
         ((= i 5000))
       (test-eqv (- 9999 i) (xvector-pop! xvector)))
-    (test-equal (let loop ((i 5000) (list '()))
-                  (if (zero? i)
-                      list
-                      (let ((i* (- i 1)))
-                        (loop i* (cons i* list)))))
-                (xvector->list xvector))))
+    (test-equal (iota 5000)
+      (xvector->list xvector))))
+
+(define-test-case xvector-tests list->xvector ()
+  (let ((xvector (list->xvector (iota 10000))))
+    (let loop ((i 0))
+      (cond ((< i 10000)
+             (test-eqv i (xvector-ref xvector i))
+             (loop (+ i 1)))))))
 
 (run-test-suite xvector-tests)

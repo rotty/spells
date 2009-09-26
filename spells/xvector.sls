@@ -31,7 +31,8 @@
           xvector-push!
           xvector-pop!
           xvector-walk
-          xvector->list)
+          xvector->list
+          list->xvector)
   (import (except (rnrs base) error)
           (rnrs control)
           (rnrs arithmetic bitwise)

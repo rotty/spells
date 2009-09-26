@@ -250,6 +250,12 @@
 (define (xvector->list procedure)
   (xvector->list/direct procedure))
 
+(define (list->xvector lst)
+  (let ((result (make-xvector)))
+    (do ((lst lst (cdr lst)))
+        ((null? lst) result)
+      (xvector-push! result (car lst)))))
+
 (define (xvector-walk/indirect xvector procedure)
   (do ((i 0 (+ i 1)))
       ((>= i (xvector-length xvector)))
