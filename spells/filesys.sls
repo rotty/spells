@@ -71,9 +71,9 @@
           (rnrs io ports)
           (rnrs exceptions)
           (srfi :8 receive)
+          (srfi :19 time)
           (except (srfi :1 lists) map for-each)
           (spells pathname)
-          (spells time-lib)
           (spells ports)
           (spells filesys compat))
 

@@ -40,7 +40,6 @@
           (rnrs conditions)
           (srfi :8 receive)
           (spells pathname)
-          (spells time-lib)
           (primitives parameterize)
           (prefix (primitives file-exists?
                               current-directory
