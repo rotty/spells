@@ -2,11 +2,11 @@
 
 (library (spells algebraic-types helpers)
   (export expand-datatype-dispatcher)
-  (import (rnrs)
+  (import (for (rnrs) run (meta -1))
           (spells tracing)
           (spells string-utils)
           (spells syntax-utils))
-  
+
 (define (cond-clause k name variants variant-clause lose)
   (syntax-case variant-clause (else)
     (((variant field ...) body0 body ...)

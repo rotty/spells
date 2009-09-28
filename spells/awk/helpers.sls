@@ -36,10 +36,10 @@
           ;; expander.
           next-range next-:range
           next-range: next-:range:)
-  (import (rnrs)
-          (srfi :8 receive)
+  (import (for (rnrs) run (meta -1))
+          (for (srfi :8 receive) (meta -1))
           (spells alist)
-          (spells irregex)
+          (for (spells irregex) (meta -1))
           (spells tracing)
           (spells algebraic-types)
           (spells syntax-utils)

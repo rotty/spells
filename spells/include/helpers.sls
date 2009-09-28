@@ -1,4 +1,4 @@
-;;; aux.sls --- 
+;;; helpers.sls --- Helper procedures for (spells include)
 
 ;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -25,7 +25,7 @@
                 file-modification-time
                 library-search-paths)
           (only (spells pathname) ->namestring)
-          (spells include compat))
+          (for (spells include compat) run (meta -1)))
 
   (define (error/conditions who msg irrts . cndts)
     (raise

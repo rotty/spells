@@ -20,11 +20,11 @@
 (library (spells record-types expand-drt)
   (export expand-define-record-type*
           expand-define-functional-fields)
-  (import (rnrs base)
+  (import (for (rnrs base) run (meta -1))
           (rnrs syntax-case)
           (only (srfi :1 lists) append-map)
-          (srfi :8 receive)
-          (srfi :9 records)
+          (for (srfi :8 receive) run (meta -1))
+          (for (srfi :9 records) (meta -1))
           (srfi :39 parameters)
           (spells syntax-utils))
 
