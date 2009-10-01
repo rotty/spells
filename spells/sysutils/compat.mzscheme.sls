@@ -18,27 +18,22 @@
 (library (spells sysutils compat)
   (export lookup-environment-variable
           current-process-environment
-          extend-process-environment
           find-exec-path
-          os-name
-          os-node-name
-          os-release-name
-          os-version-name
-          machine-name)
+          host-info)
 
-  (import (rnrs base)
+  (import (rnrs)
           (only (mzscheme) getenv system-type find-executable-path))
 
   (define lookup-environment-variable getenv)
 
   (define (current-process-environment)
-    (error "CURRENT-PROCESS-ENVIRONMENT not implemented on mzscheme"))
+    (raise (condition
+            (make-implementation-restriction-violation)
+            (make-who-condition 'current-process-environment)
+            (make-message-condition "Not supported on PLT Scheme"))))
 
   (define (find-exec-path prog)
     (find-executable-path prog #f))
 
-  (define (os-name) (symbol->string (system-type 'os)))
-  (define (os-node-name) "unknown")
-  (define (os-release-name) "unknown")
-  (define (os-version-name) "unknown")
-  (define (machine-name) (system-type 'machine)))
+  (define (host-info)
+    (values "unknown" "unknown "(symbol->string (system-type 'os)))))

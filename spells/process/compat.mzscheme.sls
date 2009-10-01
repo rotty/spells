@@ -24,10 +24,6 @@
 
           spawn-process
           wait-for-process
-          close-process-ports
-          run-process
-          call-with-process-input
-          call-with-process-output
 
           run-shell-command)
   (import (rnrs base)
@@ -36,6 +32,8 @@
                 subprocess subprocess-wait subprocess-status)
           (only (scheme system)
                 system/exit-code)
+          (only (r6rs private ports)
+                r6rs-port->port)
           (srfi :8 receive)
           (srfi :9 records)
           (spells pathname))
@@ -56,19 +54,28 @@
                   (error "cannot coerce to string list" lst))))
          lst))
 
+  (define (maybe-port->mz-port port)
+    (and port (r6rs-port->port port)))
+  
   (define (spawn-process env stdin stdout stderr prog . args)
     (receive (process stdout-port stdin-port stderr-port)
-        (apply subprocess stdin stdout stderr (x->strlist (cons prog args)))
+             (apply subprocess
+                    (maybe-port->mz-port stdout)
+                    (maybe-port->mz-port stdin)
+                    (maybe-port->mz-port stderr)
+                    (x->strlist (cons prog args)))
       (make-process process stdin-port stdout-port stderr-port)))
 
+  (define (status->values status)
+    (if (<= 0 status)
+        (values status #f)
+        (values status 'unknown)))
+  
   (define (wait-for-process process)
     (subprocess-wait (process-pid process))
-    (values (subprocess-status (process-pid process)) #f))
+    (status->values (subprocess-status (process-pid process))))
 
   (define (run-shell-command cmd)
-    (let ((retval (system/exit-code cmd)))
-      (if (>= 0 retval)
-          (values retval #f)
-          (values retval 'unknown))))
+    (status->values (system/exit-code cmd)))
 
   )

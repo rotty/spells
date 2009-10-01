@@ -13,7 +13,7 @@
 ;;; Commentary:
 
 ;;; Code:
-#lang scheme
+#lang scheme/base
 
 (provide make-pointer-c-getter make-pointer-c-setter
 
@@ -29,6 +29,8 @@
                      (spells:memset memset))
          free
 
+         errno
+
          dlopen dlsym dlclose dlerror)
 
 (require rnrs/base-6
@@ -36,9 +38,11 @@
          rnrs/arithmetic/bitwise-6
          rnrs/lists-6
          rnrs/bytevectors-6
-         (lib "srfi/%3a2/and-let%2a.sls")
+         rnrs/conditions-6
+         rnrs/exceptions-6
+         (lib "srfi/%3a2/and-let%2a.ss")
+         (lib "srfi/%3a39/parameters.ss")
          (lib "spells/alist.sls")
-         (lib "spells/parameter.sls")
          (lib "spells/foreign/config.sls")
          (lib "spells/tracing.sls")
          scheme/mpair
@@ -60,7 +64,7 @@
 (define (sized-types-aliases)
   (map (lambda (ctype)
          (let ((signed? (memq ctype '(char short int long llong))))
-           (cons (sized-type ctype signed?) ctype)))
+           (cons ctype (sized-type ctype signed?))))
        '(char uchar short ushort int uint long ulong llong ullong)))
 
 (define (other-types-aliases)
@@ -118,14 +122,14 @@
 (define (type->mz-type type)
   (define (prim->mz-type prim)
     (case prim
-      ((char) _int8)
-      ((uchar) _uint8)
-      ((short) _sshort)
-      ((ushort) _ushort)
-      ((int) _sint)
-      ((uint) _uint)
-      ((long) _slong)
-      ((ulong) _ulong)
+      ((int8) _int8)
+      ((uint8) _uint8)
+      ((int16) _int16)
+      ((uint16) _uint16)
+      ((int32) _sint32)
+      ((uint32) _uint32)
+      ((int64) _sint64)
+      ((uint64) _uint64)
       ((float) _float)
       ((double) _double)
       ((pointer) _pointer)
@@ -151,16 +155,21 @@
   (memset p v n)
   p)
 
-(define *dlerror* #f)
+(define (errno)
+  (raise (condition (make-implementation-restriction-violation)
+                    (make-who-condition 'errno)
+                    (make-message-condition "Not supported on PLT Scheme"))))
+
+(define current-dlerror (make-parameter #f))
 
 (define dlopen
   (case-lambda
     ((lib-name lazy? global?)
      (with-handlers ((exn:fail? (lambda (exn)
-                                  (set! *dlerror* exn)
+                                  (current-dlerror exn)
                                   #f)))
        (let ((result (ffi-lib lib-name)))
-         (set! *dlerror* #f)
+         (current-dlerror #f)
          result)))
     ((lib-name)
      (dlopen lib-name #f #f))
@@ -176,4 +185,4 @@
   #f)
 
 (define (dlerror)
-  *dlerror*)
+  (current-dlerror))

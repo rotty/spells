@@ -1,3 +1,5 @@
+#!r6rs
+
 ;;@ Miscellaneous procedures providing access to various bits of
 ;; information regarding the host running the scheme implementation.
 (library (spells sysutils)

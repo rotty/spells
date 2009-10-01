@@ -1,1 +1,6 @@
 /spells/foreign/config.sls
+/spells/compiled/*.zo
+/spells/compiled/*.dep
+/spells/*/compiled/*.zo
+/spells/*/compiled/*.dep
+

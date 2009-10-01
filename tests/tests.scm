@@ -29,7 +29,9 @@
   ("filesys.scm"
    (spells filesys) (spells pathname)
    (except (srfi :1 lists) for-each map)
-   (rnrs control) (rnrs exceptions))
+   (rnrs control)
+   (rnrs io ports)
+   (rnrs exceptions))
   ("string-utils.scm" (spells string-utils))
   ("format.scm" (spells format))
   ("misc.scm" (spells misc) (rnrs lists))

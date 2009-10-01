@@ -33,15 +33,16 @@
           file-modification-time
           file-size-in-bytes
 
-          directory-fold*
-
+          directory-stream?
+          open-directory-stream
+          close-directory-stream
+          read-directory-stream
+          
           working-directory
           with-working-directory
 
           library-search-paths)
-  (import (rnrs base)
-          (rnrs lists)
-          (rnrs conditions)
+  (import (except (rnrs) file-exists? delete-file)
           (srfi :8 receive)
           (spells pathname)
           (spells time-lib)
@@ -64,6 +65,10 @@
 
                         car cdr memq)
                   mz:)
+          (only (scheme)
+                with-handlers
+                exn:fail:filesystem?
+                exn-message)
           (only (scheme mpair) list->mlist))
 
 (define ->fn ->namestring)
@@ -100,16 +105,28 @@
 (define (file-directory? pathname)
   (mz:directory-exists? (->fn pathname)))
 
-(define (file-test-p f p)
-  (and (file-exists? f)
-       (if (mz:memq p (mz:file-or-directory-permissions f)) #t #f)))
+(define (make-file-check permission who)
+  (lambda (pathname)
+    (let ((fname (->fn pathname)))
+      (with-handlers
+        ((exn:fail:filesystem?
+          (lambda (e)
+            (raise (condition
+                    (make-error)
+                    (make-who-condition who)
+                    (make-i/o-file-does-not-exist-error fname)
+                    (make-message-condition (exn-message e)))))))
+        (and (mz:memq permission (mz:file-or-directory-permissions fname))
+             #t)))))
 
-(define (file-readable? pathname)
-  (file-test-p (->fn pathname) 'read))
-(define (file-writable? pathname)
-  (file-test-p (->fn pathname) 'write))
-(define (file-executable? pathname)
-  (file-test-p (->fn pathname) 'execute))
+(define-syntax define-file-check
+  (syntax-rules ()
+    ((_ id pred)
+     (define id (make-file-check pred 'id)))))
+
+(define-file-check file-readable? 'read)
+(define-file-check file-writable? 'write)
+(define-file-check file-executable? 'execute)
 
 (define (file-modification-time pathname)
   (posix-timestamp->time-utc
@@ -118,25 +135,29 @@
 (define (file-size-in-bytes pathname)
   (mz:file-size (->fn pathname)))
 
-(define (dot-or-dotdot? f)
-  (or (string=? "." f) (string=? ".." f)))
+;; Emulate the stream with a list. TODO: file a wishlist bug on PLT to
+;; support a stream API.
+(define-record-type directory-stream
+  (fields (mutable entries)))
 
-(define (directory-fold* pathname combiner . seeds)
-  (define (full-pathname entry)
-    (pathname-with-file pathname (pathname-file (->pathname entry))))
-  (let loop ((entries (mz:directory-list (->fn pathname))) (seeds seeds))
+(define (open-directory-stream pathname)
+  (make-directory-stream
+   (map mz:path->string (list->mlist (mz:directory-list (->fn pathname))))))
+
+(define (close-directory-stream stream)
+  (directory-stream-entries-set! stream #f))
+
+(define (read-directory-stream stream)
+  (let ((entries (directory-stream-entries stream)))
     (if (null? entries)
-        (apply values seeds)
-        (let ((entry (mz:path->string (mz:car entries))))
-          (cond ((dot-or-dotdot? entry)
-                 (loop (mz:cdr entries) seeds))
-                (else
-                 (receive (continue? . new-seeds)
-                     (apply combiner (full-pathname entry) seeds)
-                   (if continue?
-                       (loop (mz:cdr entries) new-seeds)
-                       (apply values new-seeds)))))))))
-
+        #f
+        (let ((filename (car entries)))
+          (directory-stream-entries-set! stream (cdr entries))
+          (if (or (string=? "." filename)
+                  (string=? ".." filename))
+              (read-directory-stream stream)
+              filename)))))
+  
 (define (working-directory)
   (->pathname (mz:current-directory)))
 
