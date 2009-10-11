@@ -157,6 +157,8 @@
     (define (run-test code filename options+imports)
       (receive (options imports) (parse-options options+imports)
         (let ((default-imports? (not (memq 'no-default-imports options)))
+              (debug-errors? (or (and (memq 'debug-errors options) #t)
+                                 debug-errors?))
               (test-pathnames (list (pathname-with-file directory filename))))
           (with-test-options verbosity debug-errors?
             (lambda ()
