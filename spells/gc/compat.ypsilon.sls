@@ -17,7 +17,7 @@
 
 (library (spells gc compat)
   (export make-weak-cell weak-cell-ref weak-cell?
-          make-guardian
+          make-reaper
           collect)
   (import (rnrs base)
           (rnrs control)
@@ -38,9 +38,10 @@
   (define (weak-cell-ref weak-cell)
     (weak-mapping-key weak-cell))
 
-  ;; Ypsilon does not (yet) support guardians, see
+  ;; Ypsilon does not (yet) support guardians or an equivalent
+  ;; mechanism, see
   ;; http://code.google.com/p/ypsilon/issues/detail?id=75
-  (define (make-guardian)
+  (define (make-reaper proc)
     (case-lambda
       ((obj) (unspecific))
       (()    #f)))

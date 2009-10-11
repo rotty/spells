@@ -17,9 +17,10 @@
 
 (library (spells gc compat)
   (export make-weak-cell weak-cell-ref weak-cell?
-          make-guardian
+          make-reaper
           collect)
   (import (rnrs base)
+          (rnrs control)
           (only (ikarus)
                 weak-cons weak-pair? bwp-object? make-guardian
                 collect))
@@ -32,4 +33,17 @@
 
   (define (weak-cell-ref weak-cell)
     (let ((obj (car weak-cell)))
-      (and (not (bwp-object? obj)) obj))))
+      (and (not (bwp-object? obj)) obj)))
+
+  (define (make-reaper proc)
+    (let ((guardian (make-guardian)))
+      (case-lambda
+        ((object)
+         (guardian object))
+        (()
+         (let ((object (guardian)))
+           (if object
+               (proc object)
+               #f))))))
+
+  )
