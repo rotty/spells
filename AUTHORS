@@ -38,6 +38,7 @@ License: BSD
 
 Copyright: 2007-2009, Taylor R. Campbell
 Files: spells/testing/parameters.sls, spells/record-types/expand-drt.scm,
+       spells/private/foof-loop.scm, spells/private/nested-foof-loop.scm,
        spells/private/xvector.scm, tests/xvector.scm
 License: BSD
 
