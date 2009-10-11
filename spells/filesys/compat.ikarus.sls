@@ -41,10 +41,7 @@
           with-working-directory
 
           library-search-paths)
-  (import (rnrs base)
-          (rnrs conditions)
-          (rnrs exceptions)
-          (rnrs io ports)
+  (import (except (rnrs) file-exists? delete-file)
           (srfi :8 receive)
           (spells pathname)
           (spells time-lib)

@@ -9,8 +9,7 @@
           (srfi :8 receive)
           (spells filesys)
           (spells string-utils)
-          (only (srfi :13 strings) string-tokenize string-index)
-          (only (srfi :14 char-sets) char-set-complement char-set)
+          (only (srfi :13 strings) string-index)
           (prefix  (only (ikarus)
                          environ
                          getenv

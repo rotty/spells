@@ -75,11 +75,7 @@
           pointer-utf8z-ptr-ref
 
           define-c-callouts)
-  (import (rnrs base)
-          (rnrs control)
-          (rnrs arithmetic bitwise)
-          (rnrs bytevectors)
-          (rnrs syntax-case)
+  (import (rnrs)
           (for (srfi :8 receive) run expand)
           (for (only (srfi :1) append-reverse) expand)
           (for (spells foof-loop) expand)
