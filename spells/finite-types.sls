@@ -17,12 +17,24 @@
 #!r6rs
 
 (library (spells finite-types)
-  (export define-finite-type
+  (export define-enumerated-type
+          define-finite-type
           finite-type-case)
   (import (rnrs base)
           (rnrs syntax-case)
           (srfi :9 records))
 
+  (define-syntax define-enumerated-type
+    (syntax-rules ()
+      ((_ dispatcher rtd
+          predicate
+          instance-vector
+          name-accessor
+          index-accessor
+          (instance-name ...))
+       (define-finite-type dispatcher rtd () predicate instance-vector
+         name-accessor index-accessor ((instance-name) ...)))))
+  
   (define-syntax define-finite-type
     (lambda (stx)
       (syntax-case stx ()
