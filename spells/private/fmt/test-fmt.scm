@@ -1,6 +1,6 @@
 
 (cond-expand
- (chicken (use test fmt))
+ (chicken (use test) (load "fmt-chicken.scm"))
  (gauche
   (use gauche.test)
   (use text.fmt)
@@ -9,19 +9,24 @@
   (define-syntax test
     (syntax-rules ()
       ((test name expected expr)
-       (orig-test name expected (lambda () expr)))
+       (guard (e (else #f))
+              (orig-test name expected (lambda () expr))))
       ((test expected expr)
-       (orig-test (let ((s (with-output-to-string (lambda () (write 'expr)))))
-                    (substring s 0 (min 60 (string-length s))))
-                  expected
-                  (lambda () expr)))
-      )))
+       (test (let ((s (with-output-to-string (lambda () (write 'expr)))))
+               (substring s 0 (min 60 (string-length s))))
+             expected expr)))))
  (srfi-64
   (define-syntax test
     (syntax-rules ()
       ((test expected expr)
        (test-equal expected expr)))))
  (else))
+
+;; pretty printing
+
+;; (define-macro (test-pretty str)
+;;   (let ((sexp (with-input-from-string str read)))
+;;     `(test ,str (fmt #f (pretty ',sexp)))))
 
 (define-syntax test-pretty
   (syntax-rules ()
@@ -50,13 +55,18 @@
 (test "1" (fmt #f 1))
 (test "10" (fmt #f 10))
 (test "100" (fmt #f 100))
-;; (test "1e+15" (fmt #f 1e+15))
-;; (test "1e+23" (fmt #f 1e+23))
-;; (test "1.2e+23" (fmt #f 1.2e+23))
-;; (test "1e-5" (fmt #f 1e-5))
-;; (test "1e-6" (fmt #f 1e-6))
-;; (test "1e-7" (fmt #f 1e-7))
-;; (test "2e-6" (fmt #f 2e-6))
+(test "-1" (fmt #f (num -1)))
+(test "0" (fmt #f (num 0)))
+(test "1" (fmt #f (num 1)))
+(test "10" (fmt #f (num 10)))
+(test "100" (fmt #f (num 100)))
+;; (test "1e+15" (fmt #f (num 1e+15)))
+;; (test "1e+23" (fmt #f (num 1e+23)))
+;; (test "1.2e+23" (fmt #f (num 1.2e+23)))
+;; (test "1e-5" (fmt #f (num 1e-5)))
+;; (test "1e-6" (fmt #f (num 1e-6)))
+;; (test "1e-7" (fmt #f (num 1e-7)))
+;; (test "2e-6" (fmt #f (num 2e-6)))
 (test "57005" (fmt #f #xDEAD))
 (test "#xDEAD" (fmt #f (radix 16 #xDEAD)))
 (test "#xDEAD1234" (fmt #f (radix 16 #xDEAD) 1234))
@@ -74,7 +84,43 @@
 (test "0.00" (fmt #f (fix 2 1e-17)))
 (test "0.0000000000" (fmt #f (fix 10 1e-17)))
 (test "0.00000000000000001000" (fmt #f (fix 20 1e-17)))
-(test-error (fmt #f (num 1e-17 0)))
+;; (test-error (fmt #f (num 1e-17 0)))
+(test "0.000004" (fmt #f (num 0.000004 10 6)))
+(test "0.0000040" (fmt #f (num 0.000004 10 7)))
+(test "0.00000400" (fmt #f (num 0.000004 10 8)))
+;; (test "0.000004" (fmt #f (num 0.000004)))
+
+(test "   3.14159" (fmt #f (decimal-align 5 (num 3.14159))))
+(test "  31.4159" (fmt #f (decimal-align 5 (num 31.4159))))
+(test " 314.159" (fmt #f (decimal-align 5 (num 314.159))))
+(test "3141.59" (fmt #f (decimal-align 5 (num 3141.59))))
+(test "31415.9" (fmt #f (decimal-align 5 (num 31415.9))))
+(test "  -3.14159" (fmt #f (decimal-align 5 (num -3.14159))))
+(test " -31.4159" (fmt #f (decimal-align 5 (num -31.4159))))
+(test "-314.159" (fmt #f (decimal-align 5 (num -314.159))))
+(test "-3141.59" (fmt #f (decimal-align 5 (num -3141.59))))
+(test "-31415.9" (fmt #f (decimal-align 5 (num -31415.9))))
+
+(cond
+ ((exact? (/ 1 3)) ;; exact rationals
+  (test "333.333333333333333333333333333333" (fmt #f (fix 30 1000/3)))
+  (test  "33.333333333333333333333333333333" (fmt #f (fix 30 100/3)))
+  (test   "3.333333333333333333333333333333" (fmt #f (fix 30 10/3)))
+  (test   "0.333333333333333333333333333333" (fmt #f (fix 30 1/3)))
+  (test   "0.033333333333333333333333333333" (fmt #f (fix 30 1/30)))
+  (test   "0.003333333333333333333333333333" (fmt #f (fix 30 1/300)))
+  (test   "0.000333333333333333333333333333" (fmt #f (fix 30 1/3000)))
+  (test   "0.666666666666666666666666666667" (fmt #f (fix 30 2/3)))
+  (test   "0.090909090909090909090909090909" (fmt #f (fix 30 1/11)))
+  (test   "1.428571428571428571428571428571" (fmt #f (fix 30 10/7)))
+  (test "0.123456789012345678901234567890"
+      (fmt #f (fix 30 (/  123456789012345678901234567890
+                         1000000000000000000000000000000))))
+  (test  " 333.333333333333333333333333333333" (fmt #f (decimal-align 5 (fix 30 1000/3))))
+  (test  "  33.333333333333333333333333333333" (fmt #f (decimal-align 5 (fix 30 100/3))))
+  (test  "   3.333333333333333333333333333333" (fmt #f (decimal-align 5 (fix 30 10/3))))
+  (test  "   0.333333333333333333333333333333" (fmt #f (decimal-align 5 (fix 30 1/3))))
+  ))
 
 (test "11.75" (fmt #f (num (/ 47 4) 10 2)))
 (test "-11.75" (fmt #f (num (/ -47 4) 10 2)))
@@ -194,8 +240,6 @@
              11
              (wrt/unshared
               (let ((ones (list 1))) (set-cdr! ones ones) ones)))))
-
-;; pretty printing
 
 (test-pretty "(foo bar)\n")
 
@@ -361,6 +405,25 @@ equivalent to REVERSE.
                " ; "
                (wrap-lines "The fundamental list iterator.  Applies KONS to each element of LS and the result of the previous application, beginning with KNIL.  With KONS as CONS and KNIL as '(), equivalent to REVERSE.")))))
 
+(test
+"- Item 1: The text here is
+          indented according
+          to the space \"Item
+          1\" takes, and one
+          does not known what
+          goes here.
+"
+    (fmt #f (columnar 9 (dsp "- Item 1:") " " (with-width 20 (wrap-lines "The text here is indented according to the space \"Item 1\" takes, and one does not known what goes here.")))))
+
+(test
+"- Item 1: The text here is
+          indented according
+          to the space \"Item
+          1\" takes, and one
+          does not known what
+          goes here.
+"
+    (fmt #f (columnar 9 (dsp "- Item 1:\n") " " (with-width 20 (wrap-lines "The text here is indented according to the space \"Item 1\" takes, and one does not known what goes here.")))))
 
 ;; misc extras
 

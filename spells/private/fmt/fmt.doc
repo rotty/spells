@@ -8,7 +8,7 @@
   (display "</style>\n"))
 
 \flushright{\urlh{http://synthcode.com/}{Alex Shinn}}
-\flushright{\urlh{http://synthcode.com/scheme/fmt/fmt-0.6.tar.gz}{Download Version 0.6}}
+\flushright{\urlh{http://synthcode.com/scheme/fmt/fmt-0.7.tar.gz}{Download Version 0.7}}
 
 \eval(display "<br /><br />\n\n")
 
@@ -61,8 +61,8 @@ files:
   (load "make-eq-table.scm")
   (load "mantissa.scm")
   (load "fmt.scm")
-  (load "fmt-pretty.scm")
-  (load "fmt-column.scm")
+  (load "fmt-pretty.scm")     ; optional pretty printing
+  (load "fmt-column.scm")     ; optional columnar output
   (load "fmt-c.scm")          ; optional C formatting utilities
   (load "fmt-color.scm")      ; optional color utilities
   (load "fmt-unicode.scm")    ; optional Unicode-aware formatting,
@@ -261,7 +261,22 @@ instead a string of hashes (with the current \q{<precision>}) rather
 than showing an incorrectly truncated number.  For example
 
   \q{(fmt #f (fix 2 (num/fit 4 12.345)))}
-  \q{=> "#.##".}
+  \q{=> "#.##"}
+
+\subsubsection*{(num/roman <n>)}
+
+Formats the number as a Roman numeral:
+
+  \q{(fmt #f (num/roman 1989))}
+  \q{=> "MCMLXXXIX"}
+
+\subsubsection*{(num/old-roman <n>)}
+
+Formats the number as an old-style Roman numeral, without the
+subtraction abbreviation rule:
+
+  \q{(fmt #f (num/old-roman 1989))}
+  \q{=> "MDCCCCLXXXVIIII"}
 
 
 \subsection{Formatting Space}
@@ -430,7 +445,51 @@ recursively to all output data structures, so that
 will return the string \q{"(#x46 #x50 #x5a)"}.  Note that read/write
 invariance is essential, so for \q{dsp}, \q{wrt} and \q{pretty} the
 radix prefix is always included when not decimal.  Use \q{num} if you
-want to format numbers in alternate bases without this prefix.
+want to format numbers in alternate bases without this prefix.  For
+example,
+
+  \q{(fmt #f (radix 16 "(" (fmt-join num '(70 80 90) " ") ")"))}
+
+would return \q{"(46 50 5a)"}, the same output as above without the
+"#x" radix prefix.
+
+Note that fixed point formatting supports arbitrary precision in
+implementations with exact non-integral rationals.  When trying to
+print inexact numbers more than the machine precision you will
+typically get results like
+
+  \q{(fmt #f (fix 30 #i2/3))}
+
+  \q{=> "0.666666666666666600000000000000"}
+
+but with an exact rational it will give you as many digits as you
+request:
+
+  \q{(fmt #f (fix 30 2/3))}
+
+  \q{=> "0.666666666666666666666666666667"}
+
+\subsubsection*{(decimal-align <k> <format> ...)}
+
+Specifies an alignment for the decimal place when formatting numbers,
+useful for outputting tables of numbers.
+
+\q{
+  (define (print-angles x)
+     (fmt-join num (list x (sin x) (cos x) (tan x)) " "))
+
+  (fmt #t (decimal-align 5 (fix 3 (fmt-join/suffix print-angles (iota 5) nl))))
+}
+
+would output
+
+\p{
+   0.000    0.000    1.000    0.000
+   1.000    0.842    0.540    1.557
+   2.000    0.909   -0.416   -2.185
+   3.000    0.141   -0.990   -0.142
+   4.000   -0.757   -0.654    1.158
+}
 
 \subsubsection*{(comma-char <k> <format> ...)}
 \subsubsection*{(decimal-char <k> <format> ...)}
@@ -446,8 +505,8 @@ The \q{pad-char} sets the character used by \q{space-to}, \q{tab-to},
 \q{
   (define (print-table-of-contents alist)
     (define (print-line x)
-      (cat (car x) (space-to 72) (pad 3 (cdr x))))
-    (fmt #t (pad-char #\. (fmt-join print-line alist nl))))
+      (cat (car x) (space-to 72) (pad/left 3 (cdr x))))
+    (fmt #t (pad-char #\. (fmt-join/suffix print-line alist nl))))
 
   (print-table-of-contents
    '(("An Unexpected Party" . 29)
@@ -480,6 +539,10 @@ is 78.
 
 \subsection{Columnar Formatting}
 
+Although \q{tab-to}, \q{space-to} and padding can be used to manually
+align columns to produce table-like output, these can be awkward to
+use.  The optional extensions in this section make this easier.
+
 \subsubsection*{(columnar <column> ...)}
 
 Formats each \q{<column>} side-by-side, i.e. as though each were
@@ -492,15 +555,15 @@ columns, and all but the last column are right-padded.  For example
 outputs
 
 \p{
-  abc     123
-  def     456
+     abc     123
+     def     456
 }
 
 assuming a 16-char width (the left side gets half the width, or 8
-spaces, and is left aligned).  Note that we explicitly use DSP
-instead of the strings directly.  This is because \q{columnar} treats
-raw strings as literals inserted into the given location, to be used
-as borders, for example:
+spaces, and is left aligned).  Note that we explicitly use DSP instead
+of the strings directly.  This is because \q{columnar} treats raw
+strings as literals inserted into the given location on every line, to
+be used as borders, for example:
 
 \q{
   (fmt #t (columnar "/* " (dsp "abc\\ndef\\n")
@@ -526,6 +589,22 @@ width.  Any real number between 0 and 1 indicates a fraction of the
 available width (after subtracting out any fixed widths).  Columns
 with unspecified width divide up the remaining width evenly.
 
+Note that \q{columnar} builds its output incrementally, interleaving
+calls to the generators until each has produced a line, then
+concatenating that line together and outputting it.  This is important
+because as noted above, some columns may produce an infinite stream of
+output, and in general you may want to format data larger than can fit
+into memory.  Thus columnar would be suitable for line numbering a
+file of arbitrary size, or implementing the Unix \q{yes(1)} command,
+etc.
+
+As an implementation detail, \q{columnar} uses first-class
+continuations to interleave the column output.  The core \q{fmt}
+itself has no knowledge of or special support for \q{columnar}, which
+could complicate and potentially slow down simpler \q{fmt} operations.
+This is a testament to the power of \q{call/cc} - it can be used to
+implement coroutines or arbitrary control structures even where they
+were not planned for.
 
 \subsubsection*{(fmt-columns <column> ...)}
 
@@ -588,21 +667,22 @@ arbitrary size.
 A convenience utility, just formats an infinite stream of numbers (in
 the current radix) beginning with \q{<start>}, which defaults to \q{1}.
 
+The Unix \q{nl(1)} utility could be implemented as:
+
 \q{
-  (fmt #t (columnar 4 'right 'infinite (line-numbers)
+  (fmt #t (columnar 6 'right 'infinite (line-numbers)
                     " " (fmt-file "read-line.scm")))
 }
 
 \p{
-   1 
-   2 (define (read-line . o)
-   3   (let ((port (if (pair? o) (car o) (current-input-port))))
-   4     (let lp ((res '()))
-   5       (let ((c (read-char port)))
-   6         (if (or (eof-object? c) (eqv? c #\newline))
-   7             (list->string (reverse res))
-   8             (lp (cons c res)))))))
-   9
+     1 
+     2 (define (read-line . o)
+     3   (let ((port (if (pair? o) (car o) (current-input-port))))
+     4     (let lp ((res '()))
+     5       (let ((c (read-char port)))
+     6         (if (or (eof-object? c) (eqv? c #\newline))
+     7             (list->string (reverse res))
+     8             (lp (cons c res)))))))
 }
 
 \section{C Formatting}
@@ -1160,17 +1240,21 @@ characters are considered 2 characters wide (as they typically are in
 fixed-width terminals), while treating combining and non-spacing
 characters as 0 characters wide.
 
-It also recognizes and ignores ANSI escapes.
+It also recognizes and ignores ANSI escapes, in particular useful if
+you want to combine this with the fmt-color utilities.
 
 
 \section{Optimizing}
 
-The library is designed for scalability, not speed, and I'm not
-going to think about any fine tuning until it's more stabilised.
-One aspect of the design, however, was influenced for the sake of
-future optimizations, which is that none of the default format
-variables are initialized by global parameters, which leaves room
-for inlining and subsequent simplification of format calls.
+The library is designed for scalability and flexibility, not speed,
+and I'm not going to think about any fine tuning until it's more
+stabilised.  One aspect of the design, however, was influenced for the
+sake of future optimizations, which is that none of the default format
+variables are initialized by global parameters, which leaves room for
+inlining and subsequent simplification of format calls.
+
+If you don't have an aggressively optimizing compiler, you can easily
+achieve large speedups on common cases with CL-style compiler macros.
 
 \section{Common Lisp Format Cheat Sheet}
 

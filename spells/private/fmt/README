@@ -6,12 +6,9 @@
 
                    http://synthcode.com/scheme/fmt/
 
-                             version 0.6
-                              2009/04/11
-
 
 This directory contains a portable combinator-based formatting library
-for Scheme.  It has been tested on Chicken, Gauche, MzScheme and
+for Scheme.  It has been tested on Chicken, Gauche, MzScheme 3.x and
 Scheme48.
 
 Documentation is in the file fmt.html.

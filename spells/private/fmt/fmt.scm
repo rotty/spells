@@ -1,6 +1,6 @@
 ;;;; fmt.scm -- extensible formatting library
 ;;
-;; Copyright (c) 2006-2008 Alex Shinn.  All rights reserved.
+;; Copyright (c) 2006-2009 Alex Shinn.  All rights reserved.
 ;; BSD-style license: http://synthcode.com/license.txt
 
 ;; (require-extension (srfi 1 6 13 23 69))
@@ -43,7 +43,7 @@
 ;; `properties' slot holding an alist for all other values.
 
 (define *default-fmt-state*
-  (vector 0 0 10 '() #\space #f 78 #f #f #f #f #f))
+  (vector 0 0 10 '() #\space #f 78 #f #f #f #f #f #f))
 
 (define fmt-state? vector?)
 
@@ -75,8 +75,9 @@
 (define (fmt-writer st) (vector-ref st 7))
 (define (fmt-port st) (vector-ref st 8))
 (define (fmt-decimal-sep st) (vector-ref st 9))
-(define (fmt-string-width st) (vector-ref st 10))
-(define (fmt-ellipses st) (vector-ref st 11))
+(define (fmt-decimal-align st) (vector-ref st 10))
+(define (fmt-string-width st) (vector-ref st 11))
+(define (fmt-ellipses st) (vector-ref st 12))
 
 (define (fmt-set-row! st x) (vector-set! st 0 x) st)
 (define (fmt-set-col! st x) (vector-set! st 1 x) st)
@@ -88,8 +89,9 @@
 (define (fmt-set-writer! st x) (vector-set! st 7 x) st)
 (define (fmt-set-port! st x) (vector-set! st 8 x) st)
 (define (fmt-set-decimal-sep! st x) (vector-set! st 9 x) st)
-(define (fmt-set-string-width! st x) (vector-set! st 10 x) st)
-(define (fmt-set-ellipses! st x) (vector-set! st 11 x) st)
+(define (fmt-set-decimal-align! st x) (vector-set! st 10 x) st)
+(define (fmt-set-string-width! st x) (vector-set! st 11 x) st)
+(define (fmt-set-ellipses! st x) (vector-set! st 12 x) st)
 
 (define (fmt-ref st key . o)
   (case key
@@ -103,6 +105,7 @@
     ((pad-char) (fmt-pad-char st))
     ((width) (fmt-width st))
     ((decimal-sep) (fmt-decimal-sep st))
+    ((decimal-align) (fmt-decimal-align st))
     ((string-width) (fmt-string-width st))
     ((ellipses) (fmt-ellipses st))
     (else (cond ((assq key (fmt-properties st)) => cdr)
@@ -128,6 +131,7 @@
     ((port) (fmt-set-port! st val))
     ((width) (fmt-set-width! st val))
     ((decimal-sep) (fmt-set-decimal-sep! st val))
+    ((decimal-align) (fmt-set-decimal-align! st val))
     ((string-width) (fmt-set-string-width! st val))
     ((ellipses) (fmt-set-ellipses! st val))
     (else (fmt-set-property! st key val))))
@@ -149,6 +153,7 @@
 (define (pad-char ch . ls) (fmt-let 'pad-char ch (apply-cat ls)))
 (define (comma-char ch . ls) (fmt-let 'comma-char ch (apply-cat ls)))
 (define (decimal-char ch . ls) (fmt-let 'decimal-sep ch (apply-cat ls)))
+(define (decimal-align n . ls) (fmt-let 'decimal-align n (apply-cat ls)))
 (define (with-width w . ls) (fmt-let 'width w (apply-cat ls)))
 (define (ellipses ell . ls) (fmt-let 'ellipses ell (apply-cat ls)))
 
@@ -568,6 +573,15 @@
 (define (mirror-of c)
   (case c ((#\() #\)) ((#\[) #\]) ((#\{) #\}) ((#\<) #\>) (else c)))
 
+(define default-digits
+  (list->vector (string->list "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")))
+
+;; kanji (10 included for base 11 ;)
+;; (vector "０" "一" "二" "三" "四" "五" "六" "七" "八" "九" "十")
+
+;; old style kanji:
+;; (vector "零" "壱" "弐" "参" "肆" "伍" "陸" "柒" "捌" "玖" "拾")
+
 ;; General algorithm based on "Printing Floating-Point Numbers Quickly
 ;; and Accurately" by Burger and Dybvig (FP-Printing-PLDI96.pdf).  The
 ;; code below will be hard to read out of that context until it's
@@ -584,9 +598,62 @@
            (comma-sep (and commify? (fmt-ref st 'comma-char #\,)))
            (decimal-sep (or (fmt-decimal-sep st)
                             (if (eqv? comma-sep #\.) #\, #\.)))
-           (comma-rule (if (eq? commify? #t) 3 commify?)))
+           (comma-rule (if (eq? commify? #t) 3 commify?))
+           (align (fmt-decimal-align st))
+           (digit-vec default-digits)
+           (stack '()))
 
-        (define (write-positive n)
+        (define (write-digit d)
+          (display (vector-ref digit-vec (inexact->exact (truncate d))) port))
+
+        ;; This is ugly because we need to keep a list of all output
+        ;; of the form x9999... in case we get to the end of the
+        ;; precision and need to round up.  Alas, if it weren't for
+        ;; decimals and commas, we could just keep track of the last
+        ;; non-9 digit and the number of nines seen, without any need
+        ;; for a heap-allocated stack.
+        (define (write-digit-list ls)
+          (for-each
+           (lambda (x) (if (number? x) (write-digit x) (display x port)))
+           ls))
+
+        (define (flush)
+          (write-digit-list (reverse stack))
+          (set! stack '()))
+
+        (define (flush/rounded)
+          (let lp ((ls stack) (res '()))
+            (cond
+             ((null? ls)
+              (write-digit-list (cons #\1 res)))
+             ((not (number? (car ls)))
+              (lp (cdr ls) (cons (car ls) res)))
+             ((= (car ls) (- base 1))
+              (lp (cdr ls) (cons #\0 res)))
+             (else
+              (write-digit-list
+               (append (reverse (cdr ls)) (cons (+ 1 (car ls)) res))))))
+          (set! stack '()))
+
+        (define (output digit)
+          (if (and (number? digit) (< digit (- base 1)))
+              (flush))
+          (set! stack (cons digit stack)))
+
+        (define (write-prefix prefix align k)
+          (if align
+              (let* ((prefix (cond ((string? prefix) prefix)
+                                   ((char? prefix) (string prefix))
+                                   (else "")))
+                     (diff (- align
+                              (+ (if (zero? k) 1 k) (string-length prefix))
+                              1)))
+                (if (positive? diff)
+                    (display (make-string diff (fmt-pad-char st)) port))
+                (display prefix port))
+              (if prefix (display prefix port)))) 
+
+        (define (write-real n prefix align)
 
           (let* ((m+e (mantissa+exponent (exact->inexact n)))
                  (f (car m+e))
@@ -595,16 +662,6 @@
                  (round? (even? f))
                  (smaller (if round? <= <))
                  (bigger (if round? >= >)))
-
-            (define (write-digit d)
-              (let ((d (inexact->exact (truncate d))))
-                (write-char
-                 (cond ((< d 10)
-                        (integer->char (+ d (char->integer #\0))))
-                       ((< d 36)
-                        (integer->char (+ (- d 10) (char->integer #\A))))
-                       (else (error "invalid digit: " d)))
-                 port)))
 
             (define (pad d i) ;; just pad 0's, not #'s
               (write-digit d)
@@ -621,31 +678,41 @@
                       (display comma-sep port))
                   (if (= i (- digits 1))
                       (display decimal-sep port))
-                  (write-char #\0 port)
+                  (write-digit 0)
                   (lp (- i 1))))))
 
             (define (pad-all d i)
-              (write-digit d)
+              (cond
+               ((>= d base)
+                (flush/rounded))
+               (else
+                (flush)
+                (write-digit d)))
               (let lp ((i (- i 1)))
                 (cond
                  ((> i 0)
                   (if (and commify? (zero? (modulo i comma-rule)))
                       (display comma-sep port))
-                  (write-char #\0 port)
+                  (write-digit 0)
                   (lp (- i 1)))
                  ((and (= i 0) (inexact? n))
                   (display decimal-sep port)
                   (write-digit 0)))))
 
-            (define (pad-sci d i k)
-              (write-digit d)
-              (write-char #\e port)
-              (cond
-               ((positive? k)
-                (write-char #\+ port)
-                (write (- k 1) port))
-               (else
-                (write k port))))
+            ;;(define (pad-sci d i k)
+            ;;  (cond
+            ;;   ((>= d base)
+            ;;    (flush/rounded))
+            ;;   (else
+            ;;    (flush)
+            ;;    (write-digit d)))
+            ;;  (write-char #\e port)
+            ;;  (cond
+            ;;   ((positive? k)
+            ;;    (write-char #\+ port)
+            ;;    (write (- k 1) port))
+            ;;   (else
+            ;;    (write k port))))
 
             (define (scale r s m+ m- k f e)
               (let ((est (inexact->exact
@@ -655,35 +722,35 @@
                 (if (not (negative? est))
                     (fixup r (* s (fast-expt base est)) m+ m- est)
                     (let ((skale (fast-expt base (- est))))
-                      (fixup (* r skale) s
-                             (* m+ skale) (* m- skale) est)))))
+                      (fixup (* r skale) s (* m+ skale) (* m- skale) est)))))
 
             (define (fixup r s m+ m- k)
-              (if (bigger (+ r m+) s)
+              (if (and (bigger (+ r m+) s)) ;; (or digits (>= k -4))
                   (lead r s m+ m- (+ k 1))
                   (lead (* r base) s (* m+ base) (* m- base) k)))
 
             (define (lead r s m+ m- k)
+              (write-prefix prefix align k)
               (cond
+               ((and (not digits) (or (> k 14) (< k -4)))
+                (write n port))      ; XXXX native write for sci
                ;;((and (not digits) (> k 14))
                ;; (generate-sci r s m+ m- k))
                ;;((and (not digits) (< k -4))
                ;; (if (>= (/ r s) base)
                ;;     (generate-sci (/ r base) s (/ m+ base) (/ m- base) k)
                ;;     (generate-sci r s m+ m- k)))
-               ((and (not digits) (or (> k 14) (< k -4)))
-                (write n port))      ; XXXX using native write for now
                (else
                 (cond
                  ((and (not digits)
-                       (not (positive? k)))
-                  (write-char #\0 port)
+                       (or (negative? k)
+                           (and (zero? k) (not (integer? n)))))
+                  (write-digit 0)
                   (display decimal-sep port)
                   (let lp ((i 0))
-                    (cond
-                     ((> i k)
-                      (write-char #\0 port)
-                      (lp (- i 1)))))))
+                    (cond ((> i k)
+                           (write-digit 0)
+                           (lp (- i 1)))))))
                 (if digits
                     (generate-fixed r s m+ m- k)
                     (generate-all r s m+ m- k)))))
@@ -692,17 +759,17 @@
               (let gen ((r r) (m+ m+) (m- m-) (i k))
                 (cond ((= i k))
                       ((zero? i)
-                       (display decimal-sep port))
+                       (output decimal-sep))
                       ((and commify?
                             (positive? i)
                             (zero? (modulo i comma-rule)))
-                       (display comma-sep port)))
+                       (output comma-sep)))
                 (let ((d (quotient r s))
                       (r (remainder r s)))
                   (if (not (smaller r m-))
                       (cond
                        ((not (bigger (+ r m+) s))
-                        (write-digit d)
+                        (output d)
                         (gen (* r base) (* m+ base) (* m- base) (- i 1)))
                        (else
                         (pad-all (+ d 1) i)))
@@ -710,40 +777,11 @@
                           (pad-all d i)
                           (pad-all (if (< (* r 2) s) d (+ d 1)) i))))))
 
-            ;; This is ugly because we need to keep a list of all
-            ;; output of the form x9999... in case we get to the end
-            ;; of the precision and need to round up.
             (define (generate-fixed r s m+ m- k)
-              (let ((i0 (- (+ k digits) 1))
-                    (stack (if (<= k 0)
-                               (append (make-list (min (- k) digits) 0)
-                                       (list decimal-sep 0))
-                               '())))
-                (define (write-digit-list ls)
-                  (for-each
-                   (lambda (x) (if (number? x) (write-digit x) (display x port)))
-                   ls))
-                (define (flush)
-                  (write-digit-list (reverse stack))
-                  (set! stack '()))
-                (define (flush/rounded)
-                  (let lp ((ls stack) (res '()))
-                    (cond
-                     ((null? ls)
-                      (write-digit-list (cons #\1 res)))
-                     ((not (number? (car ls)))
-                      (lp (cdr ls) (cons (car ls) res)))
-                     ((= (car ls) (- base 1))
-                      (lp (cdr ls) (cons #\0 res)))
-                     (else
-                      (write-digit-list
-                       (append (reverse (cdr ls))
-                               (cons (+ 1 (car ls)) res))))))
-                  (set! stack '()))
-                (define (output digit)
-                  (if (and (number? digit) (< digit (- base 1)))
-                      (flush))
-                  (set! stack (cons digit stack)))
+              (if (<= k 0) 
+                  (set! stack (append (make-list (min (- k) digits) 0)
+                                      (list decimal-sep 0))))
+              (let ((i0 (- (+ k digits) 1)))
                 (let gen ((r r) (m+ m+) (m- m-) (i i0))
                   (cond ((= i i0))
                         ((= i (- digits 1))
@@ -768,7 +806,7 @@
                             (flush))))
                      ((smaller r m-)
                       (cond
-                       ((= d base)
+                       ((>= d base)
                         (flush/rounded)
                         (pad 0 i))
                        (else
@@ -777,27 +815,31 @@
                             (pad (if (< (* r 2) s) d (+ d 1)) i)
                             (pad d i)))))
                      ((bigger (+ r m+) s)
-                      (flush)
-                      (pad (+ d 1) i))
+                      (cond
+                       ((>= d (- base 1))
+                        (flush/rounded)
+                        (pad 0 i))
+                       (else
+                        (flush)
+                        (pad (+ d 1) i))))
                      (else
                       (output d)
-                      (gen (* r base) (* m+ base)
-                           (* m- base) (- i 1))))))))
+                      (gen (* r base) (* m+ base) (* m- base) (- i 1))))))))
 
-            (define (generate-sci r s m+ m- k)
-              (let gen ((r r) (m+ m+) (m- m-) (i k))
-                (cond ((= i (- k 1)) (display decimal-sep port)))
-                (let ((d (quotient r s))
-                      (r (remainder r s)))
-                  (if (not (smaller r m-))
-                      (cond
-                       ((not (bigger (+ r m+) s))
-                        (write-digit d)
-                        (gen (* r base) (* m+ base) (* m- base) (- i 1)))
-                       (else (pad-sci (+ d 1) i k)))
-                      (if (not (bigger (+ r m+) s))
-                          (pad-sci d i k)
-                          (pad-sci (if (< (* r 2) s) d (+ d 1)) i k))))))
+            ;;(define (generate-sci r s m+ m- k)
+            ;;  (let gen ((r r) (m+ m+) (m- m-) (i k))
+            ;;    (cond ((= i (- k 1)) (display decimal-sep port)))
+            ;;    (let ((d (quotient r s))
+            ;;          (r (remainder r s)))
+            ;;      (if (not (smaller r m-))
+            ;;          (cond
+            ;;           ((not (bigger (+ r m+) s))
+            ;;            (output d)
+            ;;            (gen (* r base) (* m+ base) (* m- base) (- i 1)))
+            ;;           (else (pad-sci (+ d 1) i k)))
+            ;;          (if (not (bigger (+ r m+) s))
+            ;;              (pad-sci d i k)
+            ;;              (pad-sci (if (< (* r 2) s) d (+ d 1)) i k))))))
 
             (cond
              ((negative? e)
@@ -811,17 +853,54 @@
                   (let* ((be (expt 2 e)) (be1 (* be 2)))
                     (scale (* f be1 2) (* 2.0 2) be1 be 0 f e)))))))
 
-        (define (write-real n sign?)
+        (define (write-fixed-rational p prefix align)
+          (define (get-scale q) (expt base (- (integer-log q base) 1)))
+          (let ((n (numerator p))
+                (d (denominator p))
+                (k (integer-log p base)))
+            (write-prefix prefix align k)
+            (let lp ((n n)
+                     (i (- k)))
+              (cond
+               ((< i digits)
+                (if (zero? i) (output decimal-sep))
+                (let ((q (quotient n d)))
+                  (cond
+                   ((>= q base)
+                    (let* ((scale (get-scale q))
+                           (digit (quotient q scale))
+                           (n2 (- n (* d digit scale))))
+                      (output digit)
+                      (lp n2 (+ i 1))))
+                   (else
+                    (output q)
+                    (lp (* (remainder n d) base) (+ i 1))))))
+               (else
+                (let* ((q (quotient n d))
+                       (digit
+                        (* 2 (if (>= q base) (quotient q (get-scale q)) q))))
+                  (if (or (> digit base)
+                          (and (= digit base)
+                               (let ((prev (find integer? stack)))
+                                 (and prev (odd? prev)))))
+                      (flush/rounded)
+                      (flush))))))))
+
+        (define (wrap-sign n sign? align writer)
           (cond
            ((negative? n)
-            (if (char? sign?)
-                (begin (display sign? port) (write-positive (abs n))
-                       (display (mirror-of sign?) port))
-                (begin (write-char #\- port) (write-positive (abs n)))))
+            (cond
+             ((char? sign?)
+              (writer (abs n) sign? align)
+              (display (mirror-of sign?) port))
+             (else
+              (writer (abs n) #\- align))))
            (else
-            (if (and sign? (not (char? sign?)))
-                (write-char #\+ port))
-            (write-positive n))))
+            (cond
+             ((and sign? (not (char? sign?)))
+              (writer n #\+ align))
+             (else
+              (writer n #f align))))))
 
         (let ((imag (imag-part n)))
           (cond
@@ -829,14 +908,18 @@
             (error "invalid base for numeric formatting" base))
            ((zero? imag)
             (cond
-             ((and (not digits) (exact? n) (not (integer? n)))
-              (write-real (numerator n) sign?)
-              (write-char #\/ port)
-              (write-real (denominator n) #f))
+             ((and (exact? n) (not (integer? n)))
+              (cond
+               (digits
+                (wrap-sign n sign? align write-fixed-rational))
+               (else
+                (wrap-sign (numerator n) sign? #f write-real)
+                (write-char #\/ port)
+                (wrap-sign (denominator n) #f #f write-real))))
              (else
-              (write-real n sign?))))
-           (else (write-real (real-part n) sign?)
-                 (write-real imag #t)
+              (wrap-sign n sign? align write-real))))
+           (else (wrap-sign (real-part n) sign? #f write-real)
+                 (wrap-sign imag #t #f write-real)
                  (write-char #\i port))))))))
 
 (define (num n . opt)
@@ -880,6 +963,40 @@
                    (exact->inexact n2))
                (vector-ref names k)
                (if (zero? k) "" suffix)))))))
+
+(define roman-numerals
+  '((1000 . #\M) (500 . #\D) (100 . #\C)
+    (50 . #\L) (10 . #\X) (5 . #\V) (1 . #\I)))
+
+(define (num/old-roman num)
+  (lambda (st)
+    (let lp ((num num) (res '()))
+      (if (positive? num)
+          (let ((ch (find (lambda (x) (>= num (car x))) roman-numerals)))
+            (lp (- num (car ch)) (cons (cdr ch) res)))
+          (fmt-write (reverse-list->string res) st)))))
+
+(define (num/roman num)
+  (lambda (st)
+    (let lp1 ((num num) (res '()))
+      (if (positive? num)
+          (let lp2 ((ls roman-numerals))
+               (let* ((big (car ls))
+                      (big-n (car big)))
+                 (cond
+                  ((>= num big-n)
+                   (lp1 (- num big-n) (cons (cdr big) res)))
+                  ((and (> (* 2 num) big-n)
+                        (find (lambda (c)
+                                (let ((x (car c)))
+                                  (<= (+ x 1) (- big-n x) num)))
+                              ls))
+                   => (lambda (c)
+                        (lp1 (- num (- big-n (car c)))
+                             (cons (cdr big) (cons (cdr c) res)))))
+                  (else
+                   (lp2 (cdr ls))))))
+          (fmt-write (reverse-list->string res) st)))))
 
 ;; Force a number into a fixed width, print as #'s if doesn't fit.
 ;; Needs to be wrapped in a PAD if you want to expand to the width.
@@ -1031,7 +1148,8 @@
     (let* ((output (fmt-writer st))
            (wr-num
             (cond ((and (= 10 (fmt-radix st))
-                        (not (fmt-precision st)))
+                        (not (fmt-precision st))
+                        (not (fmt-decimal-align st)))
                    (lambda (n st) (output (number->string n) st)))
                   ((assv (fmt-radix st)
                          '((16 . "#x") (10 . "") (8 . "#o") (2 . "#b")))

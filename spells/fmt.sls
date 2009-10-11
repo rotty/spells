@@ -1,7 +1,7 @@
 ;;; fmt.sls --- R6RS library for the fmt core
 ;;
 ;; Based on fmt-scheme48.scm, which is
-;; Copyright (c) 2007 Alex Shinn.  All rights reserved.
+;; Copyright (c) 2007, 2009 Alex Shinn.  All rights reserved.
 ;; BSD-style license: http://synthcode.com/license.txt
 ;;
 ;; R6RS adaption Copyright (c) 2009 Andreas Rottmann, same license.
@@ -23,7 +23,7 @@
           pad pad/right pad/left pad/both trim trim/left trim/both trim/length
           fit fit/left fit/both tab-to space-to wrt wrt/unshared dsp
           pretty pretty/unshared slashified maybe-slashified
-          num num/si num/fit num/comma radix fix ellipses
+          num num/si num/fit num/comma radix fix decimal-align ellipses
           upcase downcase titlecase pad-char comma-char decimal-char
           with-width wrap-lines fold-lines justify
           make-string-fmt-transformer

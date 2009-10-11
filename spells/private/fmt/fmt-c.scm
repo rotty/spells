@@ -225,10 +225,8 @@
              (fmt-let 'no-wrap? #t
                       (cat "{" (fmt-join c-expr (vector->list x) ", ") "}"))
              (lambda (st)
-               ;;(fprintf (current-error-port) "in alternate\n")
                (let* ((col (fmt-col st))
                       (sep (string-append "," (make-nl-space col))))
-                 ;; (fprintf (current-error-port) "x = ~S\n" x)
                  (cat "{" (fmt-join c-expr (vector->list x) sep)
                       "}" nl)))))
            st))

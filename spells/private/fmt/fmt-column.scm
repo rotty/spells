@@ -1,6 +1,6 @@
 ;;;; fmt-block.scm -- columnar formatting
 ;;
-;; Copyright (c) 2006-2007 Alex Shinn.  All rights reserved.
+;; Copyright (c) 2006-2009 Alex Shinn.  All rights reserved.
 ;; BSD-style license: http://synthcode.com/license.txt
 
 
@@ -20,69 +20,88 @@
 (define (fmt-columns . ls)
   (lambda (orig-st)
     (call-with-current-continuation
-      (lambda (return)
-        (define (infinite? x)
-          (and (pair? x) (pair? (cdr x)) (pair? (cddr x)) (caddr x)))
-        (let ((q1 '())
-              (q2 '())
-              (remaining (length (remove infinite? ls))))
-          (define (enq! proc) (set! q2 (cons proc q2)))
-          (define (deq!) (let ((proc (car q1))) (set! q1 (cdr q1)) proc))
-          (define (line-init!) (set! q1 (reverse q2)) (set! q2 '()))
-          (define (line-done?) (null? q1))
-          (define (next cont)
-            (enq! cont)
-            (if (line-done?) 
-                (cond
-                  ((not (positive? remaining))
-                   (return orig-st))
-                  (else                 ; newline
-                   (set! orig-st (nl orig-st))
-                   (line-init!)
-                   ((deq!) #f)))
-                ((deq!) #f)))
-          (define (make-empty-col fmt)
-            (define (blank *ignored*)
-              (set! orig-st ((fmt "") orig-st)) ; empty output
-              (next blank))    ; infinite loop, next terminates for us
-            blank)
-          (define (make-col st fmt gen)
-            (let ((acc '()))            ; buffer incomplete lines
-              (lambda (*ignored*)
-                (define (output* str st)
-                  (let lp ((i 0))
-                    (let ((nli (string-index str #\newline i)))
-                      (cond
-                        (nli
-                         (let ((line
-                                (string-concatenate-reverse
-                                 (cons (substring/shared str i nli) acc))))
-                           (set! acc '())
-                           (set! orig-st ((fmt line) orig-st))
-                           (call-with-current-continuation next) 
-                           (lp (+ nli 1))))
-                        (else
-                         (set! acc (cons (substring/shared str i) acc))))))
-                  ;; update - don't output or the string port will fill up
-                  (fmt-update str st))
-                ;; gen threads through it's own state, ignore result
-                (gen (fmt-set-writer! (copy-fmt-state st) output*))
-                ;; reduce # of remaining columns
-                (set! remaining (- remaining 1))
-                ;; (maybe) loop with an empty column in place
-                (if (not (positive? remaining))
-                    (return orig-st)
-                    (next (make-empty-col fmt))))))
-          ;; queue up the initial formatters
-          (for-each
-           (lambda (col)
-             (let ((st (fmt-set-port! (copy-fmt-state orig-st)
-                                      (open-output-string))))
-               (enq! (make-col st (car col) (cat (cadr col) fl)))))
-           ls)
-          (line-init!)
-          ;; start
-          ((deq!) #f))))))
+     (lambda (return)
+       (define (infinite? x)
+         (and (pair? x) (pair? (cdr x)) (pair? (cddr x)) (caddr x)))
+       (let ((q1 '())
+             (q2 '())
+             (remaining (length (remove infinite? ls))))
+         (define (enq! proc) (set! q2 (cons proc q2)))
+         (define (deq!) (let ((proc (car q1))) (set! q1 (cdr q1)) proc))
+         (define (line-init!) (set! q1 (reverse q2)) (set! q2 '()))
+         (define (line-done?) (null? q1))
+         (define line-buf '())
+         (define line-non-empty? #f)
+         (define (write-column fmt str finite?)
+           (set! line-buf (cons (cons fmt str) line-buf))
+           (if finite? (set! line-non-empty? #t)))
+         (define (write-line)
+           (cond
+            (line-non-empty?
+             (for-each
+              (lambda (x) (set! orig-st (((car x) (cdr x)) orig-st)))
+              (reverse line-buf))
+             (set! orig-st (nl orig-st))))
+           (set! line-buf '())
+           (set! line-non-empty? #f)
+           (line-init!))
+         (define (next cont)
+           (enq! cont)
+           (cond
+            ((line-done?) 
+             (write-line)
+             (if (not (positive? remaining)) (finish) ((deq!) #f)))
+            (else ((deq!) #f))))
+         (define (finish)
+           (write-line)
+           (return orig-st))
+         (define (make-empty-col fmt)
+           (define (blank *ignored*)
+             (write-column fmt "" #f)
+             (next blank))    ; infinite loop, next terminates for us
+           blank)
+         (define (make-col st fmt gen finite?)
+           (let ((acc '()))            ; buffer incomplete lines
+             (lambda (*ignored*)
+               (define (output* str st)
+                 (let lp ((i 0))
+                   (let ((nli (string-index str #\newline i)))
+                     (cond
+                      (nli
+                       (let ((line
+                              (string-concatenate-reverse
+                               (cons (substring/shared str i nli) acc))))
+                         (set! acc '())
+                         (write-column fmt line finite?)
+                         (call-with-current-continuation next) 
+                         (lp (+ nli 1))))
+                      (else
+                       (set! acc (cons (substring/shared str i) acc))))))
+                 ;; update - don't output or the string port will fill up
+                 (fmt-update str st))
+               ;; gen threads through it's own state, ignore result
+               (gen (fmt-set-writer! (copy-fmt-state st) output*))
+               ;; reduce # of remaining finite columns
+               (set! remaining (- remaining 1))
+               ;; write any remaining accumulated output
+               (if (pair? acc)
+                   (let ((s (string-concatenate-reverse acc)))
+                     (write-column fmt s (and finite? (not (equal? s ""))))))
+               ;; (maybe) loop with an empty column in place
+               (if (not (positive? remaining))
+                   (finish)
+                   (next (make-empty-col fmt))))))
+         ;; queue up the initial formatters
+         (for-each
+          (lambda (col)
+            (let ((st (fmt-set-port! (copy-fmt-state orig-st)
+                                     (open-output-string))))
+              (enq! (make-col st (car col) (dsp (cadr col))
+                              (not (infinite? col))))))
+          ls)
+         (line-init!)
+         ;; start
+         ((deq!) #f))))))
 
 (define (columnar . ls)
   (define (proportional-width? w) (and (number? w) (< 0 w 1)))
@@ -116,13 +135,13 @@
             (if (proportional-width? width)
                 (case align
                   ((right)
-                   (lambda (str) (lambda (st) ((pad (scale-width st) str) st))))
+                   (lambda (str) (lambda (st) ((pad/left (scale-width st) str) st))))
                   ((center)
                    (lambda (str) (lambda (st) ((pad/both (scale-width st) str) st))))
                   (else
                    (lambda (str) (lambda (st) ((pad/right (scale-width st) str) st)))))
                 (case align
-                  ((right) (lambda (str) (pad width str)))
+                  ((right) (lambda (str) (pad/left width str)))
                   ((center) (lambda (str) (pad/both width str)))
                   (else (lambda (str) (pad/right width str)))))))
        ;; generator
@@ -136,9 +155,10 @@
             (filter (lambda (x) (and (number? (car x)) (>= (car x) 1))) ls))
            (fixed-total (fold + border-width (map car fixed-ls)))
            (scaled-ls (filter (lambda (x) (proportional-width? (car x))) ls))
-           (rest
-            (/ (- 1 (fold + 0 (map car scaled-ls)))
-               (- (length ls) (+ (length fixed-ls) (length scaled-ls)) ))))
+           (denom (- (length ls) (+ (length fixed-ls) (length scaled-ls))))
+           (rest (if (zero? denom)
+                     0
+                     (/ (- 1 (fold + 0 (map car scaled-ls))) denom))))
       (if (negative? rest)
           (error "fractional widths must sum to less than 1"
                  (map car scaled-ls)))
