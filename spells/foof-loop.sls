@@ -60,6 +60,7 @@
     (rnrs)
     (only (rnrs mutable-pairs) set-cdr!)
     (srfi :8 receive)
+    (spells lazy)
     (spells syn-param)
     (spells include))
 
