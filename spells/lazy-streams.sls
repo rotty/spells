@@ -24,6 +24,7 @@
           stream->list
           list->stream
           string->stream
+          vector->stream
           stream-append
           stream-difference
           in-stream)
@@ -65,6 +66,13 @@
     (lazy (if (= index (string-length string))
               stream-nil
               (stream-cons (string-ref string index)
+                           (recur (+ index 1)))))))
+
+(define (vector->stream vector)
+  (let recur ((index 0))
+    (lazy (if (= index (vector-length vector))
+              stream-nil
+              (stream-cons (vector-ref vector index)
                            (recur (+ index 1)))))))
 
 ;** Be careful!  This operation is potentially dangerous.
