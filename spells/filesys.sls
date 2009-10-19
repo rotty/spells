@@ -192,7 +192,7 @@
   (case-lambda
     ((pathname dir-list pred)
      (let ((pathname (->pathname pathname)))
-       (cond ((null? (pathname-origin pathname))
+       (cond ((not (pathname-origin pathname))
               (let loop ((lst dir-list))
                 (if (null? lst)
                     #f

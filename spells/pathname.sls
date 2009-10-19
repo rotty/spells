@@ -138,7 +138,7 @@
 ;; @code{#f}, representing an empty file field.
 (define (make-pathname origin directory file)
   (really-make-pathname
-   (or origin '())
+   origin
    (%->strlist directory
                (lambda ()
                  (error 'make-pathname "invalid directory part" directory)))
@@ -300,13 +300,13 @@
          (directory-default (pathname-directory defaults-pathname))
          (file (merge-files (pathname-file pathname)
                             (pathname-file defaults-pathname))))
-    (if (null? origin)
+    (if origin
+        (make-pathname origin directory file)
         (make-pathname origin-default
                        (cond ((null? directory) directory-default)
                              ((null? directory-default) directory)
                              (else (append directory-default directory)))
-                       file)
-        (make-pathname origin directory file))))
+                       file))))
 
 ;;@ Return a file by merging @1 with @2.
 (define (merge-files file defaults-file)
@@ -598,7 +598,7 @@
        (define (lose)
          (error 'unix/origin-namestring
                 "invalid origin for unix file system" origin))
-       (cond ((null? origin) "")
+       (cond ((not origin) "")
              ((or (eq? origin '/) (equal? origin "/")) "/")
              ((pair? origin)
               (let loop ((o origin) (parts '()))
