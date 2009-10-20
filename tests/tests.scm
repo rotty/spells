@@ -58,14 +58,7 @@
    (rnrs io ports)
    (rnrs mutable-strings)
    (rnrs r5rs))
-  ("awk.scm"
-   (spells awk)
-   (spells ascii)
-   (spells delimited-readers)
-   (rnrs io ports)
-   (rnrs lists)
-   (only (srfi :1) make-list iota)
-   (only (srfi :13) string-join))
+  "awk.scm"
   ("delimited-control.scm"
    (spells delimited-control))
   ("zipper-tree.scm"

@@ -34,8 +34,7 @@
           counter
           ((state-var init-expr) ...)
           clause ...)
-       (and (identifier? #'counter)
-            (identifier? #'continue))
+       (identifier? #'counter)
        (let*-values (((clauses) (map parse-clause #'(clause ...)))
                      ((svars) #'(state-var ...))
                      ((clauses rx-bindings)
@@ -63,11 +62,10 @@
           (record field ...)
           ((state-var init-expr) ...)
           clause ...)
-       (identifier? #'continue)
        #'(awk next-record
               (record field ...)
               counter
-              ((state-variable init-expr) ...)
+              ((state-var init-expr) ...)
               clause ...)))))
 
 )

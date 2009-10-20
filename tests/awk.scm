@@ -11,10 +11,19 @@
 
 ;;; Commentary:
 
-;; Originally written by Christoph Hetz, modified by Andreas Rottmann
-;; for inclusion in spells
+;; Originally written by Christoph Hetz, modified and extended by
+;; Andreas Rottmann for inclusion in spells.
 
 ;;; Code:
+
+(import (rnrs)
+        (only (srfi :1) make-list iota)
+        (only (srfi :13) string-join)
+        (spells ascii)
+        (spells delimited-readers)
+        (spells irregex)
+        (spells awk)
+        (spells testing))
 
 ;;; basic helper functions
 
@@ -251,6 +260,21 @@
                        (set! read (cons c read)))))))
     (test-equal (list 6 5 4 3 2 1) read)))
 
+;; This one also happens to test proper scoping of the state
+;; variables.
+(define-test-case awk-tests test=>expr/rx ()
+  (test-equal '(arrow-clause-test EINE "klein" "mit zeichen" plusplus)
+    (call-with-string-input-port (some-test-lines "arrow-clause-test")
+      (lambda (in-port)
+        (awk (read-line in-port) (line) ((result '()))
+             ("arrow-clause-test" (cons 'arrow-clause-test result))
+             ((: bos "eine zeile " ($ (+ (or alphabetic space))))
+              => (lambda (match)
+                   (cons (irregex-match-substring match 1) result)))
+             ("EINE" (cons 'EINE result))
+             ((+ "+") (cons 'plusplus result))
+             (after
+              (reverse result)))))))
 
 (define-test-case awk-tests after ()
   (let ((read '()))
@@ -293,6 +317,7 @@
     (test-equal (list 'b 'a 2 1)
       read)))
 
+(set-test-debug-errors?! #t)
 (run-test-suite awk-tests)
 
 ;; Local Variables:

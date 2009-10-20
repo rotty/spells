@@ -68,7 +68,7 @@
      (make-else-clause #'(body ...)))
     ((test => expr)
      (symbolic-identifier=? '=> #'=>)
-     (make-arrow-clause #'test #'expr))
+     (make-arrow-clause (parse-test #'test) #'expr))
     ((range-id start-test stop-test body ...)
      (and (identifier? #'range-id)
           (memq (syntax->datum #'range-id) '(range range: :range :range:)))
@@ -226,6 +226,8 @@
                     (lambda args
                       (apply make-range-clause type args))
                     body))
+        ((arrow-clause test expr)
+         (opt-tests (list test) make-arrow-clause expr))
         (else
          (continue (=> opt-clauses (cons clause opt-clauses))))))))
 
@@ -293,7 +295,7 @@
                   #,@(sloppy-mult-values #`(#t #,@svars)))))
           ((arrow-clause test expr)
            (proceed/basic-clause
-            #`(let ((tv #,test))
+            #`(let ((tv #,(mktest test)))
                 (if tv
                     #,(clause-action (list #`(#,expr tv)) #'#f #f svars)
                     #,@null-clause-maybe))))
