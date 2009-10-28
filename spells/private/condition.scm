@@ -27,65 +27,83 @@
   make-stacked-condition stacked-condition?
   (next next-condition))
 
-  ;; Condition printing code taken from Ikarus --> it's GPLv3, need to
-  ;; ask for relicencing permission
-  (define (print-simple-condition x p)
-    (let* ((rtd (record-rtd x))
-           (rf (let l ((rtd rtd) (accum '()))
-                 (if rtd
-                     (l (record-type-parent rtd)
-                        (cons
-                         (cons rtd (record-type-field-names rtd))
-                         accum))
-                     (remp (lambda (a) (zero? (vector-length (cdr a))))
-                           accum))))
-           (rf-len (apply + (map vector-length
-                                 (map cdr rf)))))
-      (let ((name (record-type-name rtd)))
-        (display name p))
-      (case rf-len
-        ((0) (newline p))
-        ((1)
-         (display ": " p)
-         (write ((record-accessor (caar rf) 0) x) p)
-         (newline p))
-        (else
-         (display ":\n" p)
-         (for-each
-          (lambda (a)
-            (let f ((i 0) (rtd (car a)) (v (cdr a)))
-              (unless (= i (vector-length v))
-                (display "       " p)
-                (display (vector-ref v i) p)
-                (display ": " p)
-                (write ((record-accessor rtd i) x) p)
-                (newline p)
-                (f (+ i 1) rtd v))))
-          rf)))))
+(define-syntax formatting
+  (syntax-rules ()
+    ((_ (state-var) (formatter state-expr) cont . env)
+     (cont
+      ()                                         ;Outer bindings
+      ((state-var state-expr                     ;Loop variables
+                  (formatter state-expr)))
+      ()                                         ;Entry bindings
+      ()                                         ;Termination conditions
+      ()                                         ;Body bindings 
+      ()                                         ;Final bindings
+      . env))))
+
+(define (dsp-simple-condition c)
+  (define (dsp-rtd.fields-list rtd.fields-list n-fields)
+    (case n-fields
+      ((0) nl)
+      ((1)
+       (cat ": " (wrt ((record-accessor (caar rtd.fields-list) 0) c)) nl))
+      (else
+       (cat ":\n"
+            (fmt-join
+             (lambda (rtd.fields)
+               (dsp-fields (car rtd.fields) (cdr rtd.fields)))
+             rtd.fields-list
+             "\n")))))
+  (define (dsp-fields rtd fields)
+    (lambda (st)
+      (loop ((for i (up-from 0 (to (vector-length fields))))
+             (for st (formatting
+                      (cat "      "
+                           (vector-ref fields i) ": "
+                           (wrt ((record-accessor rtd i) c)) "\n")
+                      st)))
+        => st)))
+  (lambda (st)
+    (let ((c-rtd (record-rtd c)))
+      (loop ((with rtd c-rtd (record-type-parent rtd))
+             (while rtd)
+             (for rtd.fields-list
+                  (listing (cons rtd (record-type-field-names rtd))))
+             (for n-fields (summing (vector-length
+                                     (record-type-field-names rtd)))))
+        => ((cat (record-type-name c-rtd)
+                 (dsp-rtd.fields-list
+                  (remp (lambda (rtd.fields)
+                          (zero? (vector-length (cdr rtd.fields))))
+                        rtd.fields-list)
+                  n-fields))
+            st)))))
+
+(define (dsp-condition c)
+  (define (dsp-components components)
+    (lambda (st)
+      (loop ((for c (in-list components))
+             (for i (up-from 1))
+             (for st (formatting
+                      (cat "  " i ". " (dsp-simple-condition c))
+                      st)))
+        => st)))
+  (cond
+    ((condition? c)
+     (let ((components (simple-conditions c)))
+       (if (null? components)
+           (dsp "Condition object with no further information\n")
+           (cat "Condition components:\n"
+                (dsp-components components)))))
+    (else
+     (cat "Non-condition object: " c (wrt c) "\n"))))
 
 (define display-condition
   (case-lambda
-    ((x p)
-     (cond
-      ((condition? x)
-       (let ((ls (simple-conditions x)))
-         (if (null? ls)
-             (display "Condition object with no further information\n" p)
-             (begin
-               (display " Condition components:\n" p)
-               (let f ((ls ls) (i 1))
-                 (unless (null? ls)
-                   (display "   " p)
-                   (display i p)
-                   (display ". " p)
-                   (print-simple-condition (car ls) p)
-                   (f (cdr ls) (+ i 1))))))))
-      (else
-       (display " Non-condition object: " p)
-       (write x p)
-       (newline p))))
-    ((x)
-     (display-condition x (current-output-port)))))
+    ((c port)
+     (fmt port (fmt-columns (list (lambda (line) (cat " " line))
+                                  (dsp-condition c)))))
+    ((c)
+     (display-condition c (current-output-port)))))
 
 
 ;; Utilities for code below. This whole section should probably be
@@ -167,5 +185,8 @@
                      (loop (+ i 1))))))))
    (write-char #\) port))
 
-;;; condition.scm ends here
+;; Local Variables:
+;; scheme-indent-styles: (foof-loop)
+;; End:
+
 

@@ -21,11 +21,14 @@
           parser-error-port
           &stacked make-stacked-condition stacked-condition? next-condition
 
+          dsp-condition
           display-condition
           
           ;; This doesn't really belong here
           limited-write)
   (import (rnrs)
+          (spells foof-loop)
+          (spells fmt)
           (spells include))
   
   (include-file ((spells private) condition)))
