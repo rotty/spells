@@ -99,7 +99,7 @@
     ((_ (elt-var) (pathname-expr) cont . env)
      (cont
       (((stream)                       ;Outer bindings
-        (open-directory-stream (->namestring pathname-expr))))
+        (open-directory-stream pathname-expr)))
       ()                               ;Loop variables
       (((elt-var)                      ;Entry bindings
         (read-directory-stream stream)))
