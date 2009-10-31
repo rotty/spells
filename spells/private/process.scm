@@ -53,6 +53,7 @@
                          prog+args))
          (port (transcoded-port (process-input process) (native-transcoder))))
     (receiver port)
+    (close-port port)
     (close-process-ports process)
     (wait-for-process process)))
 
