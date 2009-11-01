@@ -146,6 +146,19 @@
     (test-eqv #t (file-exists? dir))
     (test-eqv #t (file-directory? dir))))
 
+(define-test-case filesys-tests create-temp-directory
+  ((setup
+    (assert-clear-stage)
+    (create-directory test-dir))
+   (teardown
+    (for-each delete-file (directory-fold test-dir cons '()))
+    (delete-test-file '(()))))
+  (let ((temp-dir (create-temp-directory test-dir)))
+    (test-eqv #t (file-directory? temp-dir))
+    (test-eqv #f (pathname=? test-dir temp-dir))
+    (test-eqv #f (pathname-file temp-dir))
+    (test-eqv #t (pathname=? test-dir (pathname-container temp-dir)))))
+
 (define-test-case filesys-tests find-file ()
   (test-equal #f (find-file ".abracadabra.khgafd" (library-search-paths)))
   (test-equal #t (cond ((find-file '((spells)) (library-search-paths))

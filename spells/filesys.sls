@@ -30,7 +30,8 @@
           create-symbolic-link
           create-hard-link
           create-temp-file
-
+          create-temp-directory
+          
           file-regular?
           file-directory?
           file-symbolic-link?
@@ -253,29 +254,47 @@
      (call-with-output-file/atomic pathname 'block (native-transcoder) proc))))
 
 (define create-temp-file
+  (case-lambda
+    ((template buffer-mode transcoder)
+     (temp-pathname-loop
+      template
+      (lambda (pathname continue)
+        (guard (c ((i/o-file-already-exists-error? c)
+                   (continue)))
+          (let ((port (open-file-output-port (->namestring pathname)
+                                             (file-options)
+                                             buffer-mode
+                                             transcoder)))
+            (values pathname port))))))
+    ((template buffer-mode)
+     (create-temp-file template buffer-mode #f))
+    ((template)
+     (create-temp-file template 'block (native-transcoder)))))
+
+(define (create-temp-directory template)
+  (temp-pathname-loop
+   template
+   (lambda (pathname continue)
+     (guard (c ((i/o-file-already-exists-error? c)
+                (continue)))
+       (let ((directory (pathname-as-directory pathname)))
+         (create-directory directory)
+         directory)))))
+
+(define temp-pathname-loop
   (let ((count 1))
-    (case-lambda
-      ((pathname buffer-mode transcoder)
-       (let* ((pathname (->pathname pathname))
-              (types (file-types (pathname-file pathname)))
-              (fname (file-name (pathname-file pathname))))
-         (let loop ((i count))
-           (let ((pathname (pathname-with-file
-                            pathname
-                            (make-file (string-append fname (number->string i))
-                                       (cons "tmp" types)))))
-             (guard (c ((i/o-file-already-exists-error? c)
-                        (loop (+ i 1))))
-               (let ((port (open-file-output-port (->namestring pathname)
-                                                  (file-options)
-                                                  buffer-mode
-                                                  transcoder)))
-                 (set! count (+ i 1))
-                 (values pathname port)))))))
-      ((pathname buffer-mode)
-       (create-temp-file pathname buffer-mode #f))
-      ((pathname)
-       (create-temp-file pathname 'block (native-transcoder))))))
+    (lambda (template action)
+      (let* ((template (->pathname template))
+             (file (pathname-file template))
+             (types (if file (file-types file) '()))
+             (fname (if file (file-name file) "")))
+        (let loop ((i count))
+          (set! count i)
+          (action (pathname-with-file
+                   template
+                   (make-file (string-append fname (number->string i))
+                              (cons "tmp" types)))
+                  (lambda () (loop (+ i 1)))))))))
 
 (define-condition-type &file-unreachable-error &error
   file-unreachable-error? make-file-unreachable-error
