@@ -137,14 +137,14 @@
 ;; or more strings (representing the file name and types), or
 ;; @code{#f}, representing an empty file field.
 (define (make-pathname origin directory file)
+  (define (lose message . irritants)
+    (apply assertion-violation 'make-pathname message irritants))
   (really-make-pathname
    origin
-   (%->strlist directory
-               (lambda ()
-                 (error 'make-pathname "invalid directory part" directory)))
+   (%->strlist directory (lambda () (lose "invalid directory part" directory)))
    (cond ((list? file)
           (case (length file)
-            ((0) (error 'make-pathname "empty list not allowed for file part"))
+            ((0) (lose "empty list not allowed for file part"))
             ((1) (make-file (car file) #f))
             (else (make-file (car file) (cdr file)))))
          ((or (string? file)
@@ -154,7 +154,7 @@
               (eqv? #f file))
           file)
          (else
-          (error 'make-pathname "invalid argument type for file part" file)))))
+          (lose "invalid argument type for file part" file)))))
 
 ;;@ Coerce @1 to a pathname.
 ;;
@@ -168,7 +168,7 @@
 (define/optional-args (->pathname object (optional
                                           (fs-type (local-file-system-type))))
   (define (lose)
-    (error '->pathname "cannot coerce to a pathname" object))
+    (assertion-violation '->pathname "cannot coerce to a pathname" object))
   (cond ((symbol?    object) (make-pathname #f '() object))
         ((string?    object) (parse-namestring object fs-type))
         ((os-string? object) (parse-namestring (os-string->string object)))
@@ -195,8 +195,9 @@
                                        (fs-type (local-file-system-type))))
   (fs-type/parse-file-namestring
    fs-type
-   (%->string object (lambda ()
-                       (error '->file "cannot coerce to file" object)))))
+   (%->string object
+              (lambda ()
+                (assertion-violation '->file "cannot coerce to file" object)))))
 
 
 ;;;; Files
@@ -233,7 +234,7 @@
 
 (define (make-file/type type)
   (define (lose)
-    (error 'make-file "Invalid file type specifier" type))
+    (assertion-violation 'make-file "Invalid file type specifier" type))
   (cond ((not type)     '())
         ((string? type)  (list type))
         ((symbol? type)  (list (symbol->string type)))
@@ -370,7 +371,7 @@
              (let ((expansion (expand-pathname pathname)))
                (if (pathname=? expansion pathname)
                    (error 'pathname-container
-                          "Unable to find pathname's container: %S"
+                          "Unable to find pathname's container"
                           pathname)
                    (loop expansion))))))))
 
@@ -525,7 +526,7 @@
 ;;@ Coerce @1 into a namestring.
 ;; If @1 is a string, canonicalize it according to @2.
 ;; If @1 is a pathname, convert it according to @2.
-;; Otherwise, signal an error.
+;; Otherwise, raise an @code{&assertion} condition.
 ;; If @2 is not supplied, it defaults to the local file system type."
 (define/optional-args (->namestring object (optional
                                              (fs-type (local-file-system-type))))
@@ -536,7 +537,9 @@
          (pathname->namestring object fs-type))
         ((pair? object)
          (pathname->namestring (->pathname object) fs-type))
-        (else (error '->namestring "Unable to coerce to a namestring: %S" object))))
+        (else
+         (assertion-violation '->namestring
+                              "Unable to coerce to a namestring" object))))
 
 (define (pathname->namestring pathname fs-type)
   (fs-type/pathname->namestring fs-type pathname))
