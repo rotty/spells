@@ -14,8 +14,13 @@
 
 ;;; Code:
 
-;; Helper functions
+(import (except (rnrs) delete-file file-exists?)
+        (only (srfi :1) lset=)
+        (spells testing)
+        (spells pathname)
+        (spells filesys))
 
+;; Helper functions
 (define test-dir (->pathname '((",filesys-test.tmp"))))
 (define test-data '(foo bar baz 42))
 

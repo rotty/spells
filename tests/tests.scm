@@ -26,12 +26,7 @@
   ("algebraic-types.scm"
    (spells algebraic-types))
   ("pathname.scm" (spells pathname) (spells misc) (rnrs lists) (rnrs sorting))
-  ("filesys.scm"
-   (spells filesys) (spells pathname)
-   (except (srfi :1 lists) for-each map)
-   (rnrs control)
-   (rnrs io ports)
-   (rnrs exceptions))
+  "filesys.scm"
   ("string-utils.scm" (spells string-utils))
   ("format.scm" (spells format))
   ("misc.scm" (spells misc) (rnrs lists))
