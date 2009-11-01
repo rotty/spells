@@ -82,16 +82,17 @@
                  (process-arg+iterate option name (car args) (cdr args) seeds))
                 (else
                  (let-values
-                     ((seeds (apply (option-processor option)
-                                    option
-                                    name
-                                    #f
-                                    seeds)))
-                   (scan-short-options
-                    (+ index 1)
-                    shorts
-                    args
-                    seeds)))))))
+                     (((done? . seeds) (apply (option-processor option)
+                                              option
+                                              name
+                                              #f
+                                              seeds)))
+                   (if done?
+                       (scan-operands args seeds)
+                       (scan-short-options (+ index 1)
+                                           shorts
+                                           args
+                                           seeds))))))))
   (define (scan-operands operands seeds)
     (if (null? operands)
         (apply values seeds)
