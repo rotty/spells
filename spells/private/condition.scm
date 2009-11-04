@@ -45,7 +45,7 @@
     (case n-fields
       ((0) nl)
       ((1)
-       (cat ": " (wrt ((record-accessor (caar rtd.fields-list) 0) c)) nl))
+       (cat ": " (wrt/unshared ((record-accessor (caar rtd.fields-list) 0) c)) nl))
       (else
        (cat ":\n"
             (fmt-join
@@ -59,7 +59,7 @@
              (for st (formatting
                       (cat "      "
                            (vector-ref fields i) ": "
-                           (wrt ((record-accessor rtd i) c)) "\n")
+                           (wrt/unshared ((record-accessor rtd i) c)) "\n")
                       st)))
         => st)))
   (lambda (st)
@@ -95,7 +95,7 @@
            (cat "Condition components:\n"
                 (dsp-components components)))))
     (else
-     (cat "Non-condition object: " c (wrt c) "\n"))))
+     (cat "Non-condition object: " c (wrt/unshared c) "\n"))))
 
 (define display-condition
   (case-lambda
