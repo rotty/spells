@@ -1,9 +1,13 @@
 ;;@ A portability library. It offers a single interface to
 ;; functionality commonly present, but not standardized in various
 ;; Scheme implementations.
-(define-system spells
+(package (spells (0))
 
-  (r6rs-libraries "spells")
+  (depends
+   (srfi))
+  
+  (libraries
+   ("spells" . libs))
 
   (conjure
    (import (rnrs)
@@ -19,4 +23,6 @@
           (fetchers (cc-fetcher 'cc)
                     (hostinfo-fetcher))))))
 
-;; arch-tag: 8717975c-90a7-4442-87e2-e2ba9efecca3
+;; Local Variables:
+;; scheme-indent-styles: ((package 1))
+;; End:
