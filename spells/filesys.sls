@@ -31,6 +31,7 @@
           create-hard-link
           create-temp-file
           create-temp-directory
+          temp-pathname-iterate
           
           file-regular?
           file-directory?
@@ -65,15 +66,15 @@
 
           find-file
           library-search-paths)
-  (import (rnrs base)
-          (rnrs control)
-          (rnrs conditions)
-          (rnrs io simple)
-          (rnrs io ports)
-          (rnrs exceptions)
+  (import (except (rnrs) delete-file file-exists?)
+          (only (srfi :1 lists) fold)
           (srfi :8 receive)
           (srfi :19 time)
-          (except (srfi :1 lists) map for-each)
+          (only (srfi :13) string-contains string-unfold)
+          (only (srfi :27) random-integer)
+          (srfi :98 os-environment-variables)
+          (only (spells process) get-process-id)
+          (spells string-utils)
           (spells pathname)
           (spells ports)
           (spells filesys compat))
@@ -256,45 +257,89 @@
 (define create-temp-file
   (case-lambda
     ((template buffer-mode transcoder)
-     (temp-pathname-loop
-      template
+     (temp-pathname-iterate
       (lambda (pathname continue)
-        (guard (c ((i/o-file-already-exists-error? c)
-                   (continue)))
-          (let ((port (open-file-output-port (->namestring pathname)
-                                             (file-options)
-                                             buffer-mode
-                                             transcoder)))
-            (values pathname port))))))
+        (let ((port (open-file-output-port (->namestring pathname)
+                                           (file-options)
+                                           buffer-mode
+                                           transcoder)))
+          (values pathname port)))
+      template))
     ((template buffer-mode)
      (create-temp-file template buffer-mode #f))
     ((template)
-     (create-temp-file template 'block (native-transcoder)))))
+     (create-temp-file template 'block (native-transcoder)))
+    (()
+     (create-temp-file (default-temp-template) 'block (native-transcoder)))))
 
-(define (create-temp-directory template)
-  (temp-pathname-loop
-   template
-   (lambda (pathname continue)
-     (guard (c ((i/o-file-already-exists-error? c)
-                (continue)))
-       (let ((directory (pathname-as-directory pathname)))
-         (create-directory directory)
-         directory)))))
+(define create-temp-directory
+  (case-lambda
+    ((template)
+     (temp-pathname-iterate
+      (lambda (pathname continue)
+        (let ((directory (pathname-as-directory pathname)))
+          (create-directory directory)
+          directory))
+      template))
+    (()
+     (create-temp-directory (default-temp-template)))))
 
-(define temp-pathname-loop
-  (let ((count 1))
-    (lambda (template action)
-      (let* ((template (->pathname template))
-             (file (pathname-file template))
-             (types (if file (file-types file) '()))
-             (fname (if file (file-name file) "")))
-        (let loop ((i count))
-          (set! count i)
-          (action (pathname-with-file
-                   template
-                   (make-file (string-append fname (number->string i))
-                              (cons "tmp" types)))
-                  (lambda () (loop (+ i 1)))))))))
+(define temp-pathname-iterate
+  (case-lambda
+    ((action template)
+     (let ((pathname-generator
+            (if (procedure? template)
+                template
+                (make-pathname-generator template))))
+       (let loop ((i 1))
+         (guard (c ((i/o-file-already-exists-error? c)
+                    (loop (+ i 1))))
+           (action (pathname-generator i) (lambda () (loop (+ i 1))))))))
+    ((action)
+     (temp-pathname-iterate action (default-temp-template)))))
+
+(define (make-pathname-generator template)
+  (lambda (count)
+    (let* ((template (->pathname template))
+           (file (pathname-file template))
+           (types (if file (file-types file) '()))
+           (fname (if file (file-name file) "")))
+      (pathname-with-file
+       template
+       (make-file (string-substitute
+                   (if (exists (lambda (variable)
+                                 (string-contains fname variable))
+                               '("{count}" "{random}"))
+                       fname
+                       (string-append fname "-{pid}-{random}.tmp"))
+                   `((count . ,count)
+                     (random . ,(create-random-string 6))
+                     (pid . ,(get-process-id))))
+                  types)))))
+
+(define default-temp-template
+  (let ((cache #f))
+    (lambda ()
+      (unless cache
+        (set! cache (cond ((get-environment-variable "TMPDIR")
+                           => ->pathname)
+                          (else
+                           (->pathname "/var/tmp/{pid}-{random}.tmp")))))
+      cache)))
+
+(define (create-random-string len)
+  (string-unfold (lambda (seed)
+                   (= len (cdr seed)))
+                 car
+                 (lambda (seed)
+                   (cons (random-char) (+ 1 (cdr seed))))
+                 (cons (random-char) 0)))
+
+(define random-char
+  (let ((alphabet
+         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+    (lambda ()
+      (string-ref alphabet (random-integer (string-length alphabet))))))
 
 (define-condition-type &file-unreachable-error &error
   file-unreachable-error? make-file-unreachable-error
