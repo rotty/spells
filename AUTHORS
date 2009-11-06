@@ -29,7 +29,7 @@ Copyright: 1993-2003, Richard Kelsey and Jonathan Rees
 Files: spells/field-readers.sls,
        spells/awk/helpers.sls,
        spells/opt-args.sls,
-       spells/private/delimited-readers.scm
+       spells/delimited-readers.sls
 License: BSD
 
 Copyright: Copyright, 1993-2008 Richard Kelsey and Jonathan Rees
