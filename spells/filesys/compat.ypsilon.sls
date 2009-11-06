@@ -133,7 +133,7 @@
                 filename)))))
   
   (define (working-directory)
-    (yp:current-directory))
+    (pathname-as-directory (yp:current-directory)))
 
   (define (with-working-directory dir thunk)
     (let ((wd (yp:current-directory)))

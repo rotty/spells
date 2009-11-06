@@ -126,7 +126,7 @@
         filename)))
 
 (define (working-directory)
-  (->pathname (ik:current-directory)))
+  (pathname-as-directory (ik:current-directory)))
 
 (define (with-working-directory dir thunk)
   (let ((wd (ik:current-directory)))

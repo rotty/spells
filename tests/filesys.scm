@@ -159,6 +159,10 @@
     (test-eqv #f (pathname-file temp-dir))
     (test-eqv #t (pathname=? test-dir (pathname-container temp-dir)))))
 
+(define-test-case filesys-tests working-directory ()
+  (test-eqv #f (pathname-file (working-directory)))
+  (test-eqv #t (file-directory? (working-directory))))
+
 (define-test-case filesys-tests find-file ()
   (test-equal #f (find-file ".abracadabra.khgafd" (library-search-paths)))
   (test-equal #t (cond ((find-file '((spells)) (library-search-paths))
