@@ -57,10 +57,12 @@
 
 (define (delete-file pathname)
   (let ((fname (->fn pathname)))
-    (if (ik:file-exists? fname)
-        (if (ik:file-directory? fname)
-            (ik:delete-directory fname #t)
-            (ik:delete-file fname)))))
+    (cond ((ik:file-symbolic-link? fname)
+           (ik:delete-file fname))
+          ((ik:file-directory? fname)
+           (ik:delete-directory fname #t))
+          ((ik:file-exists? fname)
+           (ik:delete-file fname)))))
 
 (define (rename-file source-pathname target-pathname)
   (ik:rename-file (->fn source-pathname) (->fn target-pathname)))
