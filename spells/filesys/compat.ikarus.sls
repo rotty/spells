@@ -53,7 +53,14 @@
   (ik:file-exists? (->fn pathname)))
 
 (define (create-directory pathname)
-  (ik:make-directory (->fn pathname)))
+  ;;++ This is incomplete, and a kludge. Ikarus should raise the right
+  ;; (specific) exception out-of-the-box.
+  (guard (c ((i/o-filename-error? c)
+             (raise (condition
+                     (make-who-condition 'create-directory)
+                     (make-i/o-file-already-exists-error
+                      (i/o-error-filename c))))))
+    (ik:make-directory (->fn pathname))))
 
 (define (delete-file pathname)
   (let ((fname (->fn pathname)))
