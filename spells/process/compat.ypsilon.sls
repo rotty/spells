@@ -17,7 +17,7 @@
 
 (library (spells process compat)
   (export process?
-          process-pid
+          process-id
           process-input
           process-output
           process-errors
@@ -25,6 +25,8 @@
           spawn-process
           wait-for-process
 
+          get-process-id
+          
           run-shell-command)
   (import (rnrs base)
           (rnrs io ports)
@@ -43,7 +45,7 @@
   (define-record-type process
     (make-process pid input output errors)
     process?
-    (pid process-pid)
+    (pid process-id)
     (input process-input)
     (output process-output)
     (errors process-errors))
@@ -68,9 +70,13 @@
         (values #f (- status))))
 
   (define (wait-for-process process)
-    (status->values (yp:process-wait (process-pid process) #f)))
+    (status->values (yp:process-wait (process-id process) #f)))
 
   (define (run-shell-command cmd)
     (status->values (yp:system cmd)))
+
+  (define (get-process-id)
+    ;; FIXME: Ypsilon doesn't wrap getpid() yet.
+    12356789)
 
 )

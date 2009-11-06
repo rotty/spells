@@ -18,6 +18,7 @@
 ;;@ Process interface.
 (library (spells process)
   (export process?
+          process-id
           process-input
           process-output
           process-errors
@@ -34,7 +35,10 @@
           run-process/lines
           run-process/sexps
 
-          run-shell-command)
+          run-shell-command
+
+          get-process-id
+          )
   (import (except (rnrs base) string-copy string-for-each string->list)
           (rnrs io ports)
           (rnrs io simple)

@@ -17,7 +17,7 @@
 
 (library (spells process compat)
   (export process?
-          process-pid
+          process-id
           process-input
           process-output
           process-errors
@@ -25,7 +25,9 @@
           spawn-process
           wait-for-process
 
-          run-shell-command)
+          run-shell-command
+
+          get-process-id)
   (import (rnrs base)
           (rnrs arithmetic bitwise)
           (rnrs io ports)
@@ -45,7 +47,7 @@
   (define-record-type process
     (make-process pid input output errors)
     process?
-    (pid process-pid)
+    (pid process-id)
     (input process-input)
     (output process-output)
     (errors process-errors))
@@ -71,8 +73,12 @@
             (ik:wstatus-received-signal wstatus)))
   
   (define (wait-for-process process)
-    (wstatus->values (ik:waitpid (process-pid process))))
+    (wstatus->values (ik:waitpid (process-id process))))
 
+  (define (get-process-id)
+    ;; FIXME: Ikarus doesn't wrap getpid() yet.
+    123567890)
+  
   (define (run-shell-command cmd)
     ;; This is a hack, but works (at least) on Linux. See
     ;; <https://bugs.launchpad.net/ikarus/+bug/349210>.
