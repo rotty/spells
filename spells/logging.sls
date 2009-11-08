@@ -24,6 +24,7 @@
           log-entry-level
           log-entry-level-name
           log-entry-object
+          log-entry-logger-name
 
           default-log-formatter
 

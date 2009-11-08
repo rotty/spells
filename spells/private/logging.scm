@@ -96,6 +96,9 @@
              *builtin-levels*)
         level)))
 
+(define (log-entry-logger-name entry)
+  (logger-name (log-entry-logger entry)))
+
 ;;; Internal functions
 
 (define (passes? threshold filters entry)
