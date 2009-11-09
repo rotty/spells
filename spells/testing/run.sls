@@ -35,8 +35,8 @@
           (spells pathname)
           (spells condition)
           (only (spells testing)
-                with-test-verbosity
-                with-test-debug-errors?)
+                test-verbosity with-test-verbosity
+                test-debug-errors? with-test-debug-errors?)
           (spells testing run-env))
 
   ;;@ Run specified tests.
@@ -127,14 +127,14 @@
   ;;                (<filename> [<options+imports>])
   ;;                ((code <scheme expr> ...) <filename> [<options+imports>])
   ;; <options+imports> -> ['<option> ...] <library-name> ...
-  (define (eval-test-spec pathname test-spec verbosity debug-errors?)
+  (define (eval-test-spec pathname test-spec)
     (for-each
      (lambda (spec)
        (case (car spec)
          ((files)
           (for-each
            (lambda (clause)
-             (eval-test-clause clause pathname verbosity debug-errors?))
+             (eval-test-clause clause pathname (test-verbosity) (test-debug-errors?)))
            (cdr spec)))))
      test-spec))
 
@@ -184,17 +184,32 @@
        (run-test #f filename '()))))
   
   (define (main args)
-    (for-each
-     (lambda (tests-file)
-       (call-with-input-file tests-file
-         (lambda (port)
-           (let* ((test-spec (read port))
+    (define (process-tests-files files)
+      (for-each
+       (lambda (tests-file)
+         (call-with-input-file tests-file
+           (lambda (port)
+             (let* ((test-spec (read port))
                   (pathname (->pathname tests-file))
                   (directory (pathname-with-file pathname #f)))
-             (parameterize ((this-directory (->namestring directory)))
-               (eval-test-spec directory test-spec 'quiet #f))))))
-     (cdr args))))
-
+               (parameterize ((this-directory (->namestring directory)))
+                 (eval-test-spec directory test-spec))))))
+       files))
+    (define (parse-options args run)
+      (match args
+        (("--debug" . rest)
+         (parse-options rest (lambda (args)
+                               (with-test-debug-errors? #t
+                                 (lambda () (run args))))))
+        (("--verbosity" verbosity . rest)
+         (parse-options rest (lambda (args)
+                               (with-test-verbosity (string->symbol verbosity)
+                                 (lambda () (run args))))))
+        (_
+         (run args))))
+    (with-test-options 'quiet #f
+      (lambda ()
+        (parse-options (cdr args) (lambda (files) (process-tests-files files)))))))
 
 ;; Local Variables:
 ;; scheme-indent-styles: ((match 1) (parameterize 1))
