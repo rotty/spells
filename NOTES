@@ -53,8 +53,19 @@ bug.
 
 * Things to think about
 
-- (spells opt-args)
+** (spells opt-args)
 
    Do we really need to have so many optional argument macros (except
    to support legacy code?). Actually, inside spells, I think I'll
    forbid use of anything except DEFINE/OPTIONAL-ARGS.
+
+** (spells foreign)
+
+Naming issues:
+
+- =ptr= vs =pointer=
+- =dlsym= and =dlopen=
+- The C type names might be better off using no shortened prefixes
+
+The =dlerror= API is kind of ugly; probably a condition should be
+raised instead.
