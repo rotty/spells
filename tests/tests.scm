@@ -25,6 +25,7 @@
    (srfi :8 receive))
   ("algebraic-types.scm"
    (spells algebraic-types))
+  "args-fold.scm"
   ("pathname.scm" (spells pathname) (spells misc) (rnrs lists) (rnrs sorting))
   "filesys.scm"
   ("string-utils.scm" (spells string-utils))

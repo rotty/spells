@@ -11,55 +11,100 @@
 
 ;;; Commentary:
 
-;; This is a slight extension of SRFI-37, unimaginatively called
-;; `args-fold*', which requires that the option processor returns an
-;; additional value which, if true, causes option processing to be
-;; stopped, and all further command line arguments are considered
-;; operands.
-
-;; The signature of an option processor is hence:
+;; This is a slight extension of SRFI-37, which is intended to be
+;; backwards compatible, and offers the following additional features:
 ;;
-;; (option-processor option name arg seed ...) => done? seed ...
+;; - Support for additional `description' field in the option record,
+;;   to faciliate providing an `--help' option.
 ;;
+;; - `option' accepts a symbol as what is the `required-arg?' argument
+;;   in SRFI-37, for the same reason; this value is available via
+;;   `option-argument'. This is allowed also to faciliate `--help'.
+;;
+;; - An option may terminate command-line processing
+;;   (`option-terminator?').
+;;
+;; - An additional procedure `args-fold*' is provided, which has one
+;;   additional argument `stop-early?'. When this argument is true,
+;;   scanning for arguments stops after the first non-option
+;;   argument. When `stop-early' is #f, `args-fold*' behaves the same
+;;   as `args-fold'.
+;; 
 
 ;;; Code:
 #!r6rs
 
 (library (spells args-fold)
   (export option
-          args-fold*
+          args-fold
           option-names
           option-required-arg?
           option-optional-arg?
-          option-processor)
+          option-processor
+
+          ;; extensions to SRFI-37
+          args-fold*
+          option-argument
+          option-terminator?
+          option-description)
   (import (rnrs base)
+          (rnrs control)
+          (rnrs lists)
           (srfi :9 records))
 
-
-(define-record-type option-type
-  (option names required-arg? optional-arg? processor)
+(define-record-type :option
+  (make-option names argument optional-arg? terminator? description processor)
   option?
   (names option-names)
-  (required-arg? option-required-arg?)
+  (argument option-argument)
   (optional-arg? option-optional-arg?)
+  (terminator? option-terminator?)
+  (description option-description)
   (processor option-processor))
+
+(define option
+  (case-lambda
+    ((names argument processor)
+     (make-option names argument #f #f #f processor))
+    ((names argument optional? processor) ; SRFI-37 backwards-compatible case
+     (make-option names argument optional? #f #f processor))
+    ((names argument optional? terminator? processor)
+     (make-option names argument optional? terminator? #f processor))
+    ((names argument optional? terminator? description processor)
+     (make-option names
+                  argument
+                  optional?
+                  terminator?
+                  description
+                  processor))))
+
+(define (option-required-arg? option)
+  (let ((arg (option-argument option)))
+    (if (symbol? arg)
+        (not (option-optional-arg? option))
+        arg)))
+
+(define (args-fold args options unrecognized-option-proc operand-proc . seeds)
+  (apply args-fold*
+         args
+         options
+         #f
+         unrecognized-option-proc
+         operand-proc
+         seeds))
 
 (define (args-fold* args
                     options
+                    stop-early?
                     unrecognized-option-proc
                     operand-proc
                     . seeds)
-  (define (find l ?)
-    (cond ((null? l) #f)
-          ((? (car l)) (car l))
-          (else (find (cdr l) ?))))
-  ;; ISSUE: This is a brute force search. Could use a table.
   (define (find-option name)
-    (find options (lambda (option)
-                    (find
-                     (option-names option)
-                     (lambda (test-name)
-                       (equal? name test-name))))))
+    (find (lambda (option)
+            (find (lambda (test-name)
+                    (equal? name test-name))
+                  (option-names option)))
+          options))
   (define (scan-short-options index shorts args seeds)
     (if (= index (string-length shorts))
         (scan-args args seeds)
@@ -81,13 +126,12 @@
                       (pair? args))
                  (process-arg+iterate option name (car args) (cdr args) seeds))
                 (else
-                 (let-values
-                     (((done? . seeds) (apply (option-processor option)
-                                              option
-                                              name
-                                              #f
-                                              seeds)))
-                   (if done?
+                 (let-values ((seeds (apply (option-processor option)
+                                            option
+                                            name
+                                            #f
+                                            seeds)))
+                   (if (option-terminator? option)
                        (scan-operands args seeds)
                        (scan-short-options (+ index 1)
                                            shorts
@@ -101,12 +145,12 @@
                                    seeds)))
           (scan-operands (cdr operands) seeds))))
   (define (process-arg+iterate option name arg args seeds)
-    (let-values (((done? . seeds) (apply (option-processor option)
-                                         option
-                                         name
-                                         arg
-                                         seeds)))
-      (if done?
+    (let-values ((seeds (apply (option-processor option)
+                               option
+                               name
+                               arg
+                               seeds)))
+      (if (option-terminator? option)
           (scan-operands args seeds)
           (scan-args args seeds))))
   (define (scan-args args seeds)
@@ -121,23 +165,7 @@
             (string=? "--" arg)
             ;; End option scanning:
             (scan-operands args seeds))
-           ( ;;(rx bos
-            ;;    "--"
-            ;;    (submatch (+ (~ "=")))
-            ;;    "="
-            ;;    (submatch (* any)))
-            (and (> (string-length arg) 4)
-                 (char=? #\- (string-ref arg 0))
-                 (char=? #\- (string-ref arg 1))
-                 (not (char=? #\= (string-ref arg 2)))
-                 (let loop ((index 3))
-                   (cond ((= index (string-length arg))
-                          #f)
-                         ((char=? #\= (string-ref arg index))
-                          index)
-                         (else
-                          (loop (+ 1 index))))))
-            ;; Found long option with arg:
+           ((looking-at-long-option-with-arg arg)
             => (lambda (=-index)
                  (let* ((name (substring arg 2 =-index))
                         (option-arg (substring arg
@@ -156,11 +184,10 @@
             ;; Found long option:
             (let* ((name (substring arg 2 (string-length arg)))
                    (option (or (find-option name)
-                               (option
-                                (list name)
-                                #f
-                                #f
-                                unrecognized-option-proc))))
+                               (option (list name)
+                                       #f
+                                       #f
+                                       unrecognized-option-proc))))
               (if (and (option-required-arg? option)
                        (pair? args))
                   (process-arg+iterate option name (car args) (cdr args) seeds)
@@ -173,7 +200,26 @@
               (scan-short-options 0 shorts args seeds)))
            (else
             (let-values ((seeds (apply operand-proc arg seeds)))
-              (scan-args args seeds)))))))
+              (if stop-early?
+                  (scan-operands args seeds)
+                  (scan-args args seeds))))))))
   (scan-args args seeds))
 
+(define (looking-at-long-option-with-arg arg)
+  ;;(rx bos
+  ;;    "--"
+  ;;    (submatch (+ (~ "=")))
+  ;;    "="
+  ;;    (submatch (* any)))
+  (and (> (string-length arg) 4)
+       (char=? #\- (string-ref arg 0))
+       (char=? #\- (string-ref arg 1))
+       (not (char=? #\= (string-ref arg 2)))
+       (let loop ((index 3))
+         (cond ((= index (string-length arg))
+                #f)
+               ((char=? #\= (string-ref arg index))
+                index)
+               (else
+                (loop (+ 1 index)))))))
 )
