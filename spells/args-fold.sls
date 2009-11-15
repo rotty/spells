@@ -139,26 +139,16 @@
                           (loop (+ 1 index))))))
             ;; Found long option with arg:
             => (lambda (=-index)
-                 (let*-values
-                     (((name)
-                       (substring arg 2 =-index))
-                      ((option-arg)
-                       (substring arg
-                                  (+ =-index 1)
-                                  (string-length arg)))
-                      ((option)
-                       (or (find-option name)
-                           (option (list name)
-                                   #t
-                                   #f
-                                   unrecognized-option-proc)))
-                      (seeds
-                       (apply (option-processor option)
-                              option
-                              name
-                              option-arg
-                              seeds)))
-                   (scan-args args seeds))))
+                 (let* ((name (substring arg 2 =-index))
+                        (option-arg (substring arg
+                                               (+ =-index 1)
+                                               (string-length arg)))
+                        (option (or (find-option name)
+                                    (option (list name)
+                                            #t
+                                            #f
+                                            unrecognized-option-proc))))
+                   (process-arg+iterate option name option-arg args seeds))))
            ( ;;(rx bos "--" (submatch (+ any)))
             (and (> (string-length arg) 3)
                  (char=? #\- (string-ref arg 0))
