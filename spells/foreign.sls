@@ -15,7 +15,7 @@
 ;;; Code:
 #!r6rs
 
-;;@ C foreign function interface allowing Scheme code to interact with
+;;@ Foreign function interface allowing Scheme code to interact with
 ;; code written in C.
 (library (spells foreign)
   (export c-type-sizeof c-type-alignof c-type-align
@@ -443,6 +443,22 @@
                                  bit-offset)))))))
                (else
                 (lambda (pointer val) (ptr-set pointer offset val))))))))
+
+  ;;@defun memcpy target source count
+  ;;@defunx memcpy target target-start source source-start count
+  ;;
+  ;; Transfer @var{count} bytes between Scheme and C. If @var{target}
+  ;; is a bytevector, @var{source} must be pointer, and vice
+  ;; versa. The second variant of this function allows to specify
+  ;; offsets (in bytes) into the memory areas. Both @var{source-start}
+  ;; and @var{target-start} default to 0.
+  ;;
+  ;;@end defun
+
+  ;;@defun memset pointer value count
+  ;; Set @var{count} bytes at @var{pointer} to @var{value}, which must
+  ;; be an integer between 0 and 255.
+  ;;@end defun
 
   ;;@defspec let*-pointers (@var{binding} ...) @var{body} ...
   ;;
