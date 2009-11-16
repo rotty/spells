@@ -31,8 +31,8 @@
 ;; Auxiliary syntax
 (define-syntax %method-clauses->handler
   (syntax-rules ()
-    ((%method-clauses->handler ((?op ?param ...) ?body ...) ...)
-     (let ((methods (list (cons ?op (lambda (?param ...) ?body ...)) ...)))
+    ((%method-clauses->handler ((?op . ?params) ?body ...) ...)
+     (let ((methods (list (cons ?op (lambda ?params ?body ...)) ...)))
        (lambda (op)
          (cond ((assq op methods) => cdr)
                (else #f)))))))
@@ -71,10 +71,10 @@
 
 (define-syntax define-operation
   (syntax-rules ()
-    ((define-operation (?name ?arg ...))
+    ((define-operation (?name . ?args))
      (define ?name (operation "%named" ?name #f)))
-    ((define-operation (?name ?arg ...) ?body1 ?body ...)
-     (define ?name (operation "%named" ?name (lambda (?arg ...) ?body1 ?body ...))))))
+    ((define-operation (?name . ?args) ?body1 ?body ...)
+     (define ?name (operation "%named" ?name (lambda ?args ?body1 ?body ...))))))
 
 (define (join object1 . objects)
   (make-object object1
