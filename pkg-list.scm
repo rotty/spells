@@ -5,9 +5,10 @@
 
   (depends
    (srfi))
-  
+
   (libraries
-   ("spells" . libs))
+   ("spells" "private")
+   ("spells" . sls))
 
   (conjure
    (import (rnrs)
