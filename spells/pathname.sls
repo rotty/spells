@@ -46,6 +46,7 @@
           pathname-with-file
           pathname-default
           merge-pathnames
+          enough-pathname
           directory-pathname?
           pathname-as-directory
           pathname-container
@@ -110,7 +111,6 @@
 ;;++ Still missing:
 ;;++
 ;;++   - non-Unix file system types
-;;++   - enough pathnames
 ;;++   - pathname expansion
 ;;++   - truename operation
 
@@ -323,13 +323,15 @@
 ;;@stop
 
 (define (origin-back-count origin)
-  (let loop ((origin origin) (n 0))
-    (cond ((null? origin)
-           n)
-          ((and (pair? origin) (eq? 'back (car origin)))
-           (loop (cdr origin) (+ n 1)))
-          (else
-           #f))))
+  (if (not origin)
+      0
+      (let loop ((origin origin) (n 0))
+        (cond ((null? origin)
+               n)
+              ((and (pair? origin) (eq? 'back (car origin)))
+               (loop (cdr origin) (+ n 1)))
+              (else
+               #f)))))
 
 ;;@ Return a file by merging @1 with @2.
 (define (merge-files file defaults-file)
@@ -346,12 +348,57 @@
                       (if (null? types) defaults-types types)
                       (or version defaults-version))))))
 
-;;@ Return a pathname whose merging with RELATIVE produces PATHNAME.
-;; This is currently unimplemented and will simply return PATHNAME."
+;;@ Return a pathname whose merging with @var{relative} produces
+;; @var{pathname}.
 (define (enough-pathname pathname relative)
-  ;;(error 'enough-pathname "Unimplemented: %S"
-  ;;       `(enough-pathname ',pathname ',relative))
-  pathname)
+  (define (lose)
+    (error 'enough-pathname
+           "cannot represent pathname relatively" pathname relative))
+  (let* ((pathname (->pathname pathname))
+         (relative (->pathname relative))
+         (origin (pathname-origin pathname))
+         (relative-origin (pathname-origin relative)))
+    (cond ((equal? origin relative-origin)
+           (receive (relative-directory directory)
+                    (drop-prefix string=?
+                                 (pathname-directory relative)
+                                 (pathname-directory pathname))
+             (cond ((null? relative-directory)
+                    (make-pathname #f directory (pathname-file pathname)))
+                   (else
+                    (make-pathname (make-list (length relative-directory)
+                                              'back)
+                                   directory
+                                   (pathname-file pathname))))))
+          (else
+           (let ((n-backs (origin-back-count origin))
+                 (relative-n-backs (origin-back-count relative-origin)))
+             (cond ((and n-backs relative-n-backs)
+                    (if (< n-backs relative-n-backs)
+                        (lose)
+                        (make-pathname
+                         (make-list (+ (length (pathname-directory relative))
+                                       (- n-backs relative-n-backs))
+                                    'back)
+                         (pathname-directory pathname)
+                         (pathname-file pathname))))
+                   ((not n-backs)
+                    ;; `pathname' is absolute
+                    pathname)
+                   (else
+                    ;; `pathname' is relative, but `relative' is not
+                    (lose))))))))
+
+;;@stop
+
+(define (drop-prefix =? xs ys)
+  (let loop ((xs xs) (ys ys))
+    (cond ((or (null? xs) (null? ys))
+           (values xs ys))
+          ((=? (car xs) (car ys))
+           (loop (cdr xs) (cdr ys)))
+          (else
+           (values xs ys)))))
 
 
 ;;;; Directory Pathnames
@@ -551,22 +598,18 @@
                                                  (fs-type (local-file-system-type))))
   (fs-type/file-namestring fs-type (->pathname pathname)))
 
-;; Return a string naming @1 relative to RELATIVE,
-;; according to @2.
-;; If @2 is not supplied, it defaults to the local file system type."
-(define/optional-args (enough-namestring pathname relative
+;;@ Return a string naming @var{pathname} relative to @var{relative},
+;; according to @var{fs-type}.  If @var{fs-type} is not supplied, it
+;; defaults to the local file system type."
+(define/optional-args (enough-namestring pathname
+                                         relative
                                          (optional (fs-type (local-file-system-type))))
-  (fs-type/enough-namestring fs-type
-                             (->pathname pathname)
-                             (->pathname relative)))
+  (fs-type/pathname->namestring (enough-pathname pathname relative) fs-type))
 
 
 ;;;; File System Types
 
 (define-operation (fs-type/parse-namestring fs-type namestring))
-
-(define-operation (fs-type/enough-namestring fs-type pathname relative)
-  (->namestring (enough-pathname pathname relative) fs-type))
 
 (define-operation (fs-type/canonicalize-namestring fs-type object)
   (pathname->namestring (->pathname object) fs-type))
