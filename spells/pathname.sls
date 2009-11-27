@@ -301,13 +301,35 @@
          (directory-default (pathname-directory defaults-pathname))
          (file (merge-files (pathname-file pathname)
                             (pathname-file defaults-pathname))))
-    (if origin
-        (make-pathname origin directory file)
-        (make-pathname origin-default
-                       (cond ((null? directory) directory-default)
-                             ((null? directory-default) directory)
-                             (else (append directory-default directory)))
-                       file))))
+    (cond ((not origin)
+           (make-pathname origin-default
+                          (cond ((null? directory) directory-default)
+                                ((null? directory-default) directory)
+                                (else (append directory-default directory)))
+                          file))
+          ((origin-back-count origin)
+           => (lambda (n-backs)
+                (let* ((n-drop (min n-backs (length directory-default)))
+                       (n-left (- n-backs n-drop)))
+                  (make-pathname (or origin-default
+                                     (and (> n-left 0)
+                                          (make-list n-left 'back)))
+                                 (append (drop-right directory-default n-drop)
+                                         directory)
+                                 file))))
+          (else
+           (make-pathname origin directory file)))))
+
+;;@stop
+
+(define (origin-back-count origin)
+  (let loop ((origin origin) (n 0))
+    (cond ((null? origin)
+           n)
+          ((and (pair? origin) (eq? 'back (car origin)))
+           (loop (cdr origin) (+ n 1)))
+          (else
+           #f))))
 
 ;;@ Return a file by merging @1 with @2.
 (define (merge-files file defaults-file)
@@ -379,43 +401,10 @@
 ;; relative to the origin and directory of @1, with the last element
 ;; of @2 specifying the file component of the result.
 (define (pathname-join base . steps)
-  (let ((base (->pathname base)))
-    (if (null? steps)
+  (fold (lambda (step pathname)
+          (merge-pathnames step pathname))
         base
-        (let loop ((steps steps)
-                   (o (pathname-origin base))
-                   (o-parts (let ((o (pathname-origin base)))
-                              (and (list? o) (reverse o))))
-                   (dir (reverse (pathname-directory base)))
-                   (file #f))
-          (if (null? steps)
-              (make-pathname (if o-parts (reverse o-parts) o) (reverse dir) file)
-              (let* ((step (->pathname (car steps)))
-                     (step-o (or (pathname-origin step) '())))
-                (define (iterate o o-parts dir)
-                  (if (null? (cdr steps))
-                    (loop (cdr steps)
-                          o o-parts
-                          (append-reverse (pathname-directory step) dir)
-                          (pathname-file step))
-                    (loop (cdr steps)
-                          o o-parts
-                          (append-reverse (pathname-directory
-                                           (pathname-as-directory step))
-                                          dir)
-                          file)))
-                (cond ((not (list? step-o))
-                       (iterate step-o #f '()))
-                      (else
-                       (receive (backs others)
-                                (span (lambda (x) (eq? x 'back)) (reverse step-o))
-                         (let ((n-drop (min (length backs)
-                                            (length dir))))
-                           (if o-parts
-                               (iterate o
-                                        (append (drop step-o n-drop) o-parts)
-                                        (drop dir n-drop))
-                               (iterate o #f (drop dir n-drop)))))))))))))
+        steps))
 
 ;;;; Pathname hashing
 

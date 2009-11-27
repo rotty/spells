@@ -15,6 +15,11 @@
 
 ;;; Code:
 
+(import (rnrs)
+        (spells misc)
+        (spells testing)
+        (spells pathname))
+
 (define-syntax test-pn=
   (syntax-rules ()
     ((test-pn= expected actual)
@@ -83,14 +88,22 @@
 
 (define-test-case pathname-tests.ops merge ()
   (test-pn= (->pathname '(/ ("foo" "bar" "baz") #f))
-    (merge-pathnames '(("baz")) '(/ ("foo" "bar") #f))))
+    (merge-pathnames '(("baz")) '(/ ("foo" "bar") #f)))
+  (test-pn= (make-pathname #f '("foo" "baz") "qux")
+    (merge-pathnames '((back) ("baz") "qux") '(("foo" "bar"))))
+  (test-pn= (->pathname '((back) ("foo" "bar") "baz"))
+    (merge-pathnames '((back back back) ("foo" "bar") "baz")
+                     '(("foo" "bar"))))
+  (test-pn= (->pathname '(/ ("foo" "bar") "baz"))
+    (merge-pathnames '((back back back) ("foo" "bar") "baz")
+                     '(/ ("foo" "bar") #f))))
 
 (define-test-case pathname-tests.ops join ()
   (test-pn= (->pathname '(("foo" "bar") "baz"))
     (pathname-join '(("foo" "bar") "file") '(() "baz")))
   (test-pn= (->pathname '(("foo" "bar" "baz") "file2"))
     (pathname-join '(("foo" "bar") "file1") '(("baz") "file2")))
-  (test-pn= (->pathname '(("foo" "bar" "baz" "f2" "qux") "f3"))
+  (test-pn= (->pathname '(("foo" "bar" "baz" "qux") "f3"))
     (pathname-join '(("foo" "bar") "f1")
                    '(("baz") "f2")
                    '(("qux") "f3")))

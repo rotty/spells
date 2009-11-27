@@ -26,7 +26,7 @@
   ("algebraic-types.scm"
    (spells algebraic-types))
   "args-fold.scm"
-  ("pathname.scm" (spells pathname) (spells misc) (rnrs lists) (rnrs sorting))
+  "pathname.scm"
   "filesys.scm"
   ("string-utils.scm" (spells string-utils))
   ("format.scm" (spells format))
@@ -75,4 +75,4 @@
    (spells include)
    (spells misc)
    (spells string-utils))
-))
+  ))
