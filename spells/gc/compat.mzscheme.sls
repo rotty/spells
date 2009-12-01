@@ -17,7 +17,7 @@
 
 (library (spells gc compat)
   (export make-weak-cell weak-cell-ref weak-cell?
-          make-guardian
+          make-reaper
           collect)
   (import (rnrs base)
           (rnrs control)
@@ -38,11 +38,11 @@
                                 
                   (collect-garbage collect)))
 
-  (define (make-guardian)
+  (define (make-reaper proc)
     (let ((executor (make-will-executor)))
       (case-lambda
-        ((v)
-         (will-register executor v (lambda (v) v)))
+        ((object)
+         (will-register executor object proc))
         (()
          (will-try-execute executor)))))
 

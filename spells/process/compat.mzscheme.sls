@@ -17,7 +17,7 @@
 
 (library (spells process compat)
   (export process?
-          process-pid
+          process-id
           process-input
           process-output
           process-errors
@@ -25,6 +25,8 @@
           spawn-process
           wait-for-process
 
+          get-process-id
+          
           run-shell-command)
   (import (rnrs base)
           (rnrs io ports)
@@ -32,6 +34,7 @@
                 subprocess subprocess-wait subprocess-status)
           (only (scheme system)
                 system/exit-code)
+          (only (mzlib os) getpid)
           (only (r6rs private ports)
                 r6rs-port->port)
           (srfi :8 receive)
@@ -39,9 +42,9 @@
           (spells pathname))
 
   (define-record-type process
-    (make-process pid input output errors)
+    (make-process id input output errors)
     process?
-    (pid process-pid)
+    (id process-id)
     (input process-input)
     (output process-output)
     (errors process-errors))
@@ -72,10 +75,13 @@
         (values status 'unknown)))
   
   (define (wait-for-process process)
-    (subprocess-wait (process-pid process))
-    (status->values (subprocess-status (process-pid process))))
+    (subprocess-wait (process-id process))
+    (status->values (subprocess-status (process-id process))))
 
   (define (run-shell-command cmd)
     (status->values (system/exit-code cmd)))
+
+  (define (get-process-id)
+    (getpid))
 
   )
