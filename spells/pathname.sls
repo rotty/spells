@@ -633,8 +633,8 @@
        (define (lose)
          (error 'unix/origin-namestring
                 "invalid origin for unix file system" origin))
-       (cond ((not origin) "")
-             ((or (eq? origin '/) (equal? origin "/")) "/")
+       (cond ((or (not origin) (null? origin)) "")
+             ((or (eq? origin '/)) "/")
              ((pair? origin)
               (let loop ((o origin) (parts '()))
                 (if (null? o)
