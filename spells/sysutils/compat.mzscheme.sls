@@ -16,21 +16,12 @@
 #!r6rs
 
 (library (spells sysutils compat)
-  (export lookup-environment-variable
-          current-process-environment
-          find-exec-path
+  (export find-exec-path
           host-info)
 
   (import (rnrs)
-          (only (mzscheme) getenv system-type find-executable-path))
-
-  (define lookup-environment-variable getenv)
-
-  (define (current-process-environment)
-    (raise (condition
-            (make-implementation-restriction-violation)
-            (make-who-condition 'current-process-environment)
-            (make-message-condition "Not supported on PLT Scheme"))))
+          (srfi :98 os-environment-variables)
+          (only (mzscheme) system-type find-executable-path))
 
   (define (find-exec-path prog)
     (find-executable-path prog #f))

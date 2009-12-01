@@ -1,24 +1,17 @@
 ;;@ Miscellaneous procedures providing access to various bits of
 ;; information regarding the host running the scheme implementation.
 (library (spells sysutils compat)
-  (export lookup-environment-variable
-          current-process-environment
-          find-exec-path
+  (export find-exec-path
           host-info)
   (import (rnrs base)
           (srfi :8 receive)
           (spells filesys)
           (spells string-utils)
           (only (srfi :13 strings) string-index)
-          (prefix  (only (ikarus)
-                         environ
-                         getenv
-                         host-info)
-                   ik:))
-
-  (define lookup-environment-variable ik:getenv)
-
-  (define current-process-environment ik:environ)
+          (prefix (only (ikarus)
+                        getenv
+                        host-info)
+                  ik:))
 
   (define (find-exec-path prog)
     (let ((paths (string-split (ik:getenv "PATH") #\:)))

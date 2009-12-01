@@ -10,8 +10,12 @@
           host-info)
   (import (rnrs base)
           (rnrs lists)
+          (srfi :98 os-environment-variables)
           (spells sysutils compat))
 
+  (define lookup-environment-variable get-environment-variable)
+  (define current-process-environment get-environment-variables)
+  
   (define (extend-process-environment env)
     (let ((current-env (remp (lambda (x) (assoc (car x) env))
                              (current-process-environment))))

@@ -24,9 +24,7 @@
 #!r6rs
 
 (library (spells sysutils compat)
-  (export lookup-environment-variable
-          current-process-environment
-          find-exec-path
+  (export find-exec-path
           host-info)
   (import (rnrs base)
           (rnrs records syntactic)
@@ -39,17 +37,9 @@
                 process-environment->alist)
           (only (ypsilon ffi) on-posix))
 
-  (define (todo-proc who)
-    (lambda args
-      (error who "please implement me!")))
-
   (define (find-exec-path prog)
     (let ((paths (string-split (getenv "PATH") #\:)))
       (find-file prog paths file-executable?)))
-
-  (define lookup-environment-variable getenv)
-
-  (define current-process-environment process-environment->alist)
 
   (define (host-info)
     (let ((os (architecture-feature 'operating-system)))
