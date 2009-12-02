@@ -49,7 +49,12 @@
    (spells sysutils)
    (only (srfi :1 lists) count)
    (rnrs lists))
-  ("foreign.scm" (spells foreign) (spells misc) (spells filesys))
+  ("foreign.scm"
+   (spells foreign)
+   (spells misc)
+   (spells filesys)
+   (spells gc)
+   (rnrs control))
   ("foof-loop.scm"
    (spells foof-loop)
    (rnrs io simple)

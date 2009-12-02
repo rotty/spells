@@ -113,11 +113,14 @@
     (lambda (ptr)
       (function-ptr ptr ctype))))
 
-(define (make-c-callback ret-type arg-types)
-  (let ((ctype (_cprocedure (mlist->list (map type->mz-type arg-types))
-                            (type->mz-type ret-type))))
-    (lambda (proc)
-      (function-ptr proc ctype))))
+(define make-c-callback
+  (let ((c-callback-keeper (box '())))
+    (lambda (ret-type arg-types)
+      (let ((ctype (_cprocedure (mlist->list (map type->mz-type arg-types))
+                                (type->mz-type ret-type)
+                                #:keep c-callback-keeper)))
+        (lambda (proc)
+          (function-ptr proc ctype))))))
 
 (define (type->mz-type type)
   (define (prim->mz-type prim)

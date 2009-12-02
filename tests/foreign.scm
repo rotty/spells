@@ -19,6 +19,7 @@
 
 ;; You will probably have to tweak this on a non-GNU/Linux system.
 (define *libc-path* "libc.so.6")
+(define SIGINT 2)
 
 (define N 1000)
 
@@ -117,5 +118,22 @@
      (begin
        (pointer-uint32-set! key 0 10)
        (bsearch key data 5 4 cmp)))))
+
+;; This test tries to ensure that callbacks are not garbage collected.
+(define-test-case foreign-tests callback-gc ()
+  (let ((signal ((make-c-callout 'pointer '(int pointer))
+                 (dlsym (dlopen *libc-path*) "signal")))
+        (raise ((make-c-callout 'int '(int))
+                (dlsym (dlopen *libc-path*) "raise")))
+        (make-callback (make-c-callback 'void '(int)))
+        (store '()))
+    (let ((old-callback (signal SIGINT
+                                (make-callback (lambda (i)
+                                                 (set! store (make-vector 1000)))))))
+      (do ((i 0 (+ i 1)))
+          ((= i 10))
+        (raise SIGINT)
+        (collect))
+      (signal SIGINT old-callback))))
 
 (run-test-suite foreign-tests)
