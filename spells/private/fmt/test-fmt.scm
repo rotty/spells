@@ -1,26 +1,8 @@
 
-(cond-expand
- (chicken (use test) (load "fmt-chicken.scm"))
- (gauche
-  (use gauche.test)
-  (use text.fmt)
-  (define test-begin test-start)
-  (define orig-test (with-module gauche.test test))
-  (define-syntax test
-    (syntax-rules ()
-      ((test name expected expr)
-       (guard (e (else #f))
-              (orig-test name expected (lambda () expr))))
-      ((test expected expr)
-       (test (let ((s (with-output-to-string (lambda () (write 'expr)))))
-               (substring s 0 (min 60 (string-length s))))
-             expected expr)))))
- (srfi-64
-  (define-syntax test
-    (syntax-rules ()
-      ((test expected expr)
-       (test-equal expected expr)))))
- (else))
+(define-syntax test
+  (syntax-rules ()
+    ((test expected expr)
+     (test-equal expected expr))))
 
 ;; pretty printing
 
@@ -140,12 +122,10 @@
 (test "1.00" (fmt #f (fix 2 (num/fit 4 1))))
 (test "#.##" (fmt #f (fix 2 (num/fit 4 12.345))))
 
-(cond-expand
- (r6rs
-  (test "1+2i" (fmt #f (string->number "1+2i")))
-  (test "1+2i" (fmt #f (num (string->number "1+2i"))))
-  (test "1.00+2.00i" (fmt #f (fix 2 (num (string->number "1+2i")))))
-  (test "3.14+2.00i" (fmt #f (fix 2 (num (string->number "3.14159+2i")))))))
+(test "1+2i" (fmt #f (string->number "1+2i")))
+(test "1+2i" (fmt #f (num (string->number "1+2i"))))
+(test "1.00+2.00i" (fmt #f (fix 2 (num (string->number "1+2i")))))
+(test "3.14+2.00i" (fmt #f (fix 2 (num (string->number "3.14159+2i")))))
 
 (test "3.9Ki" (fmt #f (num/si 3986)))
 (test "4k" (fmt #f (num/si 3986 1000)))

@@ -74,7 +74,6 @@
    (rnrs)
    (rnrs r5rs)
    (rnrs mutable-pairs)
-   (srfi :0 cond-expand)
    (srfi :26 cut)
    (srfi :64 testing)
    (spells include)
