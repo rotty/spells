@@ -1,6 +1,6 @@
 ;;; time-lib.sls --- Time library.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -17,7 +17,9 @@
 
 (library (spells time-lib)
   (export posix-timestamp->time-utc
-          time-utc->posix-timestamp)
+          time-utc->posix-timestamp
+          date-up-from
+          date-down-from)
   (import
     (rnrs base)
     (srfi :19 time)
@@ -29,4 +31,42 @@
     (add-duration *posix-epoch* (make-time time-duration nanoseconds timestamp)))
 
   (define (time-utc->posix-timestamp time-utc)
-    (time-second (time-difference time-utc *posix-epoch*))))
+    (time-second (time-difference time-utc *posix-epoch*)))
+
+  (define one-day (make-time time-duration 0 (* 24 60 60)))
+  
+  (define-syntax date-up-from
+    (syntax-rules ()
+      ((_ (date-var) (start-expr (to end-expr)) cont . env)
+       (cont
+        (((end) (date->time-utc end-expr)) ;Outer bindings
+         ((start tz) (let ((start start-expr))
+                       (values start (date-zone-offset start))))
+         ((step) one-day))
+        ((time-var (date->time-utc start)  ;Loop variables
+                   (add-duration time-var step)))
+        ()                                 ;Entry bindings
+        ((time>=? time-var end))           ;Termination conditions
+        (((date-var)                       ;Body bindings
+          (time-utc->date time-var tz)))
+        ()                                 ;Final bindings
+        . env))))
+  
+  (define-syntax date-down-from
+    (syntax-rules ()
+      ((_ (date-var) (start-expr (to end-expr)) cont . env)
+       (cont
+        (((end) (date->time-utc end-expr)) ;Outer bindings
+         ((start tz) (let ((start start-expr))
+                       (values start (date-zone-offset start))))
+         ((step) one-day))
+        ((time-var (date->time-utc start)  ;Loop variables
+                   (subtract-duration time-var step)))
+        ()                                 ;Entry bindings
+        ((time<=? time-var end))           ;Termination conditions
+        (((date-var)                       ;Body bindings
+          (time-utc->date time-var tz)))
+        ()                                 ;Final bindings
+        . env))))
+  
+)
