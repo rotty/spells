@@ -1,6 +1,6 @@
 ;;; filesys.scm --- Filesystem interface.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -230,7 +230,7 @@
 ;; working directory as specified by the directory part of @1.
 (define (call-with-input-file-and-directory pathname proc)
   (let ((pathname (->pathname pathname)))
-    (with-working-directory (directory-namestring pathname)
+    (with-working-directory (pathname-with-file pathname #f)
       (lambda ()
         (call-with-input-file (file-namestring pathname) proc)))))
 
