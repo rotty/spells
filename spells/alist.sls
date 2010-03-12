@@ -1,6 +1,6 @@
 ;;; alist.sls --- R6RS library providing alist utilities.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -17,9 +17,13 @@
 
 ;;@ Association list utilities.
 (library (spells alist)
-  (export acons assq-ref assv-ref assoc-ref)
+  (export acons
+          assq-ref assv-ref assoc-ref
+          let-assq)
   (import (rnrs base)
-          (rnrs lists))
+          (rnrs syntax-case)
+          (rnrs lists)
+          (srfi :8 receive))
 
 ;;@ Return the alist @3 extended by @code{(cons @1 @2)}.
 (define (acons key val alist)
@@ -33,5 +37,29 @@
   (cond ((assv key alist) => cdr) (else #f)))
 (define (assoc-ref alist key)
   (cond ((assoc key alist) => cdr) (else #f)))
+
+(define-syntax let-assq
+  (lambda (stx)
+    (define (valid-binding? b)
+      (syntax-case b ()
+        ((id key) (and (identifier? #'id) (identifier? #'key)) #t)
+        (id (identifier? #'id) #t)
+        (_ #f)))
+    (syntax-case stx ()
+      ((_ alist-expr (binding ...) body ...)
+       (for-all valid-binding? #'(binding ...))
+       (with-syntax (((let-binding ...)
+                      (map (lambda (b)
+                             (receive (id key)
+                                      (syntax-case b ()
+                                        ((id key)
+                                         (values #'id #'key))
+                                        (id
+                                         (values #'id #'id)))
+                               #`(#,id (assq-ref alist '#,key))))
+                           #'(binding ...))))
+         #'(let ((alist alist-expr))
+             (let (let-binding ...)
+               body ...)))))))
 
 )
