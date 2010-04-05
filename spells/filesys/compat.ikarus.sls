@@ -1,6 +1,6 @@
 ;;; compat.ikarus.sls --- filesys compat library for Ikarus.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -42,6 +42,7 @@
 
           library-search-paths)
   (import (except (rnrs) file-exists? delete-file)
+          (only (srfi :13) string-prefix?) ;for exception kludge
           (srfi :8 receive)
           (spells pathname)
           (spells time-lib)
@@ -53,14 +54,8 @@
   (ik:file-exists? (->fn pathname)))
 
 (define (create-directory pathname)
-  ;;++ This is incomplete, and a kludge. Ikarus should raise the right
-  ;; (specific) exception out-of-the-box.
-  (guard (c ((i/o-filename-error? c)
-             (raise (condition
-                     (make-who-condition 'create-directory)
-                     (make-i/o-file-already-exists-error
-                      (i/o-error-filename c))))))
-    (ik:make-directory (->fn pathname))))
+  (with-i/o-condition-adornment
+    (lambda () (ik:make-directory (->fn pathname)))))
 
 (define (delete-file pathname)
   (let ((fname (->fn pathname)))
@@ -91,16 +86,39 @@
 
 (define (make-file-check pred who)
   (lambda (pathname)
-    (let ((fname (->fn pathname)))
-      ;; This re-raising is there to produce an exception a more
-      ;; specific type; see
-      ;; <https://bugs.launchpad.net/ikarus/+bug/405944>.
-      (guard (c ((i/o-filename-error? c)
-                 (raise (condition
-                         (make-error)
-                         (make-who-condition who)
-                         (make-i/o-file-does-not-exist-error fname)))))
-        (pred fname)))))
+    (with-i/o-condition-adornment
+      (lambda () (pred (->fn pathname))))))
+
+      
+;; This re-raising kludge is there to produce an exception of a more
+;; specific type; see <https://bugs.launchpad.net/ikarus/+bug/405944>.
+(define (with-i/o-condition-adornment thunk)
+  (guard (c ((and (i/o-filename-error? c)                  
+                  (message-condition? c)
+                  (not (or (i/o-file-already-exists-error? c)
+                           (i/o-file-does-not-exist-error? c)
+                           (i/o-file-is-read-only-error? c)
+                           (i/o-file-protection-error? c)))
+                  (condition-message->i/o-error-constructor
+                   (condition-message c)))
+             => (lambda (constructor)
+                  (raise (apply condition
+                                (map (lambda (c)
+                                       (if (i/o-filename-error? c)
+                                           (constructor (i/o-error-filename c))
+                                           c))
+                                     (simple-conditions c)))))))
+    (thunk)))
+
+(define (condition-message->i/o-error-constructor msg)
+  (cond ((assp (lambda (key)
+                  (string-prefix? (string-append key ": ") msg))
+                `(("ENOENT" . ,make-i/o-file-does-not-exist-error)
+                  ("EEXIST" . ,make-i/o-file-already-exists-error)
+                  ("EACCES" . ,make-i/o-file-protection-error)))
+         => cdr)
+        (else
+         #f)))
 
 (define-syntax define-file-check
   (syntax-rules ()
