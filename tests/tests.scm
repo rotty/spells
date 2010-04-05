@@ -80,4 +80,6 @@
    (spells include)
    (spells misc)
    (spells string-utils))
-  ))
+  "irregex.scm"
+  )
+)

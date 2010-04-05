@@ -9,8 +9,8 @@
   (export
     irregex string->irregex sre->irregex irregex? irregex-match-data?
     irregex-new-matches irregex-reset-matches!
-    irregex-match-start-source irregex-match-start-index
-    irregex-match-end-source irregex-match-end-index
+    irregex-match-start-chunk irregex-match-start-index
+    irregex-match-end-chunk irregex-match-end-index
     irregex-match-num-submatches irregex-match-substring
     irregex-match-index irregex-match-chunker
     irregex-search irregex-search/matches irregex-match
