@@ -1,6 +1,6 @@
 ;;; logging.scm --- Unit tests for (spells logging)
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,8 +13,13 @@
 ;;; Commentary:
 
 ;;; Code:
+#!r6rs
 
-;; Utility procedures
+(import (rnrs)
+        (spells logging)
+        (spells testing))
+
+;;; Utility procedures
 
 (define (expand-handlers note-taker config)
   (map (lambda (entry)
@@ -55,7 +60,7 @@
 
 (define test-logger (make-logger root-logger 'test))
 
-;; Test suite
+;;; Test suite
 
 (define-test-suite logging-tests
   "Testing logging library")

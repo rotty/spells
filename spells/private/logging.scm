@@ -1,6 +1,6 @@
 ;;; logging.scm --- Logging library.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -72,11 +72,24 @@
 ;;; Data types
 
 (define-record-type* logger
-  (%make-logger parent name)
-  ((threshold #f)
-   (propagate? #t)
-   (filters '())
-   (handlers '())))
+  (%make-logger parent name properties)
+  ())
+
+(define-record-type* logger-prop
+  (make-logger-prop threshold propagate? filters handlers)
+  ())
+
+(define (make-property-accessor accessor)
+  (lambda (logger)
+    (accessor ((logger-properties logger)))))
+
+(define logger-threshold (make-property-accessor logger-prop-threshold))
+(define logger-propagate? (make-property-accessor logger-prop-propagate?))
+(define logger-filters (make-property-accessor logger-prop-filters))
+(define logger-handlers (make-property-accessor logger-prop-handlers))
+
+(define (make-default-properties)
+  (make-parameter (make-logger-prop #f #t '() '())))
 
 (define-record-type* log-handler
   (%make-log-handler proc threshold filters)
@@ -162,7 +175,7 @@
 
 ;;; Global state
 
-(define root-logger (%make-logger #f '()))
+(define root-logger (%make-logger #f '() (make-default-properties)))
 
 (define (default-logger-properties)
   `((handlers (lambda (entry)
@@ -197,7 +210,9 @@
 ;;@ Create a logger object.
 ;;
 (define (make-logger parent name)
-  (%make-logger parent (append (logger-name parent) (list name))))
+  (%make-logger parent
+                (append (logger-name parent) (list name))
+                (make-default-properties)))
 
 ;;@ Create a logging procedure.
 ;;
@@ -300,11 +315,13 @@
        (make-log-handler (make-proc proc)))
       ((? procedure? proc)
        (make-log-handler proc))))
-  (set-logger-handlers! logger (map make-handler
-                                    (property-ref properties 'handlers '())))
-  (set-logger-threshold! logger (numeric-level
-                                 (property-ref* properties 'threshold #f)))
-  (set-logger-propagate?! logger (property-ref* properties 'propagate? #t)))
+  ((logger-properties logger)
+   (make-logger-prop (numeric-level
+                      (property-ref* properties 'threshold #f))
+                     (property-ref* properties 'propagate? #t)
+                     (property-ref properties 'filters '())
+                     (map make-handler
+                          (property-ref properties 'handlers '())))))
 
 
 ;; Must go last, since it may expand into an expression

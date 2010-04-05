@@ -1,6 +1,6 @@
 ;;; tests.scm --- Test directory
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -43,7 +43,7 @@
    (rnrs io ports))
   ("operations.scm" (spells operations) (rnrs lists))
   ("ports.scm" (spells ports) (srfi :8 receive) (rnrs io ports))
-  ("logging.scm" (spells logging) (rnrs lists))
+  ("logging.scm")
   ("process.scm" (spells process) (srfi :8 receive) (srfi :13 strings) (rnrs io ports))
   ("sysutils.scm"
    (spells sysutils)

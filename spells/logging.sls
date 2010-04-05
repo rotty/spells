@@ -1,6 +1,6 @@
 ;;; logging.sls --- Logging library.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -35,6 +35,7 @@
           (rnrs io simple)
           (except (srfi :1 lists) map for-each)
           (srfi :19 time)
+          (srfi :39 parameters)
           (spells alist)
           (spells match)
           (spells opt-args)
