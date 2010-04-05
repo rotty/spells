@@ -1,6 +1,6 @@
 ;;; process.sls --- OS process interface.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -29,6 +29,7 @@
 
           call-with-process-input
           call-with-process-output
+          call-with-process
           
           run-process
           run-process/string
@@ -56,6 +57,12 @@
     (if input (close-port input))
     (if output (close-port output))
     (if errors (close-port errors))))
+
+(define (call-with-process process proc)
+  (receive results (proc process)
+    (close-process-ports process)
+    (receive (status signal) (wait-for-process process)
+      (apply values status signal results))))
 
 ;;@ Run @2 with the environment @1 and arguments @3 synchronously (@0
 ;; returns after the process has terminated, yielding the the exit
