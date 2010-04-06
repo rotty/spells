@@ -295,6 +295,10 @@
   (set-logger-properties! logger
                           (optional (properties (default-logger-properties))
                                     (procedures '())))
+  
+  ((logger-properties logger) (alist->logger-prop properties procedures)))
+
+(define (alist->logger-prop properties procedures)
   (define (proc-ref name)
     (or (assq-ref procedures name)
         (error 'configure-logger "invalid procedure reference" name)))
@@ -307,21 +311,36 @@
            (apply (proc-ref (car spec)) (cdr spec)))))
   (define (make-handler spec)
     (match spec
-      ((threshold proc)
-       (make-log-handler (make-proc proc) threshold))
-      ((threshold (filters ___) proc)
-       (make-log-handler (make-proc proc) threshold (map make-proc filters)))
-      ((proc)
-       (make-log-handler (make-proc proc)))
-      ((? procedure? proc)
-       (make-log-handler proc))))
-  ((logger-properties logger)
-   (make-logger-prop (numeric-level
+           ((threshold proc)
+            (make-log-handler (make-proc proc) threshold))
+           ((threshold (filters ___) proc)
+            (make-log-handler (make-proc proc) threshold (map make-proc filters)))
+           ((proc)
+            (make-log-handler (make-proc proc)))
+           ((? procedure? proc)
+            (make-log-handler proc))))
+  (make-logger-prop (numeric-level
                       (property-ref* properties 'threshold #f))
                      (property-ref* properties 'propagate? #t)
                      (property-ref properties 'filters '())
                      (map make-handler
-                          (property-ref properties 'handlers '())))))
+                          (property-ref properties 'handlers '()))))
+
+;;@ Change logger properties for the dynamic extent of
+;; @var{body}.
+;;
+;; This macro works similiar to a @code{parameterize} form; the
+;; left-hand side of the bindings must evaluate to logger objects, and
+;; the right-hand-side must evaluate to a logger property alist as
+;; described in @xref{spells logging
+;; set-logger-properties!,set-logger-properties!}.
+(define-syntax let-logger-properties
+  (syntax-rules ()
+    ((let-logger-properties ((logger properties) ...) body ...)
+     (parameterize (((logger-properties logger)
+                     (alist->logger-prop properties '()))
+                    ...)
+       body ...))))
 
 
 ;; Must go last, since it may expand into an expression

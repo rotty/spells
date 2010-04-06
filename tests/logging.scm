@@ -63,7 +63,7 @@
 ;;; Test suite
 
 (define-test-suite logging-tests
-  "Testing logging library")
+  "Logging library")
 
 (define-test-case logging-tests handler-invocation ()
   (test-equal '((passed root))

@@ -28,6 +28,7 @@
 
           default-log-formatter
 
+          let-logger-properties
           set-logger-properties!)
   (import (rnrs base)
           (rnrs control)
