@@ -7,23 +7,52 @@
    (srfi))
 
   (libraries
+   (exclude ("spells" "foreign")
+            ("spells" "foreign.sls"))
    ("spells" "private")
-   ("spells" . sls))
+   ("spells" . sls)))
+
+(package (spells-foreign (0))
+  
+  (depends
+   (srfi)
+   (spells)
+   (conjure))
+
+  (libraries
+   ("spells" "foreign" . sls)
+   ("spells" "foreign.sls"))
 
   (conjure
-   (import (rnrs)
-           (conjure cc)
-           (conjure hostinfo)
-           (conjure dsl))
+   (import (rnrs base)
+           (spells foreign conjure))
 
-   (task cc (cc-conf))
-   
-   (task (configure
-          (produce '((("spells" "foreign") "config.sls")
-                     <= (("spells" "foreign") "config.sls.in")))
-          (fetchers (cc-fetcher 'cc)
-                    (hostinfo-fetcher))))))
+   (foreign-conjure-tasks))
+  
+  (installation-hook ((needs-source? . #t))
+    (import (rnrs)
+            (spells pathname)
+            (spells foreign conjure)
+            (conjure dsl)
+            (conjure dorodango))
+
+    (make-conjure-hook
+     (lambda (agent)
+       (let ((config-pathname (->pathname
+                               '(("spells" "foreign") "config.sls"))))
+         (foreign-conjure-tasks)
+       
+         (task install
+           (ordinary
+            (depends 'configure)
+            (proc (lambda (self)
+                    (let ((product (pathname-join ((self 'project) 'product-dir)
+                                                  config-pathname)))
+                      (agent 'install-file
+                             'libraries
+                             (->namestring config-pathname)
+                             (->namestring product))))))))))))
 
 ;; Local Variables:
-;; scheme-indent-styles: ((package 1))
+;; scheme-indent-styles: (pkg-list conjure-dsl)
 ;; End:
