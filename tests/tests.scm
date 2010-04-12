@@ -47,6 +47,7 @@
   ("process.scm" (spells process) (srfi :8 receive) (srfi :13 strings) (rnrs io ports))
   ("sysutils.scm"
    (spells sysutils)
+   (spells pathname)
    (only (srfi :1 lists) count)
    (rnrs lists))
   ("foreign.scm"

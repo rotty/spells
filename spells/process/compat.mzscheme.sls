@@ -1,6 +1,6 @@
 ;;; compat.mzscheme.sls --- OS process, mzscheme compat.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -54,7 +54,7 @@
            (cond ((string? s)   s)
                  ((pathname? s) (->namestring s))
                  (else
-                  (error "cannot coerce to string list" lst))))
+                  (error 'x->strlist "cannot coerce to string list" lst s))))
          lst))
 
   (define (maybe-port->mz-port port)

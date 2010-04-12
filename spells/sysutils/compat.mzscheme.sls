@@ -1,4 +1,4 @@
-;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008, 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Copyright (C) 2005, 2007 Jose Antonio Ortega Ruiz <jao@gnu.org>
 
 ;; Authors: Andreas Rottmann <a.rottmann@gmx.at>
@@ -21,10 +21,15 @@
 
   (import (rnrs)
           (srfi :98 os-environment-variables)
-          (only (mzscheme) system-type find-executable-path))
+          (spells pathname)
+          (only (scheme base)
+                system-type
+                path->string
+                find-executable-path))
 
   (define (find-exec-path prog)
-    (find-executable-path prog #f))
+    (let ((path (find-executable-path prog #f)))
+      (and path (->pathname (path->string path)))))
 
   (define (host-info)
     (values "unknown" "unknown "(symbol->string (system-type 'os)))))

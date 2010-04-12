@@ -1,5 +1,5 @@
 ;; sysutils.scm -*- scheme48-package: nil -*-
-;; Copyright (C) 2005, 2006-2007, 2009 by Jose Antonio Ortega 
+;; Copyright (C) 2005, 2006-2007, 2009, 2010 by Jose Antonio Ortega 
 
 ;; Author: Jose Antonio Ortega <jao@gnu.org>  
 ;; Start date: Wed Dec 28, 2005 02:08 
@@ -35,5 +35,10 @@
            (= (count (lambda (pr) (string=? (car pr) "HOME")) new-env) 1)
            (equal? (assoc "HOME" new-env) `("HOME" . ,home))
            (equal? (assoc "PATH" new-env) `("PATH" . ,path))))))
+
+(define-test-case sysutils-tests find-exec-path ()
+  (test-eqv #f (find-exec-path "_AN_IMPR0B4BL3__NMAE_F0R_1__PROG__"))
+  (let ((pathname (find-exec-path "ls")))
+    (test-eqv #t (pathname? pathname))))
 
 (run-test-suite sysutils-tests)
