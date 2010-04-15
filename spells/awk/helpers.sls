@@ -1,6 +1,6 @@
 ;;; helpers.sls --- The guts of the AWK macro
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Copyright (c) 1994 by Olin Shivers
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
@@ -33,12 +33,12 @@
           parse-clause)
   (import (for (rnrs) run (meta -1))
           (for (srfi :8 receive) (meta -1))
+          (for (wak irregex) (meta -1))
+          (wak foof-loop)
           (spells alist)
-          (for (spells irregex) (meta -1))
           (spells tracing)
           (spells algebraic-types)
           (spells syntax-utils)
-          (spells foof-loop)
           (for (spells awk range-tests) (meta -1)))
 
 (define-datatype <clause>

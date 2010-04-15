@@ -17,9 +17,6 @@
 
 ((systems spells)
  (files
-  ("lazy.scm"
-   (spells lazy)
-   (rnrs io ports))
   ("record-types.scm"
    (spells record-types)
    (srfi :8 receive))
@@ -30,7 +27,7 @@
   "filesys.scm"
   ("string-utils.scm" (spells string-utils))
   ("format.scm" (spells format))
-  ("misc.scm" (spells misc) (rnrs lists))
+  ("misc.scm" (spells misc) (spells testing-utils) (rnrs lists))
   ("match.scm" (spells match))
   ;; these are temporarily disabled; need to port to trc-testing
   #;("opt-args.scm" (spells opt-args))
@@ -56,12 +53,6 @@
    (spells filesys)
    (spells gc)
    (rnrs control))
-  ("foof-loop.scm"
-   (spells foof-loop)
-   (rnrs io simple)
-   (rnrs io ports)
-   (rnrs mutable-strings)
-   (rnrs r5rs))
   "awk.scm"
   ("delimited-control.scm"
    (spells delimited-control))
@@ -70,16 +61,5 @@
   ("xvector.scm"
    (spells xvector)
    (rnrs control))
-  ("fmt.scm" 'no-default-imports
-   (spells fmt)
-   (rnrs)
-   (rnrs r5rs)
-   (rnrs mutable-pairs)
-   (srfi :26 cut)
-   (srfi :64 testing)
-   (spells include)
-   (spells misc)
-   (spells string-utils))
-  "irregex.scm"
   )
 )

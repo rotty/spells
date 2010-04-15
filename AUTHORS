@@ -9,18 +9,9 @@ proposed syntax (http://dep.debian.net/deps/dep5/).
 
 # Library
 
-Copyright: 2005-2009, Andreas Rottmann <a.rottmann@gmx.at>
+Copyright: 2005-2010, Andreas Rottmann <a.rottmann@gmx.at>
 Files: *
 License: BSD
-
-Copyright: 2007, Alex Shinn
-Files: spells/fmt.sls, spells/fmt/*.sls, spells/private/fmt/*.scm,
-       spells/private/irrgex-*.scm
-License: BSD
-
-Copyright: 2003, André van Tonder
-Files: spells/lazy.sls
-License: MIT
 
 Copyright: 1993-2003, Richard Kelsey and Jonathan Rees
            1994-2003, Olin Shivers and Brian D. Carlstrom
@@ -37,20 +28,13 @@ Files: spells/private/condition.scm
 License: BSD
 
 Copyright: 2007-2009, Taylor R. Campbell
-Files: spells/testing/parameters.sls, spells/record-types/expand-drt.scm,
+Files: spells/record-types/expand-drt.scm,
        spells/private/foof-loop.scm, spells/private/nested-foof-loop.scm,
        spells/private/xvector.scm, tests/xvector.scm
 License: BSD
 
-Copyright: 2007, 2009, Taylor R. Campbell
-Files: spells/private/trc-testing.scm
-License: LGPL-3+
-
-Copyright: 2009, Derick Eddington
-Files: spells/irregex.sls
-License: MIT
-
 Copyright: 2002, Anthony Carrico
+           2009, 2010, Andreas Rottmann
 Files: spells/args-fold.sls
 License: BSD
 
@@ -82,6 +66,3 @@ Copyright: Alex Shinn
 Files: test/match.scm
 License: TODO
 
-Copyright: Taylor R. Campbell
-Files: tests/test-foof-loop.scm
-License: PD

@@ -1,6 +1,6 @@
 ;;; foreign.sls --- Foreign function interface.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -79,7 +79,7 @@
   (import (rnrs)
           (for (srfi :8 receive) run expand)
           (for (only (srfi :1) append-reverse) expand)
-          (for (spells foof-loop) expand)
+          (for (wak foof-loop) expand)
           (spells foreign compat)
           (spells foreign frozen-bytes)
           (spells foreign config))

@@ -1,6 +1,6 @@
 ;;; awk.scm --- Tests for the awk loop macro
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Copyright (C) 2004 Christoph Hetz
 
 ;; This program is free software, you can redistribute it and/or
@@ -19,11 +19,11 @@
 (import (rnrs)
         (only (srfi :1) make-list iota)
         (only (srfi :13) string-join)
+        (wak irregex)
         (spells ascii)
         (spells delimited-readers)
-        (spells irregex)
         (spells awk)
-        (spells testing))
+        (wak trc-testing))
 
 ;;; basic helper functions
 

@@ -1,6 +1,6 @@
 ;;; filesys.scm --- Unit tests for the filesystem interface
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -16,7 +16,7 @@
 
 (import (except (rnrs) delete-file file-exists?)
         (only (srfi :1) lset=)
-        (spells testing)
+        (wak trc-testing)
         (spells pathname)
         (spells filesys))
 

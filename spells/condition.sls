@@ -1,6 +1,6 @@
 ;;; condition.sls --- Extra condition types
 
-;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008, 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -27,8 +27,8 @@
           ;; This doesn't really belong here
           limited-write)
   (import (rnrs)
-          (spells foof-loop)
-          (spells fmt)
+          (wak foof-loop)
+          (wak fmt)
           (spells include))
   
   (include-file ((spells private) condition)))

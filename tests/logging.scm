@@ -17,7 +17,7 @@
 
 (import (rnrs)
         (spells logging)
-        (spells testing))
+        (wak trc-testing))
 
 ;;; Utility procedures
 

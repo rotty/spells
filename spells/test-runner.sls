@@ -1,6 +1,6 @@
 ;;; run.sls --- Utilities for running testcases
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -14,7 +14,7 @@
 #!r6rs
 
 ;;@ Utilities for running testcases.
-(library (spells testing run)
+(library (spells test-runner)
   (export run-tests
           run-tests-in-directory
           run-tests-in-file
@@ -34,10 +34,10 @@
           (spells filesys)
           (spells pathname)
           (spells condition)
-          (only (spells testing)
+          (only (wak trc-testing)
                 test-verbosity with-test-verbosity
                 test-debug-errors? with-test-debug-errors?)
-          (spells testing run-env))
+          (spells test-runner environment))
 
   ;;@ Run specified tests.
   ;;
@@ -114,8 +114,8 @@
                   '((except (rnrs base)
                             error string-copy string-for-each string->list)
                     (rnrs io simple)
-                    (spells testing)
-                    (spells testing run-env))
+                    (wak trc-testing)
+                    (spells test-runner environment))
                   '())
               imports))))
 

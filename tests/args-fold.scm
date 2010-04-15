@@ -1,6 +1,6 @@
 ;;; args-fold.scm --- Tests for the command line argument processor
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -15,7 +15,7 @@
 ;;; Code:
 (import (rnrs)
         (spells alist)
-        (spells testing)
+        (wak trc-testing)
         (spells args-fold))
 
 (define-test-suite args-tests

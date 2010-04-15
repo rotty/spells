@@ -1,5 +1,5 @@
 #!r6rs
-(library (spells testing run-env)
+(library (spells test-runner environment)
   (export this-directory
           test-environment)
   (import (rnrs)

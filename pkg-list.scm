@@ -4,7 +4,11 @@
 (package (spells (0))
 
   (depends
-   (srfi))
+   (srfi)
+   (wak-irregex)
+   (wak-foof-loop)
+   (wak-fmt)
+   (wak-trc-testing))
 
   (libraries
    (exclude ("spells" "foreign")
@@ -17,6 +21,7 @@
   (depends
    (srfi)
    (spells)
+   (wak-foof-loop)
    (conjure))
 
   (libraries

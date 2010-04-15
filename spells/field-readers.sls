@@ -1,6 +1,6 @@
 ;;; field-readers.sls --- Field and record parsing utilities from scsh
 
-;; Copyright (C) 1994 by Olin Shivers. See file AUTHORS.
+;; Copyright (C) 1994, 2010 by Olin Shivers. See file AUTHORS.
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -22,7 +22,7 @@
   (import (rnrs)
           (srfi :8 receive)
           (srfi :14 char-sets)
-          (spells irregex)
+          (wak irregex)
           (spells opt-args)
           (spells delimited-readers))
 

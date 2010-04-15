@@ -1,6 +1,6 @@
 ;;; pathname.scm --- unit tests for (spells pathname)
 
-;; Copyright (C) 2004-2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2004-2010 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Start date: Fri Nov 05, 2004 12:05
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
@@ -17,7 +17,7 @@
 
 (import (rnrs)
         (spells misc)
-        (spells testing)
+        (wak trc-testing)
         (spells pathname))
 
 (define-syntax test-pn=
