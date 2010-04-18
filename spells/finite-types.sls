@@ -1,6 +1,6 @@
 ;;; finite-types.sls --- Scheme48-style finite types
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Based on code from Scheme48 1.8, Copyright (c) 1993-2008 by Richard
 ;; Kelsey and Jonathan Rees.
@@ -20,8 +20,8 @@
   (export define-enumerated-type
           define-finite-type
           finite-type-case)
-  (import (rnrs base)
-          (rnrs syntax-case)
+  (import (for (rnrs base) run expand)
+          (for (rnrs syntax-case) expand)
           (srfi :9 records))
 
   (define-syntax define-enumerated-type
