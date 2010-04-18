@@ -94,12 +94,19 @@
     (assert-clear-stage)
     (create-directory test-dir))
    (teardown
-    (delete-file test-dir)))
+    (for-each delete-test-file '("a" (())))))
+
+  (let ((exception-cookie (list 'cookie)))
+    (test-eqv #t
+      (begin
+        (delete-file (test-file "not-there"))
+        #t))
   
-  (test-eqv #t
-    (begin
-      (delete-file (test-file "not-there"))
-      #t)))
+    (test-eq exception-cookie
+      (guard (c ((i/o-filename-error? c)
+                 exception-cookie))
+        (create-test-file "a")
+        (delete-file test-dir)))))
 
 (define-test-case filesys-tests file-checks
   ((setup
@@ -130,6 +137,44 @@
    (list file-readable?
          file-writable?
          file-executable?)))
+
+(define-test-case filesys-tests create-symbolic-link
+  ((setup
+    (assert-clear-stage)
+    (create-directory test-dir))
+   (teardown
+    (for-each delete-test-file '("bar" (())))))
+
+  (let ((exception-cookie (list 'cookie)))
+    (create-symbolic-link "foo" (test-file "bar"))
+    (test-eqv #t (file-symbolic-link? (test-file "bar")))
+
+    (test-eq exception-cookie
+      (guard (c ((i/o-file-already-exists-error? c)
+                 exception-cookie))
+        (create-symbolic-link "foo" (test-file "bar"))))))
+
+(define-test-case filesys-tests create-hard-link
+  ((setup
+    (assert-clear-stage)
+    (create-directory test-dir))
+   (teardown
+    (for-each delete-test-file '("foo" "bar" (())))))
+
+  (let ((exception-cookie (list 'cookie)))
+    (test-eq exception-cookie
+      (guard (c ((i/o-file-does-not-exist-error? c)
+                 exception-cookie))
+        (create-hard-link (test-file "foo") (test-file "bar"))))
+    
+    (create-test-file "foo")
+    (create-hard-link (test-file "foo") (test-file "bar"))
+    (test-eqv #t (file-regular? (test-file "bar")))
+
+    (test-eq exception-cookie
+      (guard (c ((i/o-file-already-exists-error? c)
+                 exception-cookie))
+        (create-hard-link (test-file "foo") (test-file "bar"))))))
 
 (define-test-case filesys-tests create-directory* 
   ((description "create-directory*")
