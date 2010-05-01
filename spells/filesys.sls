@@ -322,7 +322,7 @@
     (lambda ()
       (unless cache
         (set! cache (cond ((get-environment-variable "TMPDIR")
-                           => ->pathname)
+                           => pathname-as-directory)
                           (else
                            (->pathname "/var/tmp/{pid}-{random}.tmp")))))
       cache)))
