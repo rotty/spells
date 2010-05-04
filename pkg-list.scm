@@ -1,3 +1,12 @@
+;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+
+;; This program is free software, you can redistribute it and/or
+;; modify it under the terms of the new-style BSD license.
+
+;; You should have received a copy of the BSD license along with this
+;; program. If not, see <http://www.debian.org/misc/bsd.license>.
+
+
 ;;@ A portability library. It offers a single interface to
 ;; functionality commonly present, but not standardized in various
 ;; Scheme implementations.
