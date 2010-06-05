@@ -1,6 +1,6 @@
 ;;; opt-args.sls --- Optional arguments
 
-;; Copyright (C) 2001-2009, several authors -- see below.
+;; Copyright (C) 2001-2010, several authors -- see below.
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -15,16 +15,88 @@
 
 ;;@ Optional and named arguments.
 (library (spells opt-args)
-  (export define/named-args
+  (export define*
+          lambda*
+          
+          define/named-args
           define/optional-args
           let-optionals
           let-optionals*
           :optional
           opt-lambda)
-  (import (rnrs base)
-          (rnrs lists))
+  (import (rnrs)
+          (for (srfi :8 receive) expand))
 
+
+;; Copyright (C) 2010 Andreas Rottmann.
+;;
+;; This is a partial implementation of
+;; <http://mumble.net/~campbell/proposals/optional.text>
+(define-syntax lambda*
+  (lambda (stx)
+    (define (split-bindings bindings)
+      (let loop ((bindings bindings)
+                 (optionals? #f)
+                 (identifiers '())
+                 (optional-identifiers '())
+                 (optional-values '()))
+        (if (null? bindings)
+            (values (reverse identifiers)
+                    optional-identifiers
+                    optional-values)
+            (syntax-case (car bindings) ()
+              ((optional value)
+               (loop (cdr bindings)
+                     #t
+                     identifiers
+                     (cons #'optional optional-identifiers)
+                     (cons #'value optional-values)))
+              (id
+               (not optionals?)
+               (loop (cdr bindings)
+                     #f
+                     (cons #'id identifiers)
+                     optional-identifiers
+                     optional-values))))))
+    (define (generate-clauses ids optional-ids optional-values)
+      (let loop ((optional-ids optional-ids)
+                 (used-values '())
+                 (optional-values optional-values)
+                 (clauses '()))
+        (if (null? optional-ids)
+            (cons (generate-clause ids optional-ids used-values)
+                  clauses)
+            (loop (cdr optional-ids)
+                  (cons (car optional-values) used-values)
+                  (cdr optional-values)
+                  (cons (generate-clause ids optional-ids used-values)
+                        clauses)))))
+    (define (generate-clause ids optional-ids used-values)
+      (with-syntax (((id ...) ids)
+                    ((optional-id ...) (reverse optional-ids))
+                    ((used-value ...) used-values))
+        #'((id ... optional-id ...)
+           (f id ... optional-id ... used-value ...))))
+    (syntax-case stx ()
+      ((_ (binding ...) . body)
+       (receive (identifiers optional-identifiers optional-values)
+                (split-bindings #'(binding ...))
+         (with-syntax (((id ...) identifiers)
+                       ((optional-id ...) (reverse optional-identifiers))
+                       ((clause ...)
+                        (generate-clauses identifiers
+                                          optional-identifiers
+                                          optional-values)))
+           #'(let ((f (lambda (id ... optional-id ...) . body)))
+               (case-lambda
+                 clause ...))))))))
 
+(define-syntax define*
+  (syntax-rules ()
+    ((define* (id binding ...) . body)
+     (define id (lambda* (binding ...) . body)))))
+
+
 ;; The following code is taken from scsh, file scsh/let-opt.scm.
 ;;
 ;; Copyright (c) 2001 Olin Shivers, BSD license.
