@@ -54,11 +54,8 @@
 
   (define-syntax trace-define
     (syntax-rules ()
-      ((trace-define (name arg ...) body ...)
-       (define name (trace-lambda name (arg ...)
-                      body ...)))
-      ((trace-define (name arg ... . rest) body ...)
-       (define name (trace-lambda name (arg ... . rest)
+      ((trace-define (name . args) body ...)
+       (define name (trace-lambda name args
                       body ...)))))
 
   (define-syntax trace-lambda
