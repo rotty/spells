@@ -17,9 +17,7 @@
 
 ((systems spells)
  (files
-  ("record-types.scm"
-   (spells record-types)
-   (srfi :8 receive))
+  "record-types.scm"
   ("algebraic-types.scm"
    (spells algebraic-types))
   "args-fold.scm"

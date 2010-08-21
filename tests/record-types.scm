@@ -1,6 +1,6 @@
 ;;; record-types.scm --- unit tests for (spells record-types)
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -14,6 +14,10 @@
 
 ;;; Code:
 
+(import (rnrs)
+        (srfi :8 receive)
+        (spells record-types)
+        (wak trc-testing))
 
 (define-test-suite record-types-tests
   "Record types")
@@ -22,7 +26,7 @@
   (make-foo a b)
   ((c 1)))
 
-(define-functional-fields foo a b c)
+(define-functional-fields foo a b)
 
 (define-test-case record-types-tests basics ()
   (let ((f (make-foo 3 2)))
@@ -42,9 +46,13 @@
 
 (define-test-case record-types-tests functional-fields ()
   (let ((f (make-foo 3 2)))
-    (test-equal '(3 2 1)
+    (test-equal '(3 2)
       (receive components (foo-components f)
-        components))))
+        components))
+    (test-equal '(3 4)
+      (call-with-values
+          (lambda () (foo-components (foo-with-b f 4)))
+        list))))
 
 (run-test-suite record-types-tests)
 
