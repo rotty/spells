@@ -39,7 +39,7 @@
   ("operations.scm" (spells operations) (rnrs lists))
   ("ports.scm" (spells ports) (srfi :8 receive) (rnrs io ports))
   ("logging.scm")
-  ("process.scm" (spells process) (srfi :8 receive) (srfi :13 strings) (rnrs io ports))
+  "process.scm"
   ("sysutils.scm"
    (spells sysutils)
    (spells pathname)

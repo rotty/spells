@@ -1,6 +1,6 @@
 ;; process.scm -- unit tests for process.scm
 
-;; Copyright (C) 2005-2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2005-2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann
 ;; Start date: Fri May 20, 2005 23:22
@@ -14,6 +14,14 @@
 ;;; Commentary:
 
 ;;; Code:
+
+(import (rnrs base)
+        (rnrs io ports)
+        (rnrs io simple)
+        (srfi :8 receive)
+        (only (srfi :13 strings) string-join)
+        (spells process)
+        (wak trc-testing))
 
 (define (lines . strings)
   (list 0 #f (string-join strings (string #\newline) 'suffix)))
