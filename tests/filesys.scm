@@ -86,7 +86,7 @@
                                (lambda (port)
                                  (write '(some garbage) port)
                                  (raise 'exception)))))
-             (r2 (call-with-input-file outfile-name read)))
+                       (r2 (call-with-input-file outfile-name read)))
         (list r1 r2)))))
 
 (define-test-case filesys-tests delete
