@@ -7,9 +7,8 @@
 ;; program. If not, see <http://www.debian.org/misc/bsd.license>.
 
 
-;;@ A portability library. It offers a single interface to
-;; functionality commonly present, but not standardized in various
-;; Scheme implementations.
+;;; Main libraries
+
 (package (spells (0))
 
   (depends
@@ -19,11 +18,30 @@
    (wak-fmt)
    (wak-trc-testing))
 
+  (synopsis "portability and utility library")
+  (description
+   "A portability library. It offers a single interface to"
+   "functionality commonly present, but not standardized, in various"
+   "Scheme implementations."
+   ""
+   "Spells currently offers:"
+   " - A filesystem interface"
+   " - A pathname facility"
+   " - An interface to OS processes"
+   " - A simple interface to TCP sockets"
+   " - Weak cells"
+   " - An implementation of the zipper data structure"
+   " - Extensible vectors")
+  (homepage "http://rotty.yi.org/software/spells/")
+  
   (libraries
    (exclude ("spells" "foreign")
             ("spells" "foreign.sls"))
    ("spells" "private")
    ("spells" . sls)))
+
+
+;;; Foreign-function interface
 
 (package (spells-foreign (0))
   
@@ -33,6 +51,12 @@
    (wak-foof-loop)
    (conjure))
 
+  (synopsis "foreign function interface to C")
+  (description
+   "An foreign function interface that allows Scheme code"
+   "to interact with code (libraries) written in C.")
+  (homepage "http://rotty.yi.org/software/spells/")
+  
   (libraries
    ("spells" "foreign" . sls)
    ("spells" "foreign.sls"))
