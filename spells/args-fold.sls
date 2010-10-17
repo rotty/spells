@@ -1,6 +1,6 @@
 ;;; args-fold.sls --- Slightly extended variant of SRFI 37
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Copyright (c) 2002 Anthony Carrico
 
 ;; This program is free software, you can redistribute it and/or
@@ -29,6 +29,12 @@
 ;;   scanning for arguments stops after the first non-option
 ;;   argument. When `stop-early' is #f, `args-fold*' behaves the same
 ;;   as `args-fold'.
+;;
+;; - The argument list may carry non-strings, which are considered as
+;;   operands (or option arguments, if preceded by an option requiring
+;;   an argument).  This is allowed to increase flexibility for
+;;   applications that want to do pre-processing on the actual
+;;   argument list.
 ;; 
 
 ;;; Code:
@@ -162,7 +168,7 @@
           ;; using a regular expression matcher.
           (cond
            ( ;; (rx bos "--" eos)
-            (string=? "--" arg)
+            (and (string? arg) (string=? "--" arg))
             ;; End option scanning:
             (scan-operands args seeds))
            ((looking-at-long-option-with-arg arg)
@@ -178,7 +184,8 @@
                                             unrecognized-option-proc))))
                    (process-arg+iterate option name option-arg args seeds))))
            ( ;;(rx bos "--" (submatch (+ any)))
-            (and (> (string-length arg) 3)
+            (and (string? arg)
+                 (> (string-length arg) 3)
                  (char=? #\- (string-ref arg 0))
                  (char=? #\- (string-ref arg 1)))
             ;; Found long option:
@@ -193,7 +200,8 @@
                   (process-arg+iterate option name (car args) (cdr args) seeds)
                   (process-arg+iterate option name #f args seeds))))
            ( ;; (rx bos "-" (submatch (+ any)))
-            (and (> (string-length arg) 1)
+            (and (string? arg)
+                 (> (string-length arg) 1)
                  (char=? #\- (string-ref arg 0)))
             ;; Found short options
             (let ((shorts (substring arg 1 (string-length arg))))
@@ -211,7 +219,8 @@
   ;;    (submatch (+ (~ "=")))
   ;;    "="
   ;;    (submatch (* any)))
-  (and (> (string-length arg) 4)
+  (and (string? arg)
+       (> (string-length arg) 4)
        (char=? #\- (string-ref arg 0))
        (char=? #\- (string-ref arg 1))
        (not (char=? #\= (string-ref arg 2)))

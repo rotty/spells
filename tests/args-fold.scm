@@ -62,6 +62,15 @@
                process-operand
                '((operands)))))
 
+(define-test-case args-tests.fold non-strings ()
+  (test-equal '((operands "frotz" #("baz"))
+                ("foo" . "bar"))
+    (args-fold '("--foo=bar" #("baz") "frotz")
+               (list (option '("foo") 'file process-option))
+               unrecognized-option
+               process-operand
+               '((operands)))))
+
 (define-test-suite (args-tests.fold* args-tests)
   "args-fold*")
 
