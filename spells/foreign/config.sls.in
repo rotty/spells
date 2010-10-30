@@ -1,6 +1,6 @@
 ;;; config.sls.in --- FFI platform configuration.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -41,7 +41,8 @@
              ((time_t)         #!@(c-sizeof time_t "time.h"))
              (else #f))))
       (or size
-          (error 'c-type-sizeof "size of type unknown" sym))))
+          (assertion-violation 'c-type-sizeof
+                               "size of type unknown" sym))))
 
   (define (c-type-alignof sym)
     (let ((alignment
@@ -61,7 +62,8 @@
              ((time_t)         #!@(c-alignof time_t "time.h"))
              (else #f))))
       (or alignment
-          (error 'c-type-alignof "alignment of type unknown" sym)))))
+          (assertion-violation 'c-type-alignof
+                               "alignment of type unknown" sym)))))
 
 ;; Local Variables:
 ;; mode: scheme
