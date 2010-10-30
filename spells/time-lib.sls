@@ -18,6 +18,7 @@
 (library (spells time-lib)
   (export posix-timestamp->time-utc
           time-utc->posix-timestamp
+          time-utc->posix-offset
           date-up-from
           date-down-from)
   (import
@@ -31,7 +32,10 @@
     (add-duration *posix-epoch* (make-time time-duration nanoseconds timestamp)))
 
   (define (time-utc->posix-timestamp time-utc)
-    (time-second (time-difference time-utc *posix-epoch*)))
+    (time-second (time-utc->posix-offset time-utc)))
+
+  (define (time-utc->posix-offset time-utc)
+    (time-difference time-utc *posix-epoch*))
 
   (define one-day (make-time time-duration 0 (* 24 60 60)))
   
