@@ -23,13 +23,19 @@
           (conjure dsl))
 
 (define (foreign-conjure-tasks)
+  (task configure
+    (configure
+     (produce `((("spells" "foreign") "config.sls")
+                <= (("spells" "foreign") "config.sls.in")))
+     (fetchers (cc-fetcher 'cc)
+               (hostinfo-fetcher))))
+  
   (task cc (cc-conf))
        
-  (task configure
-        (configure
-         (produce `((("spells" "foreign") "config.sls")
-                    <= (("spells" "foreign") "config.sls.in")))
-         (fetchers (cc-fetcher 'cc)
-                   (hostinfo-fetcher)))))
+)
 
 )
+
+;; Local Variables:
+;; scheme-indent-styles: (conjure-dsl)
+;; End:

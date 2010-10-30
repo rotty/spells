@@ -78,8 +78,6 @@
      (lambda (agent)
        (let ((config-pathname (->pathname
                                '(("spells" "foreign") "config.sls"))))
-         (foreign-conjure-tasks)
-       
          (task install
            (ordinary
             (depends 'configure)
@@ -89,7 +87,9 @@
                       (agent 'install-file
                              'libraries
                              (->namestring config-pathname)
-                             (->namestring product))))))))))))
+                             (->namestring product)))))))
+         
+         (foreign-conjure-tasks))))))
 
 ;; Local Variables:
 ;; scheme-indent-styles: (pkg-list conjure-dsl)
