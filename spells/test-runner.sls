@@ -58,16 +58,15 @@
   ;; directory. If the directory contains a file named @file{tests.scm},
   ;; the list of files is read from it.
   (define (run-tests-in-directory dir env)
-    (let ((listing (make-pathname #f dir (make-file "tests" "scm"))))
-      (let ((files (if (file-regular? listing)
-                       (map (lambda (x)
-                              (pathname-with-file dir (cond ((string? x) x)
-                                                            (else (car x)))))
-                            (with-input-from-file (->namestring listing) read))
-                       (directory-fold dir cons '()))))
-        (for-each (lambda (f)
-                    (run-tests-in-file f env))
-                  files))))
+    (let* ((dir (pathname-as-directory dir))
+           (listing (pathname-with-file dir (make-file "tests" "scm"))))
+      (cond ((file-regular? listing)
+             (eval-test-spec dir (with-input-from-file (->namestring listing)
+                                   read)))
+            (else
+             (for-each (lambda (f)
+                         (run-tests-in-file f env))
+                       (directory-fold dir cons '()))))))
 
   (define (run-tests-in-file file env)
     (let ((filename (->namestring file)))
