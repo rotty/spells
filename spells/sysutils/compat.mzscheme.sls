@@ -28,7 +28,7 @@
                 find-executable-path))
 
   (define (find-exec-path prog)
-    (let ((path (find-executable-path prog #f)))
+    (let ((path (find-executable-path (->namestring prog) #f)))
       (and path (->pathname (path->string path)))))
 
   (define (host-info)
