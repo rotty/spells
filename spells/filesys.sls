@@ -71,7 +71,7 @@
           (srfi :8 receive)
           (srfi :19 time)
           (only (srfi :13) string-contains string-unfold)
-          (only (srfi :27) random-integer)
+          (srfi :27)
           (srfi :98 os-environment-variables)
           (only (spells process) get-process-id)
           (spells string-utils)
@@ -339,11 +339,16 @@
   (let ((alphabet
          "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
     (lambda ()
-      (string-ref alphabet (random-integer (string-length alphabet))))))
+      (string-ref alphabet (filename-random-integer (string-length alphabet))))))
 
 (define-condition-type &file-unreachable-error &error
   file-unreachable-error? make-file-unreachable-error
   (pathname file-unreachable-error-pathname)
   (operator file-unreachable-error-operator))
+
+(define filename-random-source (make-random-source))
+(define filename-random-integer (random-source-make-integers filename-random-source))
+
+(random-source-randomize! filename-random-source)
 
 )
