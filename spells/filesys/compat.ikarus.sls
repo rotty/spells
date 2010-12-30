@@ -70,10 +70,13 @@
   (ik:rename-file (->fn source-pathname) (->fn target-pathname)))
 
 (define (create-hard-link old-pathname new-pathname)
-  (ik:make-hard-link (->fn old-pathname) (->fn new-pathname)))
+  (with-i/o-condition-adornment
+    (lambda () (ik:make-hard-link (->fn old-pathname) (->fn new-pathname)))))
 
 (define (create-symbolic-link old-pathname new-pathname)
-  (ik:make-symbolic-link (->fn old-pathname) (->fn new-pathname)))
+  (with-i/o-condition-adornment
+    (lambda ()
+      (ik:make-symbolic-link (->fn old-pathname) (->fn new-pathname)))))
 
 (define (file-regular? pathname)
   (ik:file-regular? (->fn pathname)))
