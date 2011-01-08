@@ -1,6 +1,6 @@
 ;;; tests.scm --- Test directory
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009-2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -23,6 +23,7 @@
   "args-fold.scm"
   "pathname.scm"
   "filesys.scm"
+  "list-utils.scm"
   ("string-utils.scm" (spells string-utils))
   ("format.scm" (spells format))
   ("misc.scm" (spells misc) (spells testing-utils) (rnrs lists))
