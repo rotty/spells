@@ -1,6 +1,6 @@
 ;;; pathname.scm --- unit tests for (spells pathname)
 
-;; Copyright (C) 2004-2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2004-2011 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Start date: Fri Nov 05, 2004 12:05
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
@@ -58,6 +58,16 @@
                                             (("bar"))
                                             (() "x"))))))
 
+
+(define-test-suite (pathname-tests.predicates pathname-tests)
+  "Predicates")
+
+(define-test-case pathname-tests.predicates directory-pathname? ()
+  (test-eqv #t (directory-pathname? (make-pathname #f '() #f)))
+  (test-eqv #f (directory-pathname? (make-pathname #f '() "foo")))
+  (test-eqv #t (directory-pathname? (make-pathname #f '("foo") #f))))
+
+
 (define-test-suite (pathname-tests.s-expr pathname-tests)
   "S-Expression parsing")
 
