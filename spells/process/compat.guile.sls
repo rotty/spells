@@ -1,6 +1,6 @@
 ;;; compat.guile.sls --- process compat library for Guile
 
-;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -109,6 +109,11 @@
                            (and (not stdout) (car outports))
                            (and (not stderr) (car errports)))))))
 
+  (define (env-alist->strings alist)
+    (map (lambda (entry)
+           (string-append (car entry) "=" (cdr entry)))
+         alist))
+  
   (define (status->values status)
     (values (guile:status:exit-val status)
             (guile:status:term-sig status)))
