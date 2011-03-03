@@ -1,6 +1,6 @@
 ;;; compat.guile.sls --- Guile sysutils compatibility
 
-;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -20,7 +20,12 @@
           host-info)
   (import (rnrs base)
           (spells filesys)
-          (only (guile) uname getenv string-split))
+          (only (guile)
+                uname
+                utsname:machine
+                utsname:sysname
+                getenv
+                string-split))
 
   (define (find-exec-path prog)
     (let ((paths (string-split (getenv "PATH") #\:)))
