@@ -1,6 +1,6 @@
 ;;; pretty-print.sls --- Pretty-print S-expressions.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -26,5 +26,5 @@
   ;; which defaults to @code{(current-output-port)}.
   ;;@end defun
   (define (pretty-print object . port-opt)
-    (apply write/ss object port-opt)))
+    (apply write-with-shared-structure object port-opt)))
 
