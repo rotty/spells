@@ -1,6 +1,6 @@
 ;;; finite-types.sls --- Scheme48-style finite types
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009-2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Based on code from Scheme48 1.8, Copyright (c) 1993-2008 by Richard
 ;; Kelsey and Jonathan Rees.
@@ -59,7 +59,10 @@
                                           invocations)
                                     (+ i 1)
                                     (cdr names)
-                                    (cdr values))))))
+                                    (cdr values)))))
+                       ;; workaround for Guile psyntax issue
+                       ((instance-vector)
+                        (generate-temporaries '(instance-vector))))
            #'(begin
                (define-record-type rtd
                  (constructor name index . instance-fields)
