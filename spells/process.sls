@@ -110,8 +110,7 @@
 ;; otherwise) and the values returned by @3.
 ;;
 ;; This means, given a procedure @code{port->lines},
-;; @ref{spells.process run-process/lines,run-process/lines} can be
-;; implemented like this:
+;; @ref{run-process/lines} can be implemented like this:
 ;; @lisp
 ;; (define (run-process/lines env prog . args)
 ;;   (call-with-process-output env (cons prog args)

@@ -1,6 +1,6 @@
 ;;; pathname.sls --- Portable Pathname Abstraction
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Ported to Scheme and modified by Andreas Rottmann.
 ;;
@@ -93,7 +93,7 @@
 ;;      The @emph{origin} is the place from which the path begins.  It
 ;;      might be the Unix root directory, a user's home directory, a
 ;;      DOS device/drive, an Apollo logical name, a Unix environment
-;;      variable, a VMS host, &c.  A pathname with the empty list as
+;;      variable, a VMS host, &c.  A pathname with @code{#f} as
 ;;      origin is a relative pathname.
 ;; @item
 ;;      The @emph{directory} is a list of directory names from the
@@ -403,11 +403,11 @@
 
 ;;;; Directory Pathnames
 
-;;@ Returns @code{#t} if @1 has directory components but no file,
-;; and @code{#f} if otherwise."
+;;@ Returns @code{#t} if @var{pathname} has a directory component, but
+;; no file component, and @code{#f} if otherwise.
 (define (directory-pathname? pathname)
   (let ((pathname (->pathname pathname)))
-    (and (pathname-directory pathname)  ;++ nil/false pun
+    (and (pathname-directory pathname)
          (not (pathname-file pathname)))))
 
 ;;@ Return a pathname like @1, representing a directory.
@@ -586,13 +586,13 @@
                                          (optional (fs-type (local-file-system-type))))
   (fs-type/origin-namestring fs-type (->pathname pathname)))
 
-;; Return a string for @1's directory according to @2.
+;;@ Return a string for @1's directory according to @2.
 ;; If @2 is not supplied, it defaults to the local file system type.
 (define/optional-args (directory-namestring
                        pathname (optional (fs-type (local-file-system-type))))
   (fs-type/directory-namestring fs-type (->pathname pathname)))
 
-;; Return a string for @1's file according to @2.
+;;@ Return a string for @1's file according to @2.
 ;; If @2 is not supplied, it defaults to the local file system type.
 (define/optional-args (file-namestring pathname (optional
                                                  (fs-type (local-file-system-type))))

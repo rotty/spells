@@ -451,7 +451,7 @@
   ;; is a bytevector, @var{source} must be pointer, and vice
   ;; versa. The second variant of this function allows to specify
   ;; offsets (in bytes) into the memory areas. Both @var{source-start}
-  ;; and @var{target-start} default to 0.
+  ;; and @var{target-start} default to 0. Returns @var{target}.
   ;;
   ;;@end defun
 
