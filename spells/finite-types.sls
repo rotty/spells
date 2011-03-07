@@ -46,33 +46,33 @@
             index-accessor
             (field-tag . field-get&set) ...
             ((instance-name . instance-field-values) ...))
-         (with-syntax (((constructor-invocation ...)
-                        (let loop ((invocations '())
-                                   (i 0)
-                                   (names #'(instance-name ...))
-                                   (values #'(instance-field-values ...)))
-                          (if (null? names)
-                              (reverse invocations)
-                              (loop (cons #`(constructor '#,(car names)
-                                                         #,i
-                                                         #,@(car values))
-                                          invocations)
-                                    (+ i 1)
-                                    (cdr names)
-                                    (cdr values)))))
-                       ;; workaround for Guile psyntax issue
-                       ((instance-vector)
-                        (generate-temporaries '(instance-vector))))
-           #'(begin
-               (define-record-type rtd
-                 (constructor name index . instance-fields)
-                 predicate
-                 (name name-accessor)
-                 (index index-accessor)
-                 (field-tag . field-get&set) ...)
-               (define instance-vector
-                 (vector constructor-invocation ...))
-               (define-dispatch dispatcher (instance-name ...) instance-vector)))))))
+         ;; the outer `with-syntax' is there just to work around a
+         ;; Guile psyntax issue, see <http://savannah.gnu.org/bugs/?31472>.
+         (with-syntax (((constructor) (generate-temporaries '(constructor))))
+           (with-syntax (((constructor-invocation ...)
+                          (let loop ((invocations '())
+                                     (i 0)
+                                     (names #'(instance-name ...))
+                                     (values #'(instance-field-values ...)))
+                            (if (null? names)
+                                (reverse invocations)
+                                (loop (cons #`(constructor '#,(car names)
+                                                           #,i
+                                                           #,@(car values))
+                                            invocations)
+                                      (+ i 1)
+                                      (cdr names)
+                                      (cdr values))))))
+             #'(begin
+                 (define-record-type rtd
+                   (constructor name index . instance-fields)
+                   predicate
+                   (name name-accessor)
+                   (index index-accessor)
+                   (field-tag . field-get&set) ...)
+                 (define instance-vector
+                   (vector constructor-invocation ...))
+                 (define-dispatch dispatcher (instance-name ...) instance-vector))))))))
 
   (define-syntax define-dispatch
     (lambda (stx)

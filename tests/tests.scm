@@ -18,6 +18,7 @@
 ((systems spells)
  (files
   "record-types.scm"
+  "finite-types.scm"
   ("algebraic-types.scm"
    (spells algebraic-types))
   "args-fold.scm"
