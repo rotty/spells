@@ -47,12 +47,7 @@
    (spells pathname)
    (only (srfi :1 lists) count)
    (rnrs lists))
-  ("foreign.scm"
-   (spells foreign)
-   (spells misc)
-   (spells filesys)
-   (spells gc)
-   (rnrs control))
+  "foreign.scm"
   "awk.scm"
   ("delimited-control.scm"
    (spells delimited-control))

@@ -1,6 +1,6 @@
 ;;; foreign.scm --- Unit tests for spells.foreign
 
-;; Copyright (C) 2008, 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008, 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -16,6 +16,14 @@
 ;; only work on GNU/Linux (but should be easily adaptable).
 
 ;;; Code:
+
+(import (rnrs base)
+        (rnrs control)
+        (wak trc-testing)
+        (spells foreign)
+        (spells misc)
+        (spells filesys)
+        (spells gc))
 
 ;; You will probably have to tweak this on a non-GNU/Linux system.
 (define *libc-path* "libc.so.6")
