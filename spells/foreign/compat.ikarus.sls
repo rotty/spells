@@ -1,6 +1,6 @@
 ;;; compat.ikarus.sls --- FFI compat library for Ikarus.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -38,20 +38,9 @@
           (rnrs bytevectors)
           (srfi :2 and-let*)
           (spells alist)
-          (spells foreign config)
+          (spells foreign util)
           (spells tracing)
           (ikarus foreign))
-
-  (define (sized-type ctype signed?)
-    (case (c-type-sizeof ctype)
-      ((1)  (if signed? 'int8 'uint8))
-      ((2)  (if signed? 'int16 'uint16))
-      ((4)  (if signed? 'int32 'uint32))
-      ((8)  (if signed? 'int64 'uint64))
-      (else
-       (assertion-violation 'c-type-aliases
-                            "unexpected return value from c-type-sizeof"
-                            ctype))))
 
   (define null-pointer
     (let ((null (integer->pointer 0)))
@@ -68,21 +57,12 @@
   (define (pointer+ p n)
     (integer->pointer (+ (pointer->integer p) n)))
 
-  (define (sized-types-aliases)
+  (define sized-types-aliases
     (map (lambda (ctype)
-            (let ((signed? (memq ctype '(char short int long llong))))
-              (cons (sized-type ctype signed?) ctype)))
-          '(char uchar short ushort int uint long ulong llong ullong)))
+           (cons (sized-integer-type ctype) ctype))
+         '(char uchar short ushort int uint long ulong llong ullong)))
 
-  (define (other-types-aliases)
-    `((fpointer . pointer)
-      (size_t . ,(sized-type 'size_t #f))
-      (ssize_t . ,(sized-type 'ssize_t #t))
-      ;; we assume time_t to be a signed integer type; this true at
-      ;; least on glibc systems
-      (time_t . ,(sized-type 'time_t #t))))
-
-  (define c-type-aliases (append (sized-types-aliases) (other-types-aliases)))
+  (define c-type-aliases (append sized-types-aliases other-type-aliases))
 
   (define (resolve-alias ctype)
     (cond ((assq-ref c-type-aliases ctype)
