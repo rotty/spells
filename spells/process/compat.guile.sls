@@ -31,6 +31,7 @@
   (import (rnrs base)
           (rnrs control)
           (rnrs io ports)
+          (rnrs lists)
           (rnrs arithmetic bitwise)
           (srfi :8 receive)
           (srfi :9 records)
@@ -41,10 +42,16 @@
                         system
                         getpid
                         primitive-fork
+                        port-for-each
                         pipe
                         close
                         dup
+                        file-port?
                         fileno
+                        fcntl
+                        F_GETFD
+                        F_SETFD
+                        FD_CLOEXEC
                         status:exit-val
                         status:term-sig
                         execl
@@ -67,7 +74,6 @@
                   (assertion-violation who "cannot coerce to string list" lst))))
          lst))
 
-  ;;++ stdin & co. are not yet handled
   (define (spawn-process env stdin stdout stderr prog . args)
     (let* ((argv (->strlist 'spawn-process (cons prog args)))
            (inports (and (not stdin) (guile:pipe)))
@@ -93,7 +99,16 @@
                  (guile:dup (guile:fileno stdout)))
                (unless (= 2 (guile:fileno stderr))
                  (guile:close 2)
-                 (guile:dup (guile:fileno stderr))))
+                 (guile:dup (guile:fileno stderr)))
+               (guile:port-for-each
+                (lambda (port)
+                  (when (and (guile:file-port? port)
+                             (not (memv (guile:fileno port) '(0 1 2))))
+                    (guile:fcntl port
+                                 guile:F_SETFD
+                                 (bitwise-ior
+                                  guile:FD_CLOEXEC
+                                  (guile:fcntl port guile:F_GETFD)))))))
              (if env
                  (apply guile:execle (car argv) (env-alist->strings env) argv)
                  (apply guile:execl (car argv) argv)))
