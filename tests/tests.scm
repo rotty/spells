@@ -38,7 +38,7 @@
    (srfi :8 receive)
    (srfi :13 strings)
    (rnrs io ports))
-  ("operations.scm" (spells operations) (rnrs lists))
+  "operations.scm"
   ("ports.scm" (spells ports) (srfi :8 receive) (rnrs io ports))
   ("logging.scm")
   "process.scm"

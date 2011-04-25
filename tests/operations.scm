@@ -1,6 +1,6 @@
 ;;; operations.scm --- Unit tests for (spells operations)
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -11,7 +11,10 @@
 ;;; Commentary:
 
 ;;; Code:
-
+(import (rnrs base)
+        (rnrs lists)
+        (wak trc-testing)
+        (spells operations))
 
 (define-test-suite ops-tests
   "Operations")
