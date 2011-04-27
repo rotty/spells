@@ -17,11 +17,12 @@
 ;;; Code:
 
 (library (spells list-utils)
-  (export list-intersperse)
+  (export list-intersperse
+          list-prefix)
   (import (rnrs))
 
-;; Return a new list obtained by inserting `elem' between all elements
-;; of `lst'
+;;@ Return a new list obtained by inserting @var{elem} between all
+;; elements of @var{lst}.
 (define (list-intersperse lst elem)
   (if (null? lst)
       lst
@@ -29,5 +30,20 @@
         (if (null? l)
             (reverse result)
             (loop (cdr l) (cons (car l) (cons elem result)))))))
+
+;;@ If the list @var{prefix} is a prefix of the list @var{list},
+;;return the remainder of elements after stripping @var{prefix} from
+;;@var{list}, else return @code{#f}.
+(define (list-prefix prefix list =?)
+  (let loop ((elt-rest list)
+             (prefix-rest prefix))
+    (cond ((null? prefix-rest)
+           elt-rest)
+          ((null? elt-rest)
+           #f)
+          ((=? (car elt-rest) (car prefix-rest))
+           (loop (cdr elt-rest) (cdr prefix-rest)))
+          (else
+           #f))))
 
 )
