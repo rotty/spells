@@ -1,6 +1,6 @@
 ;;; alist.sls --- R6RS library providing alist utilities.
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009-2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -37,6 +37,8 @@
   (cond ((assv key alist) => cdr) (else #f)))
 (define (assoc-ref alist key)
   (cond ((assoc key alist) => cdr) (else #f)))
+
+;;@stop
 
 (define-syntax let-assq
   (lambda (stx)

@@ -1,6 +1,7 @@
+#!r6rs
 ;;; include.sls --- Include scheme source code.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,8 +14,8 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
+;;@ File inclusion of Scheme code.
 (library (spells include)
   (export include-file
           include-file/downcase)
@@ -25,12 +26,33 @@
                      annotation-expression) expand)
           (for (spells include helpers) expand))
 
+  ;;@defspec include-file
+  ;; @lisp
+  ;; (include-file ((@var{directory-component} @dots{}) @var{file-component}))@end lisp
+  ;;
+  ;; Include a the contents of the file specified by the
+  ;; @var{directory-component}s and @var{file-component} at in the
+  ;; lexical context of the @code{include-file} form; i.e.  the
+  ;; effect is the same as if the contents of the specified file
+  ;; (which must be syntactically valid Scheme code) was present
+  ;; instead of the @code{include-file} form.
+  ;;
+  ;;@end defspec
   (define-syntax include-file
     (lambda (stx)
       (syntax-case stx ()
         ((k <path>)
          (include-file/aux 'include-file #'k (syntax->datum #'<path>) values)))))
 
+  ;;@defspec include-file/downcase
+  ;;
+  ;; This macro has the same syntax and behavior as
+  ;; @code{include-file}, but applies case folding to all symbols
+  ;; appearing in included file's content.  This behavior is
+  ;; especially useful for including R5RS code which exploits the
+  ;; case-insensitivity of R5RS.
+  ;;
+  ;;@end defspec
   (define-syntax include-file/downcase
     (lambda (stx)
       ;; This loses all the annotations, but Ikarus provides no way to

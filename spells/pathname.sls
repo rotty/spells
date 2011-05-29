@@ -1,3 +1,4 @@
+#!r6rs
 ;;; pathname.sls --- Portable Pathname Abstraction
 
 ;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
@@ -16,7 +17,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 ;;@ Pathname abstraction.
 (library (spells pathname)
@@ -82,6 +82,8 @@
           (spells string-utils)
           (spells pathname os-string))
 
+;;@extractors (import (spells private stexidoc)) spells-extractors
+
 ;;@subheading Introduction
 ;;
 ;; @emph{Pathnames} are platform-independent representations of
@@ -123,6 +125,8 @@
 
 
 ;;;; Pathnames
+
+;;;@subheading Pathname construction
 
 ;;@ Pathname disjoint type.
 (define-record-type* pathname
@@ -253,7 +257,7 @@
   (or (not object)                     ; No version.
       (and (integer? object) (>= object 0))))
 
-;;;; Pathname Component Substitution & Merging
+;;;@subheading Pathname Component Substitution & Merging
 
 ;;@ Return a pathname like @1 with an origin of @2.
 (define (pathname-with-origin pathname origin)
@@ -401,7 +405,7 @@
            (values xs ys)))))
 
 
-;;;; Directory Pathnames
+;;;@subheading Directory Pathnames
 
 ;;@ Returns @code{#t} if @var{pathname} has a directory component, but
 ;; no file component, and @code{#f} if otherwise.
@@ -453,7 +457,7 @@
         base
         steps))
 
-;;;; Pathname hashing
+;;;@subheading Hashing and comparison
 
 (define null-hash 0)
 
@@ -471,18 +475,6 @@
                         ((string? origin) (string-hash origin))
                         (else             null-hash))
                   (hash-fold string-hash (file-hash file) dir))))
-
-
-;;;; Pathname Expansion
-
-;;@ Return a pathname like @1 but with the origin expanded.
-;; This is currently unimplemented and will simply return @1."
-(define (expand-pathname pathname)
-  ;;(error 'expand-pathname "Unimplemented: %S" `(expand-pathname ',pathname))
-  pathname)
-
-
-;;; Pathname comparison
 
 ;;@ Compare the pathnames @1 and @2 and return @code{#t} if they refer
 ;; to the same filesystem entity.
@@ -543,6 +535,7 @@
         (file-compare (pathname-file x) (pathname-file y))
         dir-cmp)))
 
+;;@ Boolean predicates based on @ref{pathname-compare}.
 (define (pathname<? x y)
   (< (pathname-compare x y) 0))
 
@@ -550,7 +543,16 @@
   (> (pathname-compare x y) 0))
 
 
-;;;; Namestrings
+;;;; Pathname Expansion
+
+;; Return a pathname like @1 but with the origin expanded.
+;; This is currently unimplemented and will simply return @1.
+(define (expand-pathname pathname)
+  ;;(error 'expand-pathname "Unimplemented: %S" `(expand-pathname ',pathname))
+  pathname)
+
+
+;;;@subheading Namestrings
 
 ;;@ Parse @1 and return a pathname representing it.
 ;; Use @2's namestring parser to parse @1.
@@ -607,7 +609,7 @@
   (fs-type/pathname->namestring (enough-pathname pathname relative) fs-type))
 
 
-;;;; File System Types
+;;;@subheading File System Types
 
 (define-operation (fs-type/parse-namestring fs-type namestring))
 
@@ -723,11 +725,21 @@
                 (else
                  (loop (cdr parts) n-backs (cons part dir) #f)))))))
 
-;;@ A parameter controlling if file types are parsed by the UNIX file
+;;@defun parse-unix-file-types
+;;@defunx parse-unix-file-types boolean
+;;
+;; An @uref{http://srfi.schemers.org/srfi-39/srfi-39.html,SRFI 39}
+;; parameter controlling if file types are parsed by the UNIX file
 ;; system type.
+;;
+;;@end defun
 (define parse-unix-file-types (make-parameter #t))
 
-;;@ Returns the local file system type.
+;;@defun local-file-system-type
+;;
+;; Returns the local file system type.
+;;
+;;@end defun
 (define local-file-system-type (make-parameter unix-file-system-type))
 
 ;; these go last, since it may expand to an expression, not a definition

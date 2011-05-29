@@ -1,6 +1,7 @@
+#!r6rs
 ;;; string-utils.sls --- String utilities
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -14,8 +15,8 @@
 
 
 ;;; Code:
-#!r6rs
 
+;;@ Utility procedures operating on strings.
 (library (spells string-utils)
   (export string-split
           string-escape
@@ -32,34 +33,37 @@
           (spells alist))
 
 
-  ;; -- procedure+: string-split STRING CHARSET
-  ;; -- procedure+: string-split STRING CHARSET MAXSPLIT
+  ;;@defun string-split string splitter
+  ;;@defunx string-split string splitter maxsplit
   ;;
-  ;; Returns a list of words delimited by the characters in CHARSET in
-  ;; STRING. CHARSET is a list of characters that are treated as delimiters.
-  ;; Leading or trailing delimeters are NOT trimmed. That is, the resulting
-  ;; list will have as many initial empty string elements as there are
-  ;; leading delimiters in STRING.
+  ;; Returns a list of words delimited by the characters in
+  ;; @var{charset} in @var{string}. @var{charset} is a list of
+  ;; characters that are treated as delimiters.  Leading or trailing
+  ;; delimeters are @emph{not} trimmed. That is, the resulting list
+  ;; will have as many initial empty string elements as there are
+  ;; leading delimiters in @var{string}.
   ;;
-  ;; If MAXSPLIT is specified and positive, the resulting list will
-  ;; contain at most MAXSPLIT elements, the last of which is the string
-  ;; remaining after (MAXSPLIT - 1) splits. If MAXSPLIT is specified and
-  ;; non-positive, the empty list is returned. "In time critical
-  ;; applications it behooves you not to split into more fields than you
-  ;; really need."
+  ;; If @var{maxsplit} is specified and positive, the resulting list
+  ;; will contain at most @var{maxsplit} elements, the last of which
+  ;; is the string remaining after (@var{maxsplit} - 1) splits. If
+  ;; @var{maxsplit} is specified and non@var{-}positive, the empty
+  ;; list is returned. ``In time critical applications it behooves you
+  ;; not to split into more fields than you really need.''
   ;;
-  ;; This is based on the split function in Python/Perl
+  ;; This is based on the split function in Python/Perl.
   ;;
-  ;; (string-split " abc d e f  ") ==> ("abc" "d" "e" "f")
-  ;; (string-split " abc d e f  " '() 1) ==> ("abc d e f  ")
-  ;; (string-split " abc d e f  " '() 0) ==> ()
-  ;; (string-split ":abc:d:e::f:" '(#\:)) ==> ("" "abc" "d" "e" "" "f" "")
-  ;; (string-split ":" '(#\:)) ==> ("" "")
-  ;; (string-split "root:x:0:0:Lord" '(#\:) 2) ==> ("root" "x:0:0:Lord")
+  ;;@lisp
+  ;; (string-split " abc d e f  ") ;==> ("abc" "d" "e" "f")
+  ;; (string-split " abc d e f  " '() 1) ;==> ("abc d e f  ")
+  ;; (string-split " abc d e f  " '() 0) ;==> ()
+  ;; (string-split ":abc:d:e::f:" '(#\:)) ;==> ("" "abc" "d" "e" "" "f" "")
+  ;; (string-split ":" '(#\:)) ;==> ("" "")
+  ;; (string-split "root:x:0:0:Lord" '(#\:) 2) ;==> ("root" "x:0:0:Lord")
   ;; (string-split "/usr/local/bin:/usr/bin:/usr/ucb/bin" '(#\:))
-  ;; ==> ("/usr/local/bin" "/usr/bin" "/usr/ucb/bin")
-  ;; (string-split "/usr/local/bin" '(#\/)) ==> ("" "usr" "local" "bin")
-  ;;
+  ;; ;==> ("/usr/local/bin" "/usr/bin" "/usr/ucb/bin")
+  ;; (string-split "/usr/local/bin" '(#\/)) ;==> ("" "usr" "local" "bin")
+  ;;@end lisp
+  ;;@end defun
   (define (string-split str splitter . rest)
     ;; maxsplit is a positive number
     ;; str is not empty
@@ -95,6 +99,10 @@
             (split-by-charset str (->char-set splitter) maxsplit)))))
     )
 
+  ;;@ Returns a string obtained by adding the character
+  ;; @var{escape-char} before characters matching @var{to-escape},
+  ;; which may be a character or a character set.  If
+  ;; @var{escape-char} is not specified, @code{#\\} is used.
   (define string-escape
     (case-lambda
       ((s to-escape escape-char)
@@ -110,10 +118,6 @@
        (string-escape s to-escape #\\))))
 
   ;;@ Simple template string substitution.
-  ;;
-  ;; This library can be used (maybe together with a formatter
-  ;; combinator library) as a replacement for CL-style `format' as
-  ;; provided by (spells format), for example.
   (define string-substitute
     (case-lambda
       ((dst template vals grammar)

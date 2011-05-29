@@ -1,6 +1,6 @@
 ;; table.scm -- Hash tables
 
-;; Copyright (C) 2005, 2008, 2009 by Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2005, 2008, 2009, 2011 by Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -21,8 +21,8 @@
           (rnrs control)
           (rnrs hashtables))
   
-  ;;@ Create a hash table. The optional argument @1 can be either
-  ;; @code{'eq}, @code{'eqv} or @code{'equal}.
+  ;;@ Create a hash table. The optional argument @var{type} can be
+  ;; either @code{'eq}, @code{'eqv} or @code{'equal}.
   (define make-table
     (case-lambda
       (()

@@ -1,6 +1,7 @@
+#!r6rs
 ;;; define-values.sls --- define-values syntax.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,19 +14,20 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
-;;@ @code{define-value} syntax.
+;;@ Define multiple identifiers using the results of a single
+;; expression.
 (library (spells define-values)
   (export define-values)
   (import (for (rnrs base) run expand)
           (for (rnrs syntax-case) run expand))
 
-  ;;@args names body ...
+  ;;@defspec define-values (name ...) body ...
   ;;
-  ;; Evaluate @2, which should return as many values as there are
-  ;; elements in @1; each identifier in @1 gets bound to the repective
-  ;; value.
+  ;; Defines the identifiers given by @var{name} @dots{} by using the
+  ;; values returned by @var{body}.
+  ;;
+  ;;@end defspec
   (define-syntax define-values
     (lambda (form)
       (syntax-case form ()

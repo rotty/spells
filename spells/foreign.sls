@@ -1,6 +1,7 @@
+#!r6rs
 ;;; foreign.sls --- Foreign function interface.
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009-2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 ;;@ Foreign function interface allowing Scheme code to interact with
 ;; code written in C.
@@ -87,7 +87,7 @@
   ;;@extractors (import (spells private stexidoc)) foreign-extractors
 
 
-  ;;;@section C datatypes
+  ;;;@subheading C datatypes
 
   ;; Throughout this library, there various occasions where C types
   ;; must be specified. These are represented as Scheme symbols, each
@@ -129,7 +129,7 @@
   ;; C floating point types.
   ;;@end deftp
 
-  ;;;@subsection About the data types
+  ;;;@subsubheading About the data types
 
   ;; All the above C data types map naturally to Scheme numbers,
   ;; except for @code{pointer}. C pointers are opaque objects for
@@ -153,7 +153,7 @@
     (let ((alignment (c-type-alignof ctype)))
       (+ n (mod (- alignment (mod n alignment)) alignment))))
   
-  ;;;@section Basic pointer primitives
+  ;;;@subheading Basic pointer primitives
   ;;
   ;;@defun pointer? thing
   ;; Returns @code{#t} when @var{thing} can be used as a pointer. Note
@@ -180,7 +180,7 @@
   ;;@end defun
   
   
-  ;;;@section Calling out to C
+  ;;;@subheading Calling out to C
 
   ;; To be able to call out to C a handle to a @emph{shared object}
   ;; has to be obtained first.
@@ -264,7 +264,7 @@
                                   c-name))))
          ...))))
 
-  ;;;@section Calling back to Scheme
+  ;;;@subheading Calling back to Scheme
 
   ;; When control has entered C code, it is sometimes required that
   ;; the C code is able to call back into Scheme. This is accomplished
@@ -287,7 +287,7 @@
   ;;@end defun
 
   
-  ;;;@section Memory allocation
+  ;;;@subheading Memory allocation
 
   ;;@defun malloc size
   ;; Returns a pointer to a memory region of @var{size} bytes
@@ -300,7 +300,7 @@
   ;;@end defun
   
   
-  ;;;@section Dealing with C strings
+  ;;;@subheading Dealing with C strings
   
   ;;@ This function takes a pointer to NUL-terminated UTF-8 data and
   ;; returns the corresponding Scheme string. It, like
@@ -354,7 +354,7 @@
           #f
           (utf8z-ptr->string utf8z-ptr))))
 
-  ;;;@section Accessing memory
+  ;;;@subheading Accessing memory
   
   ;;@ These procedures return the C value (of the type indicated by
   ;; their name) located at @var{offset} bytes from the memory
@@ -396,7 +396,7 @@
   ;; C struct. The returned retrieval procedure expects a single
   ;; pointer argument. The element to be fetched is expected to be of
   ;; the C type @var{type} and located at @var{offset} bytes in the
-  ;; struct. If @var{bit-offset} and @var{bits} are specified, the
+  ;; struct. If @var{bit-offset} and @var{bits} are not @code{#f}, the
   ;; retrieval procedure returns only the bits of the C struct value
   ;; indicated by these parameters.
   (define (make-pointer-c-element-getter type offset bit-offset bits)
@@ -418,9 +418,9 @@
   ;; struct. The returned procedure expects two arguments, a pointer
   ;; and a value. The type and offset inside the struct are specified
   ;; by @var{type} and @var{offset}, respectively. If @var{bit-offset}
-  ;; and @var{bits} are specified, the value to be stored (which must
-  ;; be an integer in this case), will be stored at the indicated bit
-  ;; position inside the C struct value at @var{offset}.
+  ;; and @var{bits} are not @code{#f}, the value to be stored (which
+  ;; must be an integer in this case), will be stored at the indicated
+  ;; bit position inside the C struct value at @var{offset}.
   (define (make-pointer-c-element-setter type offset bit-offset bits)
     (define (lose msg . irritants)
       (apply error 'make-pointer-c-element-setter msg irritants))

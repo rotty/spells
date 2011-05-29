@@ -1,6 +1,7 @@
+#!r6rs
 ;;; awk.sls --- AWK loop macro
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -17,7 +18,7 @@
 ;;; Code:
 
 
-#!r6rs
+;;@ SCSH's awk macro.
 (library (spells awk)
   (export awk)
   (import (rnrs)
@@ -26,6 +27,14 @@
           (spells tracing)
           (for (spells awk helpers) run expand))
 
+;;@defspec awk next-record (record field ...) state-vars . clauses
+;;@defspecx awk next-record (record field ...) counter state-vars . clauses
+;;
+;; See
+;; @uref{http://www.scsh.net/docu/html/man-Z-H-9.html#node_sec_8.2,
+;; the SCSH manual}.
+;;
+;;@end defspec
 (define-syntax awk
   (lambda (stx)
     (syntax-case stx ()

@@ -1,4 +1,4 @@
-;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -34,6 +34,8 @@
    " - Extensible vectors")
   (homepage "http://rotty.yi.org/software/spells/")
   
+  (stexidoc "docs/spells.scm")
+
   (libraries
    (exclude ("spells" "foreign")
             ("spells" "foreign.sls"))

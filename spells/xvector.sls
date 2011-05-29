@@ -1,6 +1,7 @@
-;;; xvector.sls --- 
+#!r6rs
+;;; xvector.sls --- Extensible vectors
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -20,8 +21,8 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
+;;@ This library implements vectors of variable length.
 (library (spells xvector)
   (export make-xvector
           xvector?
@@ -46,5 +47,60 @@
   (define (extract-bit-field size position integer)
     (bitwise-bit-field integer position (+ position size)))
   (define integer-length bitwise-length)
-  
-  (include-file ((spells private) xvector)))
+
+  (include-file ((spells private) xvector))
+
+;;@defun make-xvector
+;;@defunx xvector? object
+;;
+;; Constructor and disjoint type predicate.
+;;
+;;@end defun
+
+;;@defun xvector-length xvector
+;;
+;; Return the length of @var{xvector}.
+;;
+;;@end defun
+
+;;@defun xvector-ref xvector i
+;;
+;; Return element @var{i} of @var{xvector}.
+;;
+;;@end defun
+
+;;@defun xvector-set! xvector i value
+;;
+;; Set element @var{i} in @var{xvector} to @var{value}.
+;;
+;;@end defun
+
+;;@defun xvector-push! xvector value
+;;
+;; Extend @var{xvector} by adding @var{value} after its last element,
+;; thus making it the new last element.
+;;
+;;@end defun
+
+;;@defun vector-pop! xvector
+;;
+;; Remove the last element from @var{xvector} and return it.
+;;
+;;@end defun
+
+;;@defun xvector-walk xvector procedure
+;;
+;; Invoke @var{procedure} for each element of @var{xvector}, passing
+;; it two arguments: the index of the element, and the element's
+;; value.
+;;
+;;@end defun
+
+;;@defun xvector->list
+;;@defunx list->xvector
+;;
+;; Conversion from to and from lists.
+;;
+;;@end defun
+
+)

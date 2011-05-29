@@ -1,6 +1,7 @@
+#!r6rs
 ;;; filesys.scm --- Filesystem interface.
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009-2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -16,9 +17,11 @@
 ;; in terms of primitives.
 
 ;;; Code:
-#!r6rs
 
 ;;@ File system interface.
+;;
+;; This library accepts pathnames, for which @pxref{(spells
+;; pathname)}.
 (library (spells filesys)
   (export file-exists?
           create-directory
@@ -80,7 +83,142 @@
           (spells filesys compat))
 
 
-;;@ Foof-loop iterator for directory streams.
+;;; @subsection Individual file operations
+
+;;@defun file-exists? pathname
+;;
+;; Returns true if a file or directory exists on the file system at a
+;; location specified by @var{pathname}.
+;;
+;;@end defun
+
+;;@defun create-directory pathname
+;;
+;; Creates a new directory at @var{pathname}. It is an error if there
+;; already exists an object at the location designated by
+;; @var{pathname}.
+;;
+;;@end defun
+
+;;@defun delete-file pathname
+;;
+;; Deletes the object on the file system at the location specified by
+;; @var{pathname} (be it a regular file, a directory, or anything
+;; else).  If there is no such object, nothing is done.  It is an
+;; error if @var{pathname} designates a directory that is not empty or
+;; the operating system does not permit its deletion by the Scheme
+;; program.
+;;
+;;@end defun
+
+;;@defun rename-file old-pathname new-pathname
+;;
+;; Renames or moves the file specified by @var{old-pathname} to
+;; @var{new-pathname}. @var{new-pathname} may be a file pathname, in
+;; which case the file is given that exact name; it may also be a
+;; directory pathname, in which case the file is moved into that
+;; directory.  The object on the file system specified by
+;; @var{old-pathname} may be any kind of file: regular, directory, &c.
+;; It is an error if the Scheme program is not permitted by the
+;; operating system to perform this operation, @var{old-pathname} does
+;; not exist, or @var{new-pathname} designates a file that is not in a
+;; directory that already exists and in which files are allowed by the
+;; operating system to be created by the Scheme program.
+;;
+;;@end defun
+
+;;@defun file-regular? pathname
+;;@defunx file-symbolic-link? pathname
+;;@defunx file-directory? pathname
+;;@defunx file-readable? pathname
+;;@defunx file-writable? pathname
+;;
+;; These all test various attributes of the file specified by
+;; @var{pathname}.  @code{file-regular?} tests whether the file is a
+;; regular file, rather than a directory or other kind of object on
+;; the file system; @code{file-directory?}  tests whether the file is
+;; a directory; @code{file-readable?} tests whether the file can be
+;; read by the Scheme program, i.e. opening an input port over it will
+;; not fail; and @code{file-writable?} tests whether a file specified
+;; by @var{pathname} could be written to, i.e. opening an output port
+;; to it would not fail.
+;;
+;; @code{file-regular?} and @code{file-directory?} return false if
+;; there is no object on the file system designated by @var{pathname}.
+;;
+;;@end defun
+
+;;@defun file-modification-time pathname
+;;
+;; Returns a SRFI 19 time object that represents the last time that
+;; the file on the file system at the location specified by
+;; @var{pathname} was modified or the time that it was created.  It is
+;; an error if the operating system does not allow the Scheme program
+;; to access this attribute of the file or the file does not already
+;; exist.
+;;
+;;@end defun
+
+;;@defun file-size-in-bytes pathname
+;;
+;; Returns the number of bytes that the regular file designated by
+;; @var{pathname} contains.  The effect is unspecified if
+;; @var{pathname} is not a regular file.  It is an error if the file
+;; does not already exist or the Scheme program is not permitted by
+;; the operating system to probe this attribute of the file.
+;;
+;;@end defun
+
+;;;@subsection Directory content operations
+;;
+;; The operations in this section deal with directory contents.
+
+;;;@subsubheading Primitives
+;;
+;; These are the procedures that the rest of directory content
+;; operations are built upon; you might want to consider using the
+;; foof-loop operators instead, which provide a more convenient
+;; interface. 
+
+;;@defun directory-stream? object
+;; Return @code{#t} if @var{object} is a directory stream, @code{#f}
+;; otherwise.
+;;@end defun
+
+;;@defun open-directory-stream pathname
+;;
+;; Open the directory specified by @var{pathname} for reading its
+;; contents.  Returns a directory stream.
+;;
+;;@end defun
+
+;;@defun close-directory-stream stream
+;;
+;; Close the directory stream @var{stream}, freeing associated
+;; resources.
+;;
+;;@end defun
+
+;;@defun read-directory-stream stream
+;;
+;; Read an entry from @var{stream}.
+;;
+;;@end defun
+
+;;@subsubheading Foof-loop integration
+;;
+;; Foof-loop is an extensible loop facility that allows for concise
+;; and convenient expression of complex loops. The iterators described
+;; in the following extend foof-loop to allow for iteration over
+;; directory contents.  @xref{Top,,the foof-loop documentation,(wak
+;; foof-loop)}, for more information about how to use foof-loop.
+
+;;@
+;; @lisp
+;; (loop (for entry (in-directory-stream @var{stream}))
+;;   ...)@end lisp
+;;
+;; Loop over the entries in @var{stream}, a directory stream.
 (define-syntax in-directory-stream
   (syntax-rules ()
     ((_ (elt-var) (stream-expr) cont . env)
@@ -93,7 +231,13 @@
       ()                               ;Final bindings
       . env))))
 
-;;@ Foof-loop iterator for directories.
+;;@
+;; @lisp
+;; (loop (for entry (in-directory-stream @var{stream}))
+;;   ...)@end lisp
+;;
+;; Loop over the directory entries of @var{pathname}, which must refer
+;; to a directory.
 (define-syntax in-directory
   (syntax-rules ()
     ((_ (elt-var) (pathname-expr) cont . env)
@@ -110,22 +254,71 @@
                (values))))
       . env))))
 
-;;@ Fold @2 over the contents of the directory @1.
+;;@subsubheading Directory folding
 ;;
-;; If the directory @1 has the contents @var{f1}, @var{f2},
-;; @var{@dots{}}, this procedure first applies @2 to
-;; @code{(pathname-with-file (pathname-as-directory @1) @var{f1})} as
-;; first, and @3 as further arguments. The values returned by the
-;; application are used as new seed values for the next application of
-;; @2. It returns the results of the last application of @2.
-(define (directory-fold pathname combiner . seeds)
-  (apply
-   directory-fold* pathname
-   (lambda (dir-entry . seeds)
-     (receive new-seeds (apply combiner dir-entry seeds)
-       (apply values #t new-seeds)))
-   seeds))
+;; @quotation Note
+;;
+;; The procedures in this section are tentatively deprecated; new code
+;; should use foof-loop in combination with the above iterators, as
+;; this provides more flexibility with a more intuitive interface.
+;;
+;; @end quotation
 
+;;@
+;;
+;; Folds every file in the directory specified by @var{pathname} by
+;; @var{combiner}.  That is, for every file in the directory,
+;; @var{combiner} is passed the full pathname & the current set of
+;; state seeds.  @var{combiner} should return @math{N+1} values, where
+;; @math{N} is the number of seeds: a boolean that, if true, specifies
+;; that the iteration should continue, or, if false, specifies that
+;; the iteration should halt; and the next set of state seeds.  When
+;; the iteration is halted, either because @var{combiner} returned
+;; @code{#f} as its first value or because there are no more files in
+;; the directory, the current set of state seeds is returned.  There
+;; is no reliable ordering of the filenames passed to @var{combiner}.
+;;
+;; It is an error if there is no object specified by @var{pathname},
+;; the object on the file system is not a directory, or the operating
+;; system does not permit the Scheme program to read the directory's
+;; contents.
+;;
+;; Examples:
+;;
+;; @lisp
+;;   ;; Return a list of the full pathnames of all files in a directory.
+;;   (directory-fold* directory
+;;     (lambda (pathname list)
+;;       (values #t (cons pathname list)))
+;;     '())
+;;
+;;   ;; Compute a list of the full pathnames of all subdirectories of a
+;;   ;; directory.
+;;   (directory-fold* directory
+;;     (lambda (pathname list)
+;;       (values #t (if (file-directory? pathname)
+;;                      (cons pathname list)
+;;                      list)))
+;;     '())
+;;
+;;   ;; Find the (shallow) sum of the number of bytes in all files in a
+;;   ;; directory.
+;;   (directory-fold* directory
+;;     (lambda (pathname sum)
+;;       (values #t (if (file-regular? pathname)
+;;                      (+ sum (file-size-in-bytes pathname))
+;;                      sum)))
+;;     0)
+;;
+;;   ;; Return the full pathname of the first file in a directory that
+;;   ;; satisfies some predicate, or #F if no such file exists.
+;;   (directory-fold* directory
+;;     (lambda (pathname false)
+;;       (if (predicate? pathname)
+;;           (values #f pathname)
+;;           (values #t #f)))
+;;     #f)
+;; @end lisp
 (define (directory-fold* pathname combiner . seeds)
   (let* ((dirname (pathname-as-directory pathname))
          (stream (open-directory-stream dirname)))
@@ -141,7 +334,67 @@
                   (loop new-seeds)
                   (apply values new-seeds))))))))
 
-;; Naive implementation in terms of DIRECTORY-FOLD*
+;;@
+;;
+;; Simplified variant of @code{directory-fold*} that does not support
+;; premature termination.  This is equivalent to:
+;;
+;; @lisp
+;;  (define (directory-fold pathname combiner . seeds)
+;;    (apply
+;;      directory-fold* pathname
+;;      (lambda (dir-entry . seeds)
+;;        (receive new-seeds (apply combiner dir-entry seeds)
+;;          (apply values #t new-seeds)))
+;;      seeds)
+;; @end lisp
+;;
+;; Some of the above examples are simplified by DIRECTORY-FOLD; e.g.,
+;; to produce a list of the full pathnames of all files in a
+;; directory, one can use:
+;;
+;; @lisp
+;;   (directory-fold directory cons '())
+;; @end lisp
+(define (directory-fold pathname combiner . seeds)
+  (apply
+   directory-fold* pathname
+   (lambda (dir-entry . seeds)
+     (receive new-seeds (apply combiner dir-entry seeds)
+       (apply values #t new-seeds)))
+   seeds))
+
+
+;;@
+;;
+;; This is like @code{directory-fold}, but it walks down entire trees
+;; of directories.  For each entry in the directory named by @1: if
+;; that entry is a non-directory, @var{combiner} is passed the full pathname of
+;; that file and the current seeds, and the walk of the directory's
+;; entries proceeds with the new seeds; if that entry is a directory,
+;; @3 is passed the full pathname of that directory & the current
+;; seeds, and the seeds it returns are used to recursively descend
+;; into the directory.  When the recursive descent returns, the seeds
+;; it returned are used to proceed the walk of the enclosing
+;; directory's entries.  This could be defined as follows:
+;;
+;; @lisp
+;;   (define (directory-fold-tree pathname file-combiner dir-combiner
+;;                                . seeds)
+;;     (apply directory-fold pathname
+;;            (lambda (pathname . seeds)
+;;              (if (file-directory? pathanme)
+;;                  (receive new-seeds
+;;                           (apply dir-combiner pathname seeds)
+;;                    (apply directory-fold-tree pathname
+;;                           file-combiner dir-combiner
+;;                           new-seeds))
+;;                (apply file-combiner pathname seeds)))
+;;            seeds))
+;; @end lisp
+;;
+;; However, it is likely to be implemented much more efficiently with
+;; respect to the underlying file system.
 (define (directory-fold-tree* pathname file-combiner dir-combiner . seeds)
   (apply directory-fold* pathname
          (lambda (pathname . seeds)
@@ -174,6 +427,8 @@
            (receive new-seeds (apply dir-combiner dir-entry seeds)
              (apply values #t #t #f new-seeds)))
          seeds))
+
+;;;@subheading Unsorted
 
 ;;@ Create directories, with intermediary ones when needed.
 (define (create-directory* pathname)
@@ -226,17 +481,18 @@
         (lambda (out-port)
           (copy-port in-port out-port))))))
 
-;;@ Call @2, with the a file input port corresponding to @1, with a
-;; working directory as specified by the directory part of @1.
+;;@ Call @var{proc}, with the a file input port corresponding to @1,
+;;with a working directory as specified by the directory part of @1.
 (define (call-with-input-file-and-directory pathname proc)
   (let ((pathname (->pathname pathname)))
     (with-working-directory (pathname-with-file pathname #f)
       (lambda ()
         (call-with-input-file (file-namestring pathname) proc)))))
 
-;;@ Call @2, with a file output port corresponding to a temporary
-;; file. When @2 returns normally, the temporary file is renamed to
-;; @1, which normally is an atomic operation.
+;;@ Call @var{proc}, with a file output port corresponding to a
+;; temporary file. When @var{proc} returns normally, the temporary
+;; file is renamed to @var{pathname}, which normally is an atomic
+;; operation.
 (define call-with-output-file/atomic
   (case-lambda
     ((pathname buffer-mode transcoder proc)
@@ -254,6 +510,33 @@
     ((pathname proc)
      (call-with-output-file/atomic pathname 'block (native-transcoder) proc))))
 
+;;;@subheading Temporary files
+
+;; The procedures in this section can be used to create temporary
+;; files with unique names.  They all accept a @var{template}
+;; argument, which may either be a pathname, or a procedure of one
+;; argument.  If it is a pathname, the pathname's file name component
+;; is treated as a textual template which may contain placeholders as
+;; used with @ref{(spells string-utils)
+;; string-substitute,,string-substitute}.  The following subsitutions
+;; are available:
+;;
+;; @table @code
+;; @item count
+;; Will be subsituted with the iteration counter.
+;; @item random
+;; Will be subsituted with a random alphabetical string.
+;; @item pid
+;; Will be substituted with the current operating process' identifier
+;; (usually an integer).
+;; @end table
+;;
+;; If @var{template} is a procedure, it is invoked with the iteration
+;; counter, and expected to return a pathname.
+
+;;@ Create a temporary file.  This procedure returns two values: the
+;; pathname of the created file, and an output port corresponding to
+;; that pathname.
 (define create-temp-file
   (case-lambda
     ((template buffer-mode transcoder)
@@ -272,6 +555,7 @@
     (()
      (create-temp-file (default-temp-template) 'block (native-transcoder)))))
 
+;;@ Create a temporary directory and return its pathname.
 (define create-temp-directory
   (case-lambda
     ((template)
@@ -284,6 +568,18 @@
     (()
      (create-temp-directory (default-temp-template)))))
 
+;;@ Generator for temporary pathnames.  Its argument @var{action}
+;; should be a procedure that attempts to open a file, the pathname of
+;; which will be passed to it as first argument.  If the invocation of
+;; @var{action} raises an @code{&i/o-file-already-exists} condition, a
+;; new pathname is created, and @var{action} is called again with that
+;; pathname.  In addition to raising an
+;; @code{&i/o-file-already-exists} condition, @var{action} can use its
+;; second argument, which is a thunk, to decline the pathname it is
+;; provided with.
+;;
+;; The optional second argument, @var{template}, is used to generate
+;; the pathnames that @var{action} is invoked with.
 (define temp-pathname-iterate
   (case-lambda
     ((action template)
@@ -297,6 +593,8 @@
            (action (pathname-generator i) (lambda () (loop (+ i 1))))))))
     ((action)
      (temp-pathname-iterate action (default-temp-template)))))
+
+;;@stop
 
 (define (make-pathname-generator template)
   (lambda (count)

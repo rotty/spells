@@ -1,6 +1,7 @@
+#!r6rs
 ;;; zipper.sls --- Huet's "Zipper" data structure
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -10,25 +11,21 @@
 ;; You should have received a copy of the BSD license along with this
 ;; program. If not, see <http://www.debian.org/misc/bsd.license>.
 
-;;; Commentary:
-
+;;@
 ;; A zipper is a cursor into a tree, allowing to manipulate the tree
 ;; in a functional manner.
 ;;
 ;; This implementation is nearly identical to the OCaml one given in
-;; the paper "Functional Pearl -- The Zipper" by Gerard Huet. It
+;; the paper ``Functional Pearl -- The Zipper'' by Gerard Huet. It
 ;; operates on a tree built from lists; the leafs may be of any type.
 ;;
 ;; There is a more general derivation of the zipper using delimited
 ;; continuations (see
-;; <http://okmij.org/ftp/Scheme/zipper-in-scheme.txt>), which does not
-;; restrict the datatype to lists, but this one is likely to be more
-;; performant, at least on implementations that don't provide native
-;; support for delimited continuations.
-
-;;; Code:
-#!r6rs
-
+;; @uref{http://okmij.org/ftp/Scheme/zipper-in-scheme.txt}), which does
+;; not restrict the datatype to lists, but this one is likely to be
+;; more performant, at least on implementations that don't provide
+;; native support for delimited continuations.
+;;
 (library (spells zipper-tree)
   (export make-zipper
           zipper?
@@ -62,13 +59,44 @@
 (define-record-type (zipper %make-zipper zipper?)
   (fields node path))
 
+;;;@subheading Construction and deconstruction
+
+;;@ Construct a zipper based on @var{tree}.
 (define (make-zipper tree)
   (%make-zipper tree top))
+
+;;@defun zipper? object
+;; Return @code{#t} if @var{object} is a zipper, @code{#f} otherwise.
+;;@end defun
+
+;;@defun zipper-node zipper
+;; Return the current node of @var{zipper}.
+;;@end defun
 
 (define (make-loser who irritant)
   (lambda (msg)
     (assertion-violation who msg irritant)))
 
+;;;@subheading Predicates
+
+;;@ Return @code{#t} if @var{z} is at the top of its tree, @code{#f}
+;; otherwise.
+(define (zip-top? z)
+  (eq? (zipper-path z) top))
+
+;;@ Return @code{#t} if @var{z} is at leftmost position, @code{#f}
+;; otherwise.
+(define (zip-leftmost? z)
+  (null? (path-left (zipper-path z))))
+
+;;@ Return @code{#t} if @var{z} is at rightmost position, @code{#f}
+;; otherwise.
+(define (zip-rightmost? z)
+  (null? (path-right (zipper-path z))))
+
+;;;@subheading Movement
+
+;;@ Return a zipper moved to the left of @var{z}.
 (define (zip-left z)
   (define lose (make-loser 'zip-left z))
   (let ((p (zipper-path z)))
@@ -81,6 +109,7 @@
                                     (cons (zipper-node z)
                                           (path-right p))))))))
 
+;;@ Return a zipper moved to the right of @var{z}.
 (define (zip-right z)
   (define lose (make-loser 'zip-right z))
   (let ((p (zipper-path z)))
@@ -93,6 +122,7 @@
                                     (path-up p)
                                     (cdr (path-right p))))))))
 
+;;@ Return a zipper moved up from @var{z}.
 (define (zip-up z)
   (define lose (make-loser 'zip-up z))
   (let ((p (zipper-path z)))
@@ -103,20 +133,13 @@
                     (cons (zipper-node z) (path-right p)))
             (path-up p))))))
 
-(define (zip-top? z)
-  (eq? (zipper-path z) top))
-
-(define (zip-leftmost? z)
-  (null? (path-left (zipper-path z))))
-
-(define (zip-rightmost? z)
-  (null? (path-right (zipper-path z))))
-
+;;@ Return a zipper located on the top of @var{z}'s tree.
 (define (zip-top z)
   (let loop ((z z))
     (cond ((zip-up z) => loop)
           (else          z))))
 
+;;@ Return a zipper moved down to the leftmost child of @var{z}.
 (define (zip-down z)
   (define lose (make-loser 'zip-down z))
   (let ((node (zipper-node z)))
@@ -127,12 +150,18 @@
           (else
            (lose "down on leaf")))))
 
+;;@ Return the tree root of @var{z}.
 (define (zip-finish z)
   (zipper-node (zip-top z)))
 
+;;;@subheading Modification
+
+;;@ Return a zipper with @var{z}'s current node exchanged with
+;; @var{node}.
 (define (zip-change z node)
   (%make-zipper node (zipper-path z)))
 
+;;@ Return a zipper with @var{node} inserted to the right of @var{z}.
 (define (zip-insert-right z node)
   (define lose (make-loser 'zip-insert-right z))
   (let ((p (zipper-path z)))
@@ -143,6 +172,8 @@
             (zipper-node z)
             (path-modify-right p (lambda (nodes) (cons node nodes))))))))
 
+
+;;@ Return a zipper with @var{node} inserted to the left of @var{z}.
 (define (zip-insert-left z node)
   (define lose (make-loser 'zip-insert-left z))
   (let ((p (zipper-path z)))
@@ -153,6 +184,8 @@
             (zipper-node z)
             (path-modify-left p (lambda (nodes) (cons node nodes))))))))
 
+;;@ Return a zipper referring to @var{node}, which is inserted to as
+;; leftmost child of @var{z}.
 (define (zip-insert-down z node)
   (define lose (make-loser 'zip-insert-down z))
   (let ((children (zipper-node z)))
@@ -161,6 +194,9 @@
           (else
            (lose "down on leaf")))))
 
+;;@ Delete the current node of @var{z}.  Returns a zipper that is
+;; either moved to the right, left, or upwards from @var{z}, in this
+;; order of precedence, depending on whether such a move is possible.
 (define (zip-delete z)
   (define lose (make-loser 'zip-delete z))
   (let ((p (zipper-path z)))

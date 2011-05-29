@@ -30,8 +30,10 @@
 
 ;; Copyright (C) 2010, 2011 Andreas Rottmann.
 ;;
-;; This is a partial implementation of
-;; <http://mumble.net/~campbell/proposals/optional.text>
+;;@ A partial implementation of
+;; @uref{http://mumble.net/~campbell/proposals/optional.text, Taylor
+;; Campbell's ``optional'' proposal}.  All that is missing is support
+;; for rest arguments.
 (define-syntax lambda*
   (lambda (stx)
     (define (split-bindings bindings)
@@ -128,7 +130,7 @@
 ;; Typical usage is like this:
 ;; @lisp
 ;;   (define (foo arg1 arg2 . args)
-;;     (let-optionals* ((opt1 'default1) (opt2 'default2))
+;;     (let-optionals* args ((opt1 'default1) (opt2 'default2))
 ;;       ...))
 ;; @end lisp
 (define-syntax let-optionals*
@@ -136,6 +138,8 @@
     ((let-optionals* arg (opt-clause ...) body ...)
      (let ((rest arg))
        (%let-optionals* rest (opt-clause ...) body ...)))))
+
+;;@stop
 
 (define-syntax %let-optionals*
   (syntax-rules ()
@@ -175,21 +179,31 @@
      (if (null? arg) (let () body ...)
 	 (error "Too many arguments in let-opt" arg)))))
 
-;;; (:optional rest-arg default-exp [test-pred])
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; This form is for evaluating optional arguments and their defaults
-;;; in simple procedures that take a *single* optional argument. It is
-;;; a macro so that the default will not be computed unless it is needed.
-;;; 
-;;; REST-ARG is a rest list from a lambda -- e.g., R in
-;;;     (lambda (a b . r) ...)
-;;; - If REST-ARG has 0 elements, evaluate DEFAULT-EXP and return that.
-;;; - If REST-ARG has 1 element, return that element.
-;;; - If REST-ARG has >1 element, error.
-;;;
-;;; If there is an TEST-PRED form, it is a predicate that is used to test
-;;; a non-default value. If the predicate returns false, an error is raised.
-
+;;@defspec :optional rest-arg default-exp [test-pred]
+;;
+;; This form is for evaluating optional arguments and their defaults
+;; in simple procedures that take a @emph{single} optional
+;; argument. It is a macro so that the default will not be computed
+;; unless it is needed.
+;; 
+;; @var{rest-arg} is a rest list from a lambda -- e.g., @var{R} in
+;;     (lambda (a b . r) ...)
+;;
+;;@itemize @bullet
+;; @item
+;; If @var{rest-arg} has 0 elements, evaluate @var{default-exp} and
+;; return that.
+;; @item
+;; If @var{rest-arg} has 1 element, return that element.
+;; @item
+;; If @var{rest-arg} has >1 element, error.
+;;@end itemize
+;;
+;; If there is an @var{test-pred} form, it is a predicate that is used
+;; to test a non-default value. If the predicate returns false, an
+;; error is raised.
+;;
+;;@end defspec
 (define-syntax :optional
   (syntax-rules ()
     ((:optional rest default-exp)
@@ -209,6 +223,8 @@
 			    'arg-test val)))
 	       (error "too many optional arguments" maybe-arg))
 	   default-exp)))))
+
+;;@stop
 
 ;; Copyright (c) Jose Antonio Ortega Ruiz <jao@gnu.org>
 ;; Start date: Sat Oct 23, 2004 00:27
@@ -249,12 +265,14 @@
      (define/named-args (name? (arg? def?) ...)
        (lambda (arg? ...) form1? form2? rest? ...) "define/named-args"))))
 
+;;@stop
+
 (define-syntax let-optionals
   (syntax-rules ()
     ((let-optionals arg ...)
      (let-optionals* arg ...))))
 
-;;@ macro that allows for simple definition of functions with
+;;@ Macro that allows for simple definition of functions with
 ;; optional arguments.
 ;;
 ;; it can be used as:

@@ -1,3 +1,4 @@
+#!r6rs
 ;;;; match.scm -- portable hygienic pattern matcher
 ;;
 ;; This code is written by Alex Shinn and placed in the
@@ -38,7 +39,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; force compile-time syntax errors with useful messages
-#!r6rs
 
 ;;@ Pattern matching.
 (library (spells match)
