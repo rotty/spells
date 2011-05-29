@@ -1,6 +1,6 @@
 ;;; opt-args.sls --- Optional arguments
 
-;; Copyright (C) 2001-2010, several authors -- see below.
+;; Copyright (C) 2001-2011, several authors -- see below.
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -28,7 +28,7 @@
           (for (srfi :8 receive) expand))
 
 
-;; Copyright (C) 2010 Andreas Rottmann.
+;; Copyright (C) 2010, 2011 Andreas Rottmann.
 ;;
 ;; This is a partial implementation of
 ;; <http://mumble.net/~campbell/proposals/optional.text>
@@ -39,57 +39,81 @@
                  (optionals? #f)
                  (identifiers '())
                  (optional-identifiers '())
-                 (optional-values '()))
+                 (optional-values '())
+                 (presence-identifiers '()))
+        (define (found-optional optional value presence)
+          (loop (cdr bindings)
+                #t
+                identifiers
+                (cons optional optional-identifiers)
+                (cons value optional-values)
+                (cons presence presence-identifiers)))
         (if (null? bindings)
             (values (reverse identifiers)
                     optional-identifiers
-                    optional-values)
+                    optional-values
+                    presence-identifiers)
             (syntax-case (car bindings) ()
+              ((optional value presence)
+               (found-optional #'optional #'value #'presence))
               ((optional value)
-               (loop (cdr bindings)
-                     #t
-                     identifiers
-                     (cons #'optional optional-identifiers)
-                     (cons #'value optional-values)))
+               (found-optional #'optional #'value #f))
               (id
-               (not optionals?)
+               (and (identifier? #'id) (not optionals?))
                (loop (cdr bindings)
                      #f
                      (cons #'id identifiers)
                      optional-identifiers
-                     optional-values))))))
-    (define (generate-clauses ids optional-ids optional-values)
+                     optional-values
+                     presence-identifiers))))))
+    (define (generate-clauses ids optional-ids optional-values presence-ids)
       (let loop ((optional-ids optional-ids)
                  (used-values '())
                  (optional-values optional-values)
                  (clauses '()))
         (if (null? optional-ids)
-            (cons (generate-clause ids optional-ids used-values)
+            (cons (generate-clause ids optional-ids presence-ids used-values)
                   clauses)
             (loop (cdr optional-ids)
                   (cons (car optional-values) used-values)
                   (cdr optional-values)
-                  (cons (generate-clause ids optional-ids used-values)
+                  (cons (generate-clause ids
+                                         optional-ids
+                                         presence-ids
+                                         used-values)
                         clauses)))))
-    (define (generate-clause ids optional-ids used-values)
+    (define (generate-clause ids optional-ids presence-ids used-values)
       (with-syntax (((id ...) ids)
                     ((optional-id ...) (reverse optional-ids))
-                    ((used-value ...) used-values))
+                    ((used-value ...) used-values)
+                    ((presence-id ...) (remv #f presence-ids))
+                    ((presence-value ...)
+                     (create-presence-values presence-ids (length used-values))))
         #'((id ... optional-id ...)
-           (f id ... optional-id ... used-value ...))))
+           (let ((presence-id presence-value) ...)
+             (f id ... optional-id ... used-value ... presence-id ...)))))
+    (define (create-presence-values presence-ids n-used-values)
+      (let loop ((i 0) (presence-ids presence-ids) (result '()))
+        (let ((present? (>= i n-used-values)))
+          (cond ((null? presence-ids)
+                 (reverse result))
+                ((car presence-ids)
+                 (loop (+ i 1) (cdr presence-ids) (cons present? result)))
+                (else
+                 (loop (+ i 1) (cdr presence-ids) result))))))
     (syntax-case stx ()
       ((_ (binding ...) . body)
-       (receive (identifiers optional-identifiers optional-values)
+       (receive (ids optional-ids optional-values presence-ids)
                 (split-bindings #'(binding ...))
-         (with-syntax (((id ...) identifiers)
-                       ((optional-id ...) (reverse optional-identifiers))
-                       ((clause ...)
-                        (generate-clauses identifiers
-                                          optional-identifiers
-                                          optional-values)))
-           #'(let ((f (lambda (id ... optional-id ...) . body)))
-               (case-lambda
-                 clause ...))))))))
+         (let ((clauses (generate-clauses ids optional-ids optional-values presence-ids)))
+           (with-syntax (((id ...) ids)
+                         ((optional-id ...) (reverse optional-ids))
+                         ((presence-id ...) (remv #f presence-ids))
+                         ((clause ...) clauses))
+             #'(let ((f (lambda (id ... optional-id ... presence-id ...)
+                          . body)))
+                 (case-lambda
+                   clause ...)))))))))
 
 (define-syntax define*
   (syntax-rules ()

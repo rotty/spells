@@ -30,7 +30,7 @@
   ("misc.scm" (spells misc) (spells testing-utils) (rnrs lists))
   ("match.scm" (spells match))
   ;; these are temporarily disabled; need to port to trc-testing
-  #;("opt-args.scm" (spells opt-args))
+  "opt-args.scm"
   #;("table.scm" (spells table))
   ("delimited-readers.scm"
    (spells delimited-readers)

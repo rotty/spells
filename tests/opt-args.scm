@@ -1,6 +1,6 @@
 ;; opt-args.scm -- unit tests for named-args.scm
 
-;; Copyright (C) 2009 by Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 by Andreas Rottmann <a.rottmann@gmx.at>
 ;; Copyright (C) 2004, 2005 by Jose Antonio Ortega Ruiz <jao@gnu.org>
 
 ;; Start date: Thu Nov 04, 2004 22:02
@@ -15,6 +15,7 @@
 
 ;; define/named-args tests
 
+#|
 (define/named-args (named-plus (a 5) (b 1)) +)
 (define/named-args (greater-a? (af 5) (bf 1) (gt #f)) (set! gt (> af bf)) gt)
 (define/named-args (inc-val (val 0)) (+ 1 val))
@@ -61,4 +62,46 @@
  "opt-args - single form"
  (test/eqv "no args" (inc-val/opt) 1)
  (test/eqv "1 arg" (inc-val/opt 41) 42))
+|#
 
+(import (rnrs)
+        (wak trc-testing)
+        (spells opt-args))
+
+(define-test-suite optarg-tests
+  "Optional arguments")
+
+(define-test-suite (optarg-tests.lambda* optarg-tests)
+  "lambda*")
+
+(define-test-case optarg-tests.lambda* no-optargs ()
+  (test-equal '(1 2 3)
+    ((lambda* (a b c) (list a b c)) 1 2 3)))
+
+(define-test-case optarg-tests.lambda* optarg ()
+  (let ((proc (lambda* (a b (c 42) (d 'foo))
+                (list a b c d))))
+    (test-equal '(1 2 42 foo)
+      (proc 1 2))
+    (test-equal '(1 2 3 foo)
+      (proc 1 2 3))
+    (test-equal '(1 2 3 bar)
+      (proc 1 2 3 'bar))))
+
+(define-test-case optarg-tests.lambda* presence ()
+  (let ((proc (lambda* (a b (c 42) (d 'foo d-present?) (e 'baz))
+                (list a b c d d-present? e))))
+    (test-equal '(1 2 42 foo #f baz)
+      (proc 1 2))
+    (test-equal '(1 2 3 foo #f baz)
+      (proc 1 2 3))
+    (test-equal '(1 2 3 bar #t baz)
+      (proc 1 2 3 'bar))
+    (test-equal '(1 2 3 bar #t qux)
+      (proc 1 2 3 'bar 'qux))))
+
+(run-test-suite optarg-tests)
+
+;; Local Variables:
+;; scheme-indent-styles: (trc-testing)
+;; End:
