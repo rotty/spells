@@ -51,7 +51,9 @@
                         (if have-else?
                             #'()
                             #'((else
-                                (error 'cases "no matching clause for" value))))))
+                                (assertion-violation 'cases
+                                                     "no matching clause for value"
+                                                     value))))))
            #'(let ((value expr))
                (cond clause ... . else-clause-maybe))))))))
 
