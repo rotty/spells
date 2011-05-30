@@ -36,14 +36,12 @@
   (lambda (stx)
     (define (split-bindings bindings)
       (let loop ((bindings bindings)
-                 (optionals? #f)
                  (identifiers '())
                  (optional-identifiers '())
                  (optional-values '())
                  (presence-identifiers '()))
         (define (found-optional optional value presence)
           (loop (cdr bindings)
-                #t
                 identifiers
                 (cons optional optional-identifiers)
                 (cons value optional-values)
@@ -59,9 +57,8 @@
               ((optional value)
                (found-optional #'optional #'value #f))
               (id
-               (and (identifier? #'id) (not optionals?))
+               (and (identifier? #'id) (null? optional-identifiers))
                (loop (cdr bindings)
-                     #f
                      (cons #'id identifiers)
                      optional-identifiers
                      optional-values
