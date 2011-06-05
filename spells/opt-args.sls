@@ -20,10 +20,8 @@
           
           define/named-args
           define/optional-args
-          let-optionals
           let-optionals*
-          :optional
-          opt-lambda)
+          :optional)
   (import (rnrs)
           (for (srfi :8 receive) expand))
 
@@ -265,13 +263,6 @@
      (define/named-args (name? (arg? def?) ...)
        (lambda (arg? ...) form1? form2? rest? ...) "define/named-args"))))
 
-;;@stop
-
-(define-syntax let-optionals
-  (syntax-rules ()
-    ((let-optionals arg ...)
-     (let-optionals* arg ...))))
-
 ;;@ Macro that allows for simple definition of functions with
 ;; optional arguments.
 ;;
@@ -300,95 +291,5 @@
     ((_ name body)                    ; just the definition for 'name',
      (define name body))              ; for compatibilibility with define
     ))
-
-; Copyright (c) 1993-2005 by Richard Kelsey and Jonathan Rees. See file COPYING.
-
-; Library functionality for writing procedures with variable number of arguments.
-
-; This has the same interface as the OPT-LAMBDA in PLT Scheme's etc.ss
-; library.
-
-;;@args clause...
-;;
-;; Macro that creates a procedure with default arguments. Each clause
-;; can either be an identifier, which names a variable like in regular
-;; @code{lambda}. It can also be of the form @code{(name value)},
-;; which creates an optional argument @code{name} with the default
-;; value @code{value}.
-(define-syntax opt-lambda
-  (syntax-rules ()
-    ((opt-lambda (?clause1 . ?clauses) ?body1 ?body ...)
-     (opt-lambda-aux-1 (?clause1 . ?clauses) () ?body1 ?body ...))
-    ((opt-lambda ?id ?body1 ?body ...)
-     (lambda ?id ?body1 ?body ...))))
-
-; process the initial vanilla parameters
-(define-syntax opt-lambda-aux-1
-  (syntax-rules ()
-    ((opt-lambda-aux-1 () (?arg ...) ?body ...)
-     (lambda (?arg ...) ?body ...))
-    ((opt-lambda-aux-1 ((?id ?default) . ?rest) (?arg ...) ?body ...)
-     (opt-lambda-aux-2 ((?id ?default) . ?rest)
-		       (?arg ... . rest) rest ()
-		       ?body ...))
-    ((opt-lambda-aux-1 (?id . ?rest) (?arg ...) ?body ...)
-     (opt-lambda-aux-1 ?rest (?arg ... ?id) ?body ...))))
-
-; this processes from the optionals on
-(define-syntax opt-lambda-aux-2
-  (syntax-rules ()
-     ((opt-lambda-aux-2 () ?args ?rest-param (?lclause ...) ?body ...)
-     (lambda ?args
-       (let* (?lclause ...)
-	 ?body ...)))
-    ;; optimization
-    ((opt-lambda-aux-2 ((?id ?default))
-		       ?args ?rest-param (?lclause ...) ?body ...)
-     (lambda ?args
-       (let* (?lclause
-	      ...
-	      (?id (if (pair? ?rest-param)
-		       (car ?rest-param)
-		       ?default)))
-	 ?body ...)))
-    ((opt-lambda-aux-2 ((?id ?default) ?rest ...)
-		       ?args ?rest-param (?lclause ...) ?body ...)
-     (opt-lambda-aux-2 (?rest ...)
-		       ?args
-		       new-rest
-		       (?lclause ...
-				 (?id (if (pair? ?rest-param)
-					  (car ?rest-param)
-					  ?default))
-				 (new-rest (if (pair? ?rest-param)
-					       (cdr ?rest-param)
-					       '())))
-		       ?body ...))
-    ;; kludge for dealing with rest parameter
-    ((opt-lambda-aux-2 ((?id ?default) . (?rest1 . ?rest))
-		       ?args ?rest-param (?lclause ...) ?body ...)
-     (opt-lambda-aux-2 (?rest1 . ?rest)
-		       ?args
-		       new-rest
-		       (?lclause ...
-				 (?id (if (pair? ?rest-param)
-					  (car ?rest-param)
-					  ?default))
-				 (new-rest (if (pair? ?rest-param)
-					       (cdr ?rest-param)
-					       '())))
-		       ?body ...))
-    ((opt-lambda-aux-2 ((?id ?default) . ?rest)
-		       ?args ?rest-param (?lclause ...) ?body ...)
-     (lambda ?args
-       (let* (?lclause
-	      ...
-	      (?id (if (pair? ?rest-param)
-		       (car ?rest-param)
-		       ?default))
-	      (?rest (if (pair? ?rest-param)
-			 (cdr ?rest-param)
-			 '())))
-	 ?body ...)))))
 
 )
