@@ -125,7 +125,7 @@
   (%make-log-handler proc threshold filters)
   ())
 
-(define/optional-args (make-log-handler proc (optional (threshold #f) (filters '())))
+(define* (make-log-handler proc (threshold #f) (filters '()))
   (%make-log-handler proc (numeric-level threshold) filters))
 
 ;;@ Log entry object.
@@ -326,10 +326,9 @@
 ;; without threshold and filters, using @ref{default-log-formatter} to
 ;; format the log entry.
 ;;
-(define/optional-args
-  (set-logger-properties! logger
-                          (optional (properties (default-logger-properties))
-                                    (procedures '())))
+(define* (set-logger-properties! logger
+                                 (properties (default-logger-properties))
+                                 (procedures '()))
   
   ((logger-properties logger) (alist->logger-prop properties procedures)))
 

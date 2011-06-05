@@ -1,6 +1,6 @@
 ;;; time-lib.sls --- Time library.
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -28,7 +28,7 @@
 
   (define *posix-epoch* (date->time-utc (make-date 0 0 0 0 1 1 1970 0)))
 
-  (define/optional-args (posix-timestamp->time-utc timestamp (optional (nanoseconds 0)))
+  (define* (posix-timestamp->time-utc timestamp (nanoseconds 0))
     (add-duration *posix-epoch* (make-time time-duration nanoseconds timestamp)))
 
   (define (time-utc->posix-timestamp time-utc)
