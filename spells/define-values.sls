@@ -30,9 +30,11 @@
   ;;@end defspec
   (define-syntax define-values
     (lambda (form)
+      ;; The temporaries generated for `dummy' are just a workaround
+      ;; for a psyntax bug in Guile.
       (syntax-case form ()
         ((_ () exp ...)
-         (with-syntax (((dummy) (generate-temporaries (list 'dummy))))
+         (with-syntax (((dummy) (generate-temporaries '(dummy))))
            (syntax
             (define dummy (begin exp ... 'dummy)))))
 	((_ (id ...) exp0 exp ...)
@@ -41,7 +43,8 @@
 	 ;; variables cannot be exported).  This fix is due to Andre
 	 ;; van Tonder.
 	 (with-syntax (((mutable-id ...) (generate-temporaries (syntax (id ...))))
-		       ((result ...)     (generate-temporaries (syntax (id ...)))))
+		       ((result ...)     (generate-temporaries (syntax (id ...))))
+                       ((dummy)          (generate-temporaries '(dummy))))
 	   (syntax
 	    (begin
 	      (define mutable-id) ...

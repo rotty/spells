@@ -17,6 +17,7 @@
 
 ((systems spells)
  (files
+  "define-values.scm"
   "record-types.scm"
   "finite-types.scm"
   ("algebraic-types.scm"
