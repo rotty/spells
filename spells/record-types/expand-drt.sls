@@ -1,6 +1,6 @@
 ;;; expand-drt.sls --- Macro expanders for `define-record-type*'
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; R6RS syntax-case port of Taylor Campbell's Public
 ;; Domain `define-record-type*' macro expander:
@@ -41,10 +41,10 @@
              (receive (needs-conser-layer? arg-tags vars inits)
                       (compute-vars+inits #'(conser-args ...)
                                           #'(other-fields ...))
-               (with-syntax ((real-conser
+               (with-syntax (((real-conser)
                               (if needs-conser-layer?
-                                  (identifier-append #'k '% #'conser-name)
-                                  #'conser-name)))
+                                  (generate-temporaries '(real-conser))
+                                  #'(conser-name))))
                  #`(begin
                      (define-record-type type-name
                        (real-conser #,@arg-tags)
