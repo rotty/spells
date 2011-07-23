@@ -12,7 +12,20 @@
 (package (spells (0))
 
   (depends
-   (srfi)
+   (srfi-1)
+   (srfi-2)
+   (srfi-8)
+   (srfi-9)
+   (srfi-13)
+   (srfi-14)
+   (srfi-19)
+   (srfi-26)
+   (srfi-27)
+   (srfi-38)
+   (srfi-39)
+   (srfi-43)
+   (srfi-67)
+   (srfi-98)
    (wak-irregex)
    (wak-foof-loop)
    (wak-fmt)
@@ -48,7 +61,8 @@
 (package (spells-foreign (0))
   
   (depends
-   (srfi)
+   (srfi-1)
+   (srfi-8)
    (spells)
    (wak-foof-loop)
    (conjure))
