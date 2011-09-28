@@ -1,6 +1,6 @@
 ;;; filesys.scm --- Unit tests for the filesystem interface
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009-2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -150,9 +150,14 @@
     (test-eqv #t (file-symbolic-link? (test-file "bar")))
 
     (test-eq exception-cookie
-      (guard (c ((i/o-file-already-exists-error? c)
-                 exception-cookie))
-        (create-symbolic-link "foo" (test-file "bar"))))))
+      (guard (c ((and (i/o-file-already-exists-error? c)
+                      (pathname=? (->pathname (i/o-error-filename c))
+                                  (test-file "bar")))
+                 exception-cookie)
+                (else
+                 'bad-exception))
+        (create-symbolic-link "foo" (test-file "bar"))
+        'no-exception))))
 
 (define-test-case filesys-tests create-hard-link
   ((setup
@@ -163,18 +168,26 @@
 
   (let ((exception-cookie (list 'cookie)))
     (test-eq exception-cookie
-      (guard (c ((i/o-file-does-not-exist-error? c)
-                 exception-cookie))
-        (create-hard-link (test-file "foo") (test-file "bar"))))
+      (guard (c ((and (i/o-file-does-not-exist-error? c)
+                      (pathname=? (->pathname (i/o-error-filename c))
+                                  (test-file "foo")))
+                 exception-cookie)
+                (else 'bad-exception))
+        (create-hard-link (test-file "foo") (test-file "bar"))
+        'no-exception))
     
     (create-test-file "foo")
     (create-hard-link (test-file "foo") (test-file "bar"))
     (test-eqv #t (file-regular? (test-file "bar")))
 
     (test-eq exception-cookie
-      (guard (c ((i/o-file-already-exists-error? c)
-                 exception-cookie))
-        (create-hard-link (test-file "foo") (test-file "bar"))))))
+      (guard (c ((and (i/o-file-already-exists-error? c)
+                      (pathname=? (->pathname (i/o-error-filename c))
+                                  (test-file "bar")))
+                 exception-cookie)
+                (else 'bad-exception))
+        (create-hard-link (test-file "foo") (test-file "bar"))
+        'no-exception))))
 
 (define-test-case filesys-tests create-directory* 
   ((description "create-directory*")

@@ -1,6 +1,6 @@
 ;;; compat.guile.sls --- filesys compat library for Guile.
 
-;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -61,19 +61,22 @@
           (cons guile:EEXIST make-i/o-file-already-exists-error)
           (cons guile:EACCES make-i/o-file-protection-error)))
   
-  (define (with-exception-converter filename thunk)
+  (define (with-exception-converter filename-chooser thunk)
     (guile:catch 'system-error
       thunk
       (lambda (key func fmt fmtargs data)
-        (define (construct-condition constructor)
-          (apply condition
-                 (append (list (constructor filename))
-                         (if func
-                             (list (make-who-condition func))
-                             '())
-                         (list (make-message-condition
-                                (apply guile:simple-format #f fmt fmtargs))))))
         (let ((errno (car data)))
+          (define (construct-condition constructor)
+            (apply condition
+                   (append (list
+                            (constructor (if (procedure? filename-chooser)
+                                             (filename-chooser errno)
+                                             filename-chooser)))
+                           (if func
+                               (list (make-who-condition func))
+                               '())
+                           (list (make-message-condition
+                                  (apply guile:simple-format #f fmt fmtargs))))))
           (cond ((assv errno i/o-error-constructors)
                  => (lambda (pair)
                       (raise (construct-condition (cdr pair)))))
