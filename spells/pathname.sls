@@ -520,7 +520,8 @@
                (let ((types-cmp (strlist-compare (file-types x)
                                                  (file-types y))))
                  (if (= 0 types-cmp)
-                     (version-compare (file-version x) (file-version y))))
+                     (version-compare (file-version x) (file-version y))
+                     types-cmp))
                name-cmp)))))
 
 ;;@ Compare the pathnames @1 and @2, without considering the
