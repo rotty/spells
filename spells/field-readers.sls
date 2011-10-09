@@ -1,3 +1,4 @@
+#!r6rs
 ;;; field-readers.sls --- Field and record parsing utilities from scsh
 
 ;; Copyright (C) 1994, 2010 by Olin Shivers. See file AUTHORS.
@@ -10,10 +11,10 @@
 
 ;;; Commentary:
 
-;; Slightly adapted to use Alex Shinn's irregex package.
+;; Slightly adapted to use Alex Shinn's irregex package and spells'
+;; optional argument handling.
 
 ;;; Code:
-#!r6rs
 
 (library (spells field-readers)
   (export field-splitter infix-splitter suffix-splitter sloppy-suffix-splitter
@@ -116,9 +117,9 @@
 (define (make-field-parser-generator default-delim-matcher loop-proc)
   ;; This is the parser-generator
   (lambda args
-    (let-optionals args ((delim-spec default-delim-matcher)
-			 (num-fields #f)
-			 (handle-delim 'trim))
+    (let-optionals* args ((delim-spec default-delim-matcher)
+                          (num-fields #f)
+                          (handle-delim 'trim))
       ;; Process and error-check the args
       (let ((match-delim (->delim-matcher delim-spec))
 	    (cons-field (case handle-delim	 	; Field     is s[i,j).
@@ -155,24 +156,21 @@
 
 ;;; (field-splitter [field-spec num-fields])
 
-(define (field-splitter . args)
-  (let-optionals args ((field-spec default-field-matcher)
-		       (num-fields #f))
+(define* (field-splitter (field-spec default-field-matcher) (num-fields #f))
+  ;; Process and error-check the args
+  (let ((match-field (->delim-matcher field-spec)))
+    (receive (num-fields nfields-exact?)
+             (cond ((not num-fields) (values #f #f))
+                   ((not (integer? num-fields))
+                    (error "Illegal NUM-FIELDS value"
+                           field-splitter num-fields))
+                   ((<= num-fields 0) (values (- num-fields) #f))
+                   (else (values num-fields #t)))
 
-    ;; Process and error-check the args
-    (let ((match-field (->delim-matcher field-spec)))
-      (receive (num-fields nfields-exact?)
-	       (cond ((not num-fields) (values #f #f))
-		     ((not (integer? num-fields))
-		      (error "Illegal NUM-FIELDS value"
-			     field-splitter num-fields))
-		     ((<= num-fields 0) (values (- num-fields) #f))
-		     (else (values num-fields #t)))
-
-	;; This is the parser procedure.
-	(lambda (s . maybe-start)
-	  (reverse (fieldspec-field-loop s (:optional maybe-start 0)
-					 match-field num-fields nfields-exact?)))))))
+      ;; This is the parser procedure.
+      (lambda (s . maybe-start)
+        (reverse (fieldspec-field-loop s (:optional maybe-start 0)
+                                       match-field num-fields nfields-exact?))))))
 
 
 ;;; These four procedures implement the guts of each parser
@@ -330,48 +328,46 @@
 ;;; (record-reader [delims elide? handle-delim]) -> reader
 ;;; (reader [port]) -> string or eof
 
-(define (record-reader . args)
-  (let-optionals args ((delims default-record-delims)
-		      (elide? #f)
-		      (handle-delim 'trim))
-    (let ((delims (->char-set delims)))
+(define* (record-reader (delims default-record-delims)
+                        (elide? #f)
+                        (handle-delim 'trim))
+  (let ((delims (->char-set delims)))
+    (case handle-delim
+      ((trim)                           ; TRIM-delimiter reader.
+       (lambda maybe-port
+         (let ((s (apply read-delimited delims maybe-port)))
+           (if (and (not (eof-object? s)) elide?)
+               (apply skip-char-set delims maybe-port)) ; Snarf extra delims.
+           s)))
 
-      (case handle-delim
-	((trim)			; TRIM-delimiter reader.
-	 (lambda maybe-port
-	   (let ((s (apply read-delimited delims maybe-port)))
-	     (if (and (not (eof-object? s)) elide?)
-		 (apply skip-char-set delims maybe-port)) ; Snarf extra delims.
-	     s)))
+      ((concat)                         ; CONCAT-delimiter reader.
+       (let ((not-delims (char-set-complement delims)))
+         (lambda maybe-port
+           (let* ((p (:optional maybe-port (current-input-port)))
+                  (s (read-delimited delims p 'concat)))
+             (if (or (not elide?) (eof-object? s)) s
+                 (let ((extra-delims (read-delimited not-delims p 'peek)))
+                   (if (eof-object? extra-delims) s
+                       (string-append s extra-delims))))))))
 
-	((concat)		; CONCAT-delimiter reader.
-	 (let ((not-delims (char-set-complement delims)))
-	   (lambda maybe-port
-	     (let* ((p (:optional maybe-port (current-input-port)))
-		    (s (read-delimited delims p 'concat)))
-	       (if (or (not elide?) (eof-object? s)) s
-		   (let ((extra-delims (read-delimited not-delims p 'peek)))
-		     (if (eof-object? extra-delims) s
-			 (string-append s extra-delims))))))))
+      ((split)                          ; SPLIT-delimiter reader.
+       (let ((not-delims (char-set-complement delims)))
+         (lambda maybe-port
+           (let ((p (:optional maybe-port (current-input-port))))
+             (receive (s delim) (read-delimited delims p 'split)
+               (if (eof-object? s) (values s s)
+                   (values s
+                           (if (or (not elide?) (eof-object? delim))
+                               delim
+                               ;; Elide: slurp in extra delims.
+                               (let ((delim (string delim))
+                                     (extras (read-delimited not-delims
+                                                             p 'peek)))
+                                 (if (eof-object? extras) delim
+                                     (string-append delim extras)))))))))))
 
-	((split)		; SPLIT-delimiter reader.
-	 (let ((not-delims (char-set-complement delims)))
-	   (lambda maybe-port
-	     (let ((p (:optional maybe-port (current-input-port))))
-	       (receive (s delim) (read-delimited delims p 'split)
-		 (if (eof-object? s) (values s s)
-		     (values s
-			     (if (or (not elide?) (eof-object? delim))
-				 delim
-				 ;; Elide: slurp in extra delims.
-				 (let ((delim (string delim))
-				       (extras (read-delimited not-delims
-							       p 'peek)))
-				   (if (eof-object? extras) delim
-				       (string-append delim extras)))))))))))
-
-	(else
-	 (error "Illegal delimiter-action" handle-delim))))))
+      (else
+       (error "Illegal delimiter-action" handle-delim)))))
 
 
 ;;; Reading and parsing records
@@ -385,8 +381,8 @@
 (define default-field-parser (field-splitter))
 
 (define (field-reader . args)
-  (let-optionals args ((parser    default-field-parser)
-		       (rec-reader read-line))
+  (let-optionals* args ((parser    default-field-parser)
+                        (rec-reader read-line))
     (lambda maybe-port
       (let ((record (apply rec-reader maybe-port)))
 	(if (eof-object? record)
