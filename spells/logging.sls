@@ -37,15 +37,15 @@
           (rnrs control)
           (rnrs mutable-pairs)
           (rnrs io simple)
+          (only (rnrs io ports) flush-output-port)
           (except (srfi :1 lists) map for-each)
           (srfi :19 time)
           (srfi :39 parameters)
           (spells alist)
           (spells match)
           (spells opt-args)
-          (spells record-types)
-          (spells include))
-  
+          (spells record-types))
+
 ;;@extractors (import (spells private stexidoc)) spells-extractors
 
 ;; @subheading Introduction
@@ -204,7 +204,8 @@
         (obj port)
         (display obj port)))
   (display #\) port)
-  (newline port))
+  (newline port)
+  (flush-output-port port))
 
 ;;; Global state
 
