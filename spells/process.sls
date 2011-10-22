@@ -173,10 +173,11 @@
                          (standard-error-port)
                          prog+args))
          (port (transcoded-port (process-input process) (native-transcoder))))
-    (receiver port)
-    (close-port port)
-    (close-process-ports process)
-    (wait-for-process process)))
+    (receive results (receiver port)
+      (close-port port)
+      (close-process-ports process)
+      (receive status+signal (wait-for-process process)
+        (apply values (append status+signal results))))))
 
 ;;@ Run @2, which must be a list of the executable name and any
 ;; arguments with the environment @1.
