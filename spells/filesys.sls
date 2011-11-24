@@ -73,7 +73,10 @@
           (only (srfi :1 lists) fold)
           (srfi :8 receive)
           (srfi :19 time)
-          (only (srfi :13) string-contains string-unfold)
+          (only (srfi :13)
+                string-concatenate
+                string-contains
+                string-unfold)
           (srfi :27)
           (srfi :98 os-environment-variables)
           (only (spells process) get-process-id)
@@ -601,15 +604,18 @@
     (let* ((template (->pathname template))
            (file (pathname-file template))
            (types (if file (file-types file) '()))
-           (fname (if file (file-name file) "")))
+           (fname (and file (file-name file))))
       (pathname-with-file
        template
        (make-file (string-substitute
-                   (if (exists (lambda (variable)
-                                 (string-contains fname variable))
-                               '("{count}" "{random}"))
+                   (if (and fname
+                            (exists (lambda (variable)
+                                      (string-contains fname variable))
+                                    '("{count}" "{random}")))
                        fname
-                       (string-append fname "-{pid}-{random}.tmp"))
+                       (string-concatenate (append
+                                            (if fname (list fname "-") '())
+                                            '("{pid}-{random}.tmp"))))
                    `((count . ,count)
                      (random . ,(create-random-string 6))
                      (pid . ,(get-process-id))))
