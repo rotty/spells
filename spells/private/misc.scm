@@ -1,6 +1,6 @@
 ;; misc.scm -- Utilities that don't fit elsewhere
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -58,8 +58,8 @@
 ;; `topological-sort' based on code written by Peter Danenberg,
 ;; (re-)licensed with his permission to new-style BSD.
 
-;;@ Topologically sort @1, according to the equality function @2,
-;;  which defaults to @code{eqv?}.
+;;@ Topologically sort @var{graph}, according to the equality function
+;; @var{maybe-eql}, which defaults to @code{eqv?}.
 (define (topological-sort graph . maybe-eql)
   (let* ((eql? (if (pair? maybe-eql) (car maybe-eql) eqv?))
          (make-table (cond ((eq? eql? eq?)
@@ -72,42 +72,30 @@
                            (else
                             (lambda ()
                               (make-hashtable equal-hash eql?))))))
-    (let ((discovered (make-table))
-          (finalized (make-table))
-          (predecessors (make-table))
-          (vertices (map car graph))
-          (sorted '()))
+    (let ((vertices (make-table))
+          (discovered (make-table)))
       (define (discovered? vertex)
         (hashtable-ref discovered vertex #f))
-      (define (visit-if-undiscovered vertex)
-        (if (not (discovered? vertex))
-            (visit vertex)))
-      (define (set-predecessor! child parent)
-        (hashtable-set! predecessors child parent))
       (define (set-discovered! vertex)
         (hashtable-set! discovered vertex #t))
-      (define (set-finalized! vertex)
-        (hashtable-set! finalized vertex #t))
-      (define (undiscovered-children parent)
-        (filter (lambda (n)
-                  (not (discovered? n)))
-                (children parent)))
-      (define (children parent)
-        (let ((parent-children (assoc parent graph)))
-          (if parent-children
-              (cdr parent-children)
-              '())))
-      (define (visit parent)
+      (define (visit parent sorted)
         (set-discovered! parent)
-        (let ((children (children parent)))
-          (for-each (lambda (child)
-                      (if (not (discovered? child))
-                          (begin (set-predecessor! child parent)
-                                 (visit child))))
-                    children))
-        (set! sorted (cons parent sorted))
-        (set-finalized! parent))
-      (for-each visit-if-undiscovered vertices)
-      sorted)))
+        (cons parent
+              (fold-left (lambda (sorted child)
+                           (if (discovered? child)
+                               sorted
+                               (visit child sorted)))
+                         sorted
+                         (hashtable-ref vertices parent '()))))
+      (for-each (lambda (entry)
+                  (hashtable-set! vertices (car entry) (cdr entry)))
+                graph)
+      (fold-left (lambda (sorted entry)
+                   (let ((vertex (car entry)))
+                     (if (discovered? vertex)
+                         sorted
+                         (visit vertex sorted))))
+                 '()
+                 graph))))
 
 ;;; misc.scm ends here
