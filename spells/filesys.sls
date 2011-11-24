@@ -625,10 +625,8 @@
   (let ((cache #f))
     (lambda ()
       (unless cache
-        (set! cache (cond ((get-environment-variable "TMPDIR")
-                           => pathname-as-directory)
-                          (else
-                           (->pathname "/var/tmp/{pid}-{random}.tmp")))))
+        (set! cache (pathname-as-directory
+                     (or (get-environment-variable "TMPDIR") "/var/tmp/"))))
       cache)))
 
 (define (create-random-string len)
