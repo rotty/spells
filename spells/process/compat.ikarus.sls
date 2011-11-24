@@ -1,6 +1,6 @@
 ;;; compat.ikarus.sls --- OS processes, Ikarus compat.
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -40,7 +40,6 @@
                   ik:)
           (srfi :8 receive)
           (srfi :9 records)
-          (spells tracing)
           (spells ports)
           (spells pathname))
 

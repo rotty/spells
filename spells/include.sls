@@ -20,7 +20,6 @@
   (export include-file
           include-file/downcase)
   (import (rnrs)
-          (for (spells tracing) expand)
           (for (only (spells include compat)
                      annotation?
                      annotation-expression) expand)

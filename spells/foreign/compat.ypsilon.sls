@@ -34,7 +34,6 @@
           (srfi :2 and-let*)
           (spells foreign util)
           (spells alist)
-          (spells tracing)
           (core)
           (ypsilon ffi))
 

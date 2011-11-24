@@ -1,6 +1,6 @@
 ;;; frozen-bytes.sls --- 
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -23,7 +23,6 @@
           (rnrs control)
           (rnrs bytevectors)
           (rnrs records syntactic)
-          (spells tracing)
           (spells foreign compat))
 
 

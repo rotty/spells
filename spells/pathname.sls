@@ -78,7 +78,6 @@
           (spells opt-args)
           (spells operations)
           (spells match)
-          (spells tracing)
           (spells string-utils)
           (spells pathname os-string))
 

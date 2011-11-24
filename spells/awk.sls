@@ -24,7 +24,6 @@
   (import (rnrs)
           (only (srfi :1) append-map)
           (srfi :8 receive)
-          (spells tracing)
           (for (spells awk helpers) run expand))
 
 ;;@defspec awk next-record (record field ...) state-vars . clauses

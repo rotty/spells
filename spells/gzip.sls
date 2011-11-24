@@ -22,9 +22,9 @@
 
           open-gz-file-input-port)
   (import (rnrs)
+          (rnrs io simple)
           (only (srfi :43) vector-binary-search)
           (only (spells misc) and=>)
-          (spells tracing) (rnrs io simple)
           (spells pathname)
           (spells finite-types)
           (spells foreign))

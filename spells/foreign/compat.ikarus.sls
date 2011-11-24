@@ -39,7 +39,6 @@
           (srfi :2 and-let*)
           (spells alist)
           (spells foreign util)
-          (spells tracing)
           (ikarus foreign))
 
   (define null-pointer

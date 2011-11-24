@@ -18,7 +18,6 @@
 (library (spells include helpers)
   (export include-file/aux)
   (import (rnrs)
-          (spells tracing)
           (only (spells time-lib) time-utc->posix-timestamp)
           (only (spells filesys)
                 find-file
