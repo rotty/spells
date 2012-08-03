@@ -1,6 +1,7 @@
 ;;; logging.sls --- Logging library.
 
 ;; Copyright (C) 2009, 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2012 Ian Price <ianprice90@googlemail.com>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -212,8 +213,8 @@
 (define root-logger (%make-logger #f '() (make-default-properties)))
 
 (define (default-logger-properties)
-  `((handlers (lambda (entry)
-                (default-log-formatter entry (current-output-port))))))
+  `((handlers ,(lambda (entry)
+                 (default-log-formatter entry (current-output-port))))))
 
 (define *builtin-levels* '((trace    .  5000)
                            (debug    . 10000)
