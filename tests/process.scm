@@ -1,6 +1,6 @@
 ;; process.scm -- unit tests for process.scm
 
-;; Copyright (C) 2005-2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2005-2010, 2012 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann
 ;; Start date: Fri May 20, 2005 23:22
@@ -18,13 +18,21 @@
 (import (rnrs base)
         (rnrs io ports)
         (rnrs io simple)
+        (rnrs sorting)
         (srfi :8 receive)
         (only (srfi :13 strings) string-join)
+        (spells string-utils)
         (spells process)
+        (spells sysutils)
         (wak trc-testing))
 
 (define (lines . strings)
   (list 0 #f (string-join strings (string #\newline) 'suffix)))
+
+(define (sort-environment env)
+  (list-sort (lambda (entry1 entry2)
+               (string<? (car entry1) (car entry2)))
+             env))
 
 (define-test-suite process-tests
   "Process interface")
@@ -51,6 +59,24 @@
   (test-equal (list 0 #f '((hello world)))
     (receive results (run-process/sexps #f "/bin/echo" "(hello world)")
       results)))
+
+(define-test-case process-tests.run-process env ()
+  (test-equal (list 0 #f '("HELLO=WORLD"))
+    (receive results (run-process/lines '(("HELLO" . "WORLD")) "/usr/bin/env")
+      results)))
+
+(define-test-case process-tests.run-process env/extend ()
+  (let ((env (extend-process-environment '(("HELLO" . "WORLD")))))
+    (test-equal (list 0 #f (sort-environment env))
+      (receive (status signal lines)
+               (run-process/lines env "/usr/bin/env")
+        (list status
+              signal
+              (sort-environment
+               (map (lambda (line)
+                      (let ((parts (string-split line #\= 2)))
+                        (cons (car parts) (cadr parts))))
+                    lines)))))))
 
 (define-test-suite (process-tests.call-with-process-output process-tests)
   "call-with-process-output")

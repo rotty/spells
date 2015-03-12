@@ -1,7 +1,7 @@
 #!r6rs
 ;;; compat.mzscheme.sls --- OS process, mzscheme compat.
 
-;; Copyright (C) 2009, 2010, 2012 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010, 2012, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -31,12 +31,17 @@
   (import (rnrs base)
           (rnrs io ports)
           (only (scheme base)
-                subprocess subprocess-wait subprocess-status)
+                subprocess subprocess-wait subprocess-status
+                current-environment-variables
+                make-environment-variables
+                parameterize
+                string->bytes/utf-8)
           (only (scheme system)
                 system/exit-code)
           (only (mzlib os) getpid)
           (only (r6rs private ports)
                 r6rs-port->port)
+          (only (srfi :1) append-map)
           (srfi :8 receive)
           (srfi :9 records)
           (spells pathname))
@@ -59,14 +64,25 @@
 
   (define (maybe-port->mz-port port)
     (and port (r6rs-port->port port)))
+
+  (define (env->environment-variables env)
+    (if env
+        (apply make-environment-variables
+               (append-map (lambda (entry)
+                             (list (string->bytes/utf-8 (car entry))
+                                   (string->bytes/utf-8 (cdr entry))))
+                           env))
+        (current-environment-variables)))
   
   (define (spawn-process env stdin stdout stderr prog . args)
     (receive (process stdout-port stdin-port stderr-port)
-             (apply subprocess
-                    (maybe-port->mz-port stdout)
-                    (maybe-port->mz-port stdin)
-                    (maybe-port->mz-port stderr)
-                    (x->strlist (cons prog args)))
+             (parameterize ((current-environment-variables
+                             (env->environment-variables env)))
+               (apply subprocess
+                      (maybe-port->mz-port stdout)
+                      (maybe-port->mz-port stdin)
+                      (maybe-port->mz-port stderr)
+                      (x->strlist (cons prog args))))
       (make-process process stdin-port stdout-port stderr-port)))
 
   (define (status->values status)
