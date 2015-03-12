@@ -1,6 +1,6 @@
 ;;; compat.guile.sls --- GC-interacting procedures for Guile
 
-;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -28,14 +28,14 @@
     ;; Guile seems to have issues with `weak-vector', so we do it this
     ;; way
     (let ((result (make-weak-vector 1)))
-      (vector-set! result 0 obj)
+      (weak-vector-set! result 0 obj)
       result))
 
   (define (weak-cell? thing)
     (weak-vector? thing))
 
   (define (weak-cell-ref weak-cell)
-    (vector-ref weak-cell 0))
+    (weak-vector-ref weak-cell 0))
 
   (define (make-reaper proc)
     (let ((guardian (make-guardian)))
