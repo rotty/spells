@@ -1,6 +1,7 @@
+#!r6rs
 ;;; args-fold.sls --- Slightly extended variant of SRFI 37
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Copyright (c) 2002 Anthony Carrico
 
 ;; This program is free software, you can redistribute it and/or
@@ -38,7 +39,6 @@
 ;; 
 
 ;;; Code:
-#!r6rs
 
 (library (spells args-fold)
   (export option

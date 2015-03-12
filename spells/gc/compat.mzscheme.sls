@@ -1,6 +1,7 @@
+#!r6rs
 ;;; compat.ikarus.sls --- GC-interacting procedures for PLT Scheme
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells gc compat)
   (export make-weak-cell weak-cell-ref weak-cell?

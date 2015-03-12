@@ -1,6 +1,7 @@
+#!r6rs
 ;;; engines.sls --- Nestable "engines"
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -16,7 +17,6 @@
 ;; from Continuations", by R. Kent Dybvig and Robert Hieb, 1988.
 
 ;;; Code:
-#!r6rs
 (library (spells engines)
   (export make-engine)
   (import (rnrs base)

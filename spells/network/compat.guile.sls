@@ -1,6 +1,7 @@
+#!r6rs
 ;;; network.guile.sls --- Network interface, Guile compatibility
 
-;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2011, 2013, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells network compat)
   (export connection?

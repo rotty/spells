@@ -1,6 +1,7 @@
+#!r6rs
 ;;; compat.ypsilon.sls --- FFI compat library for Ypsilon
 
-;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells foreign compat)
   (export make-pointer-c-getter make-pointer-c-setter

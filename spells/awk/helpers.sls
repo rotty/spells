@@ -1,6 +1,7 @@
+#!r6rs
 ;;; helpers.sls --- The guts of the AWK macro
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Copyright (c) 1994 by Olin Shivers
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
@@ -23,7 +24,6 @@
 ;; regular expressions are compiled out-of-loop, however.
 
 ;;; Code:
-#!r6rs
 
 (library (spells awk helpers)
   (export get-after-body

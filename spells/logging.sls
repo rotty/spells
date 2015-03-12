@@ -1,6 +1,7 @@
+#!r6rs
 ;;; logging.sls --- Logging library.
 
-;; Copyright (C) 2009, 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010, 2011, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 ;;@ This library provides procedures implementing a flexible logging
 ;; system, for example useful for error reporting and logging debug

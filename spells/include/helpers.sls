@@ -1,6 +1,7 @@
+#!r6rs
 ;;; helpers.sls --- Helper procedures for (spells include)
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells include helpers)
   (export include-file/aux)

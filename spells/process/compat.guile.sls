@@ -1,6 +1,7 @@
+#!r6rs
 ;;; compat.guile.sls --- process compat library for Guile
 
-;; Copyright (C) 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2011, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells process compat)
   (export process?

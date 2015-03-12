@@ -1,6 +1,7 @@
+#!r6rs
 ;;; run.sls --- Utilities for running testcases
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -11,7 +12,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 ;;@ Utilities for running testcases.
 (library (spells test-runner)

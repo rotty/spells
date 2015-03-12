@@ -1,6 +1,7 @@
+#!r6rs
 ;;; compat.mzscheme.sls --- Misc functions, mzscheme compatibility
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells misc compat)
   (export sleep-seconds exit scheme-implementation)

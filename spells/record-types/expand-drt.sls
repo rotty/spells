@@ -1,6 +1,7 @@
+#!r6rs
 ;;; expand-drt.sls --- Macro expanders for `define-record-type*'
 
-;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; R6RS syntax-case port of Taylor Campbell's Public
 ;; Domain `define-record-type*' macro expander:
@@ -15,7 +16,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells record-types expand-drt)
   (export expand-define-record-type*

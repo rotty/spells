@@ -1,4 +1,5 @@
-;; Copyright (C) 2008, 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+#!r6rs
+;; Copyright (C) 2008, 2009, 2010, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 ;; Copyright (C) 2005, 2007 Jose Antonio Ortega Ruiz <jao@gnu.org>
 
 ;; Authors: Andreas Rottmann <a.rottmann@gmx.at>
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells sysutils compat)
   (export find-exec-path

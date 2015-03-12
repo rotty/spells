@@ -1,6 +1,7 @@
+#!r6rs
 ;;; os-string.sls --- Operating-system string abstraction.
 
-;; Copyright (C) 2008-2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008-2009, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -17,7 +18,6 @@
 ;; differently, a dialect-specific implementation must be provided.
 
 ;;; Code:
-#!r6rs
 
 (library (spells pathname os-string)
   (export os-string?

@@ -1,12 +1,12 @@
+#!r6rs
 ;;; Code taken from Ikarus Scheme, and tweaked.
 ;;;
 ;;; Ikarus Scheme -- A compiler for R6RS Scheme.
-;;; Copyright (C) 2006,2007,2008  Abdulaziz Ghuloum
+;;; Copyright (C) 2006,2007,2008,2015  Abdulaziz Ghuloum
 ;;;
 ;;; This program is free software: you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License version 3 as
 ;;; published by the Free Software Foundation.
-#!r6rs
 
 (library (spells tracing compat)
   (export trace-lambda trace-define)

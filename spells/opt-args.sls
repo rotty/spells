@@ -1,6 +1,7 @@
+#!r6rs
 ;;; opt-args.sls --- Optional arguments
 
-;; Copyright (C) 2001-2011, several authors -- see below.
+;; Copyright (C) 2001-2011, 2015, several authors -- see below.
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -11,7 +12,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 ;;@ Optional and named arguments.
 (library (spells opt-args)

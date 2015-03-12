@@ -1,6 +1,7 @@
+#!r6rs
 ;;; cells.sls --- Implementation of the cells datatype in terms of records
 
-;; Copyright (C) 2009 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -15,7 +16,6 @@
 ;; Heavyweight (but portable) implementation of cells.
 
 ;;; Code:
-#!r6rs
 
 ;;@ Mutable cells.
 (library (spells cells)

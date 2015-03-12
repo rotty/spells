@@ -1,6 +1,7 @@
+#!r6rs
 ;;; condition.sls --- Extra condition types
 
-;; Copyright (C) 2008, 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2008, 2009, 2010, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 ;;@ Additional condition types.
 (library (spells condition)

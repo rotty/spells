@@ -1,6 +1,7 @@
+#!r6rs
 ;;; compat.guile.sls --- Misc functions, Guile compatibility
 
-;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2012 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells misc compat)
   (export sleep-seconds

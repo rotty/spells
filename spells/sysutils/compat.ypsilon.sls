@@ -1,6 +1,7 @@
+#!r6rs
 ;;; sysutils.ypsilon.sls --- Ypsilon sysutils
 
-;; Copyright (C) 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells sysutils compat)
   (export find-exec-path

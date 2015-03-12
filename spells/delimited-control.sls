@@ -1,6 +1,7 @@
+#!r6rs
 ;;; delimited-control.sls --- Delimited-control operators
 
-;; Copyright (C) 2009, 2011 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2011, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -17,7 +18,6 @@
 ;; - Use macrology to define all 4 operator pairs
 
 ;;; Code:
-#!r6rs
 
 ;;@ Delimited control operators.
 (library (spells delimited-control)

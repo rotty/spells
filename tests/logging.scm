@@ -1,6 +1,7 @@
+#!r6rs
 ;;; logging.scm --- Unit tests for (spells logging)
 
-;; Copyright (C) 2009, 2010 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2009, 2010, 2015 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (import (rnrs)
         (spells logging)

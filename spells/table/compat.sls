@@ -1,6 +1,7 @@
+#!r6rs
 ;; table.scm -- Hash tables
 
-;; Copyright (C) 2005, 2008, 2009, 2011 by Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2005, 2008, 2009, 2011, 2015 by Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; Author: Andreas Rottmann <a.rottmann@gmx.at>
 
@@ -13,7 +14,6 @@
 ;;; Commentary:
 
 ;;; Code:
-#!r6rs
 
 (library (spells table compat)
   (export make-table table? table-ref table-set! table-walk)
