@@ -87,7 +87,8 @@
     (rnrs:file-exists? (->fn pathname)))
 
   (define (create-directory pathname)
-    (guile:mkdir (->fn pathname)))
+    (let ((fn (->fn pathname)))
+      (with-exception-converter fn (lambda () (guile:mkdir fn)))))
 
   (define (create-symbolic-link old-pathname new-pathname)
     (let ((new-filename (->fn new-pathname)))
@@ -164,7 +165,8 @@
   (define directory-stream? guile:directory-stream?)
 
   (define (open-directory-stream pathname)
-    (guile:opendir (->fn pathname)))
+    (let ((fn (->fn pathname)))
+      (with-exception-converter fn (lambda () (guile:opendir fn)))))
   
   (define close-directory-stream guile:closedir)
 
