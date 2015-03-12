@@ -37,7 +37,7 @@
           (only (wak trc-testing)
                 test-verbosity with-test-verbosity
                 test-debug-errors? with-test-debug-errors?)
-          (spells test-runner environment))
+          (spells test-runner env))
 
   ;;@ Run specified tests.
   ;;
@@ -114,7 +114,7 @@
                             error string-copy string-for-each string->list)
                     (rnrs io simple)
                     (wak trc-testing)
-                    (spells test-runner environment))
+                    (spells test-runner env))
                   '())
               imports))))
 
