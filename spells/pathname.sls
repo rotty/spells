@@ -70,7 +70,10 @@
           (srfi :8 receive)
           (srfi :9 records)
           (except (srfi :13 strings)
-                  string-hash string-copy string->list string-for-each)
+                  string-hash
+                  string-copy
+                  string->list
+                  string-for-each)
           (srfi :14 char-sets)
           (srfi :39 parameters)
           (spells hash-utils)
