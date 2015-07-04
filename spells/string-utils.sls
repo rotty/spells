@@ -33,8 +33,8 @@
           (spells alist))
 
 
-  ;;@defun string-split string splitter
-  ;;@defunx string-split string splitter maxsplit
+  ;;@defun string-split string charset
+  ;;@defunx string-split string charset maxsplit
   ;;
   ;; Returns a list of words delimited by the characters in
   ;; @var{charset} in @var{string}. @var{charset} is a list of
