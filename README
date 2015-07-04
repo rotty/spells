@@ -2,9 +2,8 @@
 
 * Spells -- A Scheme portability library
 
-Spells stands for is a collection of R6RS libraries providing
-features beyond R6RS in a uniform way across supported
-implementations.
+Spells is a collection of R6RS libraries providing features beyond
+R6RS in a uniform way across supported implementations.
 
 * Documentation
 
