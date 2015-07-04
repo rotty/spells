@@ -1,4 +1,4 @@
-;; Copyright (C) 2010, 2011 Andreas Rottmann <a.rottmann@gmx.at>
+;; Copyright (C) 2010, 2011, 2012 Andreas Rottmann <a.rottmann@gmx.at>
 
 ;; This program is free software, you can redistribute it and/or
 ;; modify it under the terms of the new-style BSD license.
@@ -51,9 +51,12 @@
 
   (libraries
    (exclude ("spells" "foreign")
-            ("spells" "foreign.sls"))
-   ("spells" "private")
-   ("spells" . sls)))
+            ("spells" "foreign.sls")
+            ("spells" "gzip.sls")
+            ("spells" "private" "stexidoc.sls"))
+   ("spells" . sls))
+  (library-auxiliaries
+   ("spells" "private")))
 
 
 ;;; Foreign-function interface
